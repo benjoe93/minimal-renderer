@@ -1,0 +1,5 @@
+build/
+*.vcxproj
+*.sln
+*.obj
+*.exe
