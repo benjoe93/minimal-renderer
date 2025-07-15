@@ -117,11 +117,45 @@ int main() {
     // Print out the loaded OpenGL version (just to test it worked)
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << "\n";
 
+    // Load shaders
+    std::string vertSource = LoadShaderSource("../shaders/triangle.vert");
+    std::string fragSource = LoadShaderSource("../shaders/triangle.frag");
+
+    // Create shader program
+    GLuint shaderProgram = CreateShaderProgram(vertSource, fragSource);
+
+    // Create triagle vert data
+    float vertices[] = {
+        0.0f, 0.5f, 0.0f,       // Vert 1
+        -0.5f, -0.5f, 0.0f,     // Vert 2
+        0.5f, -0.5f, 0.0f       // Vert 3
+    };
+
+    // VBO setup
+    GLuint VBO;                                                                 // Buffer ID variable
+    glGenBuffers(1,&VBO);                                                       // Allocate a buffer on the GPU
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);                                         // Tells OpenGL this is the active vertex buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);  // Moves triangle data to GPU memory, use STATIC_DRAW as this triagle won't change
+
+    // VAO setup
+    GLuint VAO;                                                                 // Array ID variable
+    glGenVertexArrays(1, &VAO);                                                 // Allocate an array
+    glBindVertexArray(VAO);                                                     // Tells OpenGL this is the active array
+    glVertexAttribPointer(0, 3, GL_FLOAT , GL_FALSE, 3*sizeof(float), nullptr); // Tells OpenGL that attrib 0, has 3 float/vert, it's a float, not normalized, tightly packed in memory, start from the beginning
+    glEnableVertexAttribArray(0);                                               // Enables position atrribute in the shader
+
     // Main render loop
-    while (!glfwWindowShouldClose(Window)) {
-        // Clear the screen with chosen color
-        glClearColor(0.1f, 0.1f, 0.3f, 1.0f);
+    while (!glfwWindowShouldClose(Window))
+    {
+        // Clear the screen with chosen color - background color
+        glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        // Need to be set every frame as these are not persistant across frames
+        glUseProgram(shaderProgram);        // Tells OpenGL which shader to use
+        glBindVertexArray(VAO);             // Needs to re-bind the VAO
+
+        glDrawArrays(GL_TRIANGLES, 0, 3);   // Draw VAO
 
         glfwSwapBuffers(Window);
         glfwPollEvents();
