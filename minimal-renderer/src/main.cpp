@@ -18,9 +18,10 @@ const char* vertexShaderSource = "#version 330 core\n"
 "}\0";
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
+"uniform vec4 ourColor;\n"
 "void main()\n"
 "{\n"
-"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+"   FragColor = ourColor;\n"
 "}\n\0";
 
 
@@ -52,7 +53,6 @@ int main(void)
     }
 
     // build and compile our shader program
-    // ------------------------------------
     // vertex shader
     unsigned int vertShader = glCreateShader(GL_VERTEX_SHADER);
     glShaderSource(vertShader, 1, &vertexShaderSource, nullptr);
@@ -110,28 +110,23 @@ int main(void)
     glGenVertexArrays(1, &VAO); // vertex array object
     glGenBuffers(1, &VBO);      // vertex buffer object
     glGenBuffers(1, &EBO);      // element buffer object
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
 
-    // bind and provide data to vbo
+    glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    // bind and provide data to ebo
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    // linking vertex attribs
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
 
+    // Get maximum number of vertex attributes
+    int nrAttr;
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttr);
+    std::cout << "Maximum number of vertex attributes supported: " << nrAttr << std::endl;
 
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -140,6 +135,12 @@ int main(void)
     {
         // input
         processInput(window);
+
+        // time
+        float time = glfwGetTime();
+        float greenValue = sin(time) / 2.0f + 0.5f;
+        int vertexColorLocation = glGetUniformLocation(program, "ourColor");
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
