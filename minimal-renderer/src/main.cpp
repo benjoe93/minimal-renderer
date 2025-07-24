@@ -37,7 +37,7 @@ int main(void)
     }
 
     // shaders
-    Shader firstShader("shaders/triangle.vert", "shaders/triangle.frag");
+    Shader firstShader("resources/shaders/triangle.vert", "resources/shaders/triangle.frag");
 
     
 
