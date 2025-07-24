@@ -1,3 +1,6 @@
+#include <fstream>
+#include <sstream>
+#include <iostream>
 #include "shaderClass.h"
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
