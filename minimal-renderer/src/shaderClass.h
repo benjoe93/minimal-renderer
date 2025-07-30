@@ -1,8 +1,6 @@
-#ifndef SHADER_H
-#define SHADER_H
+#pragma once
 
 #include <glad/glad.h> // include glad to get all the required OpenGL headers
-
 #include <string>
 
 class Shader
@@ -20,5 +18,3 @@ public:
 	void setInt(const std::string& name, int value) const;
 	void setFloat(const std::string& name, float value) const;
 };
-
-#endif // !SHADER_H
