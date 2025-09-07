@@ -2,6 +2,10 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "vendor/imgui/imgui.h"
+#include "vendor/imgui/imgui_impl_glfw.h"
+#include "vendor/imgui/imgui_impl_opengl3.h"
+
 #include "Shader.h"
 #include "Texture.h"
 #include "VertexArray.h"
@@ -32,7 +36,7 @@ unsigned int indices[] = {
 
 int main(void)
 {
-    /* GLWF: init& config */ 
+    /* GLWF: init& config */
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -56,6 +60,14 @@ int main(void)
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    /* ImGui Setup */
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     // Create textures
     Texture texture1("resources/textures/container.jpg", GL_RGB);
@@ -84,36 +96,66 @@ int main(void)
 
     vbo1.Unbind();
     vao1.Unbind();
-    
+
     Renderer renderer;
     renderer.SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
     renderer.ToggleWireframeRender(false);
 
-    // Get maximum number of vertex attributes
+    // Log OpenGL stats
+    std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
     std::cout << "Maximum number of vertex attributes supported: " << renderer.GetMaxVertexAttribs() << std::endl;
 
+    float offset[3] = { 0.0f, 0.0f, 0.0f };
+    float rotation[3] = { 0.0f, 0.0f, 0.0f };
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))
     {
-        // input
-        processInput(window);
-
         // render
         renderer.Clear();
 
+        // Start the Dear ImGui frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        // input
+        processInput(window);
+
+        ImGui::Begin("My first window");
+        ImGui::DragFloat3("Translate", offset, 0.01f, -1.0f, 1.0f);
+        ImGui::DragFloat3("Rotation", rotation, 0.01f);
+        ImGui::End();
+
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::translate(trans, glm::vec3(offset[0], offset[1], offset[2]));
+        //trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::rotate(trans, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+        trans = glm::rotate(trans, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+        trans = glm::rotate(trans, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+
 
         defaultShader.SetMat4("transform", trans);
 
         // draw first triangle
         renderer.Draw(vao1, ebo1, defaultShader);
 
+
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         glfwSwapBuffers(window);
         glfwPollEvents();
-    }  
+    }
+
+    // Cleanup
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
+
+    glfwDestroyWindow(window);
 
     /* glfw: terminate, clearing all previously allocated GLFW resources */
     glfwTerminate();
