@@ -69,8 +69,8 @@ int main(void)
 
     // Pass textures to shader
     defaultShader.Bind();
-    defaultShader.SetUniform1i("texture1", 0);
-    defaultShader.SetUniform1i("texture2", 1);
+    defaultShader.SetInt("texture1", 0);
+    defaultShader.SetInt("texture2", 1);
 
     // Crate VAO, VBO, EBO
     VertexArray vao1;
@@ -100,6 +100,12 @@ int main(void)
 
         // render
         renderer.Clear();
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        defaultShader.SetMat4("transform", trans);
 
         // draw first triangle
         renderer.Draw(vao1, ebo1, defaultShader);
