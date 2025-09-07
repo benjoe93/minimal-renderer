@@ -126,15 +126,24 @@ int main(void)
         ImGui::DragFloat3("Rotation", rotation, 0.01f);
         ImGui::End();
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(offset[0], offset[1], offset[2]));
+        // Projection matrix
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        
+        // View matrix
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+        // Model matrix
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(offset[0], offset[1], offset[2]));
         //trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        trans = glm::rotate(trans, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
-        trans = glm::rotate(trans, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
-        trans = glm::rotate(trans, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
-
-        defaultShader.SetMat4("transform", trans);
+        defaultShader.SetMat4("model", model);
+        defaultShader.SetMat4("view", view);
+        defaultShader.SetMat4("projection", projection);
 
         // draw first triangle
         renderer.Draw(vao1, ebo1, defaultShader);
