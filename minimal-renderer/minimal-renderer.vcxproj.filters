@@ -110,6 +110,9 @@
     <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\vendor\imgui\imgui_impl_opengl3_loader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\default.frag" />
