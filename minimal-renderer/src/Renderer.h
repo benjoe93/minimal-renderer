@@ -33,15 +33,27 @@ class Renderer
 {
 private:
 	glm::vec4 m_BackgroundColor;
+    bool m_UseDepthBuffer;
+    bool m_EnableWireframe;
+    bool m_EnableFaceCulling;
 
 public:
-	Renderer();
+	Renderer(const bool DepthTesting = true, const bool Wireframe = false, const bool FaceCulling = false);
 	~Renderer();
 
-	void Clear() const;
+	void Clear();
 	void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
-	void ToggleWireframeRender(bool IsWireframe);
+
 	int GetMaxVertexAttribs() const;
 
 	inline void SetBackgroundColor(glm::vec4 new_color) { m_BackgroundColor = new_color; }
+    inline void SetDepthTest(bool Enabled) { m_UseDepthBuffer = Enabled; }
+    inline void SetWireframe(bool Enabled) { m_EnableWireframe = Enabled; }
+    inline void SetFaceCulling(bool Enabled) { m_EnableFaceCulling = Enabled; }
+
+
+private:
+    void ToggleDepthTest() const;
+	void ToggleWireframeRender() const;
+    void ToggleFaceCulling() const;
 };

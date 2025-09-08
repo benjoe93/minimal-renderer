@@ -22,16 +22,47 @@ const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
 /* QUAD DEFINITION */
+// Vertex array: 8 vertices with position (x,y,z), UV (u,v), and color (r,g,b)
+// Each vertex has 8 floats: 3 position + 2 UV + 3 color
 float vertices[] = {
     // positions          // uvs        // colors           
-     0.5f,  0.5f, 0.0f,   1.0f, 1.0f,   1.0f, 0.0f, 0.0f,   // top right
-     0.5f, -0.5f, 0.0f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   // bottom right
-    -0.5f, -0.5f, 0.0f,   0.0f, 0.0f,   0.0f, 0.0f, 1.0f,   // bottom left
-    -0.5f,  0.5f, 0.0f,   0.0f, 1.0f,   1.0f, 1.0f, 0.0f    // top left 
+     0.5f,  0.5f,  0.5f,   1.0f, 1.0f,   1.0f, 0.0f, 0.0f,   // 0: front top right
+     0.5f, -0.5f,  0.5f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   // 1: front bottom right
+    -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,   0.0f, 0.0f, 1.0f,   // 2: front bottom left
+    -0.5f,  0.5f,  0.5f,   0.0f, 1.0f,   1.0f, 1.0f, 0.0f,   // 3: front top left 
+
+     0.5f,  0.5f, -0.5f,   1.0f, 1.0f,   1.0f, 0.0f, 1.0f,   // 4: back top right
+     0.5f, -0.5f, -0.5f,   1.0f, 0.0f,   0.0f, 1.0f, 1.0f,   // 5: back bottom right
+    -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,   1.0f, 0.0f, 1.0f,   // 6: back bottom left
+    -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,   1.0f, 1.0f, 1.0f    // 7: back top left 
 };
+
+// Index array: defines 12 triangles (2 per face) for 6 cube faces
+// Using counter-clockwise winding order
 unsigned int indices[] = {
-    0, 1, 3,    // first triangle
-    1, 2, 3,    // second triangle
+    // Front face (z = +0.5)
+    0, 1, 2,
+    0, 2, 3,
+
+    // Back face (z = -0.5)
+    4, 7, 6,
+    4, 6, 5,
+
+    // Left face (x = -0.5)  
+    0, 3, 7,
+    0, 7, 4,
+
+    // Right face (x = +0.5)
+    1, 5, 6,
+    1, 6, 2,
+
+    // Bottom face (y = -0.5)
+    0, 4, 5,
+    0, 5, 1,
+
+    // Top face (y = +0.5)
+    3, 2, 6,
+    3, 6, 7
 };
 
 int main(void)
@@ -87,8 +118,8 @@ int main(void)
     // Crate VAO, VBO, EBO
     VertexArray vao1;
     vao1.Bind();
-    VertexBuffer vbo1(vertices, 4 * 8 * sizeof(float));
-    IndexBuffer ebo1(indices, 6);
+    VertexBuffer vbo1(vertices, 8 * 8 * sizeof(float));
+    IndexBuffer ebo1(indices, 36);
 
     vao1.SetLayout(vbo1, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);                    // vertex position
     vao1.SetLayout(vbo1, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));  // uv coords
@@ -99,7 +130,6 @@ int main(void)
 
     Renderer renderer;
     renderer.SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
-    renderer.ToggleWireframeRender(false);
 
     // Log OpenGL stats
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
@@ -123,15 +153,15 @@ int main(void)
 
         ImGui::Begin("My first window");
         ImGui::DragFloat3("Translate", offset, 0.01f, -1.0f, 1.0f);
-        ImGui::DragFloat3("Rotation", rotation, 0.01f);
+        ImGui::DragFloat3("Rotation", rotation, 0.1f);
         ImGui::End();
 
         // Projection matrix
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), 800.f / 600.f, 0.1f, 100.0f);
         
         // View matrix
         glm::mat4 view = glm::mat4(1.0f);
-        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
 
         // Model matrix
         glm::mat4 model = glm::mat4(1.0f);
