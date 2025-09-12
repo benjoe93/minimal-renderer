@@ -1,12 +1,16 @@
 #pragma once
 
 #include <iostream>
-#include <glad/glad.h>
-#include <glm/vec4.hpp>
 
-#include "VertexArray.h"
-#include "IndexBuffer.h"
-#include "Shader.h"
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+class Camera;
+class Shader;
+class IndexBuffer;
+class VertexArray;
 
 #define ASSERT(x) if (!(x)) __debugbreak();
 #define GLCall(x) GLClearError();\
@@ -31,29 +35,38 @@ static bool GLLogCall(const char* function, const char* file, int line)
 
 class Renderer
 {
-private:
-	glm::vec4 m_BackgroundColor;
-    bool m_UseDepthBuffer;
-    bool m_EnableWireframe;
-    bool m_EnableFaceCulling;
+    private:
+	    glm::vec4 m_background_color;
+        bool m_use_depth_buffer;
+        bool m_enable_wireframe;
+        bool m_enable_face_culling;
 
-public:
-	Renderer(const bool DepthTesting = true, const bool Wireframe = false, const bool FaceCulling = false);
-	~Renderer();
+        double m_delta_time;
+        double m_last_frame;
 
-	void Clear();
-	void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+    public:
+        Camera* m_active_cam = nullptr  ;
 
-	int GetMaxVertexAttribs() const;
+    public:
+	    Renderer(const bool depth_testing = true, const bool wireframe = false, const bool face_culling = false);
+	    ~Renderer();
 
-	inline void SetBackgroundColor(glm::vec4 new_color) { m_BackgroundColor = new_color; }
-    inline void SetDepthTest(bool Enabled) { m_UseDepthBuffer = Enabled; }
-    inline void SetWireframe(bool Enabled) { m_EnableWireframe = Enabled; }
-    inline void SetFaceCulling(bool Enabled) { m_EnableFaceCulling = Enabled; }
+	    void Clear();
+	    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+
+	    int GetMaxVertexAttribs() const;
+
+	    inline void SetBackgroundColor(glm::vec4 new_color) { m_background_color = new_color; }
+        inline void SetDepthTest(bool enabled) { m_use_depth_buffer = enabled; }
+        inline void Setwireframe(bool enabled) { m_enable_wireframe = enabled; }
+        inline void Setface_culling(bool enabled) { m_enable_face_culling = enabled; }
+        inline double GetDeltaTime() const { return m_delta_time; }
+
+        void Tick(double current_time);
 
 
-private:
-    void ToggleDepthTest() const;
-	void ToggleWireframeRender() const;
-    void ToggleFaceCulling() const;
+    private:
+        void ToggleDepthTest() const;
+	    void TogglewireframeRender() const;
+        void Toggleface_culling() const;
 };
