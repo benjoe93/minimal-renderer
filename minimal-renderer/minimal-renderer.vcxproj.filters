@@ -66,7 +66,16 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Window.cpp">
+    <ClCompile Include="src\scenes\SceneClearColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\SceneCubeMultiple.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\SceneCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\SceneColor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -122,13 +131,29 @@
     <ClInclude Include="src\Camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Window.h">
+    <ClInclude Include="src\scenes\Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\SceneClearColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\SceneCubeMultiple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\SceneCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\SceneColor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\default.frag" />
-    <None Include="resources\shaders\default.vert" />
+    <None Include="resources\shaders\GettingStarted\default.frag" />
+    <None Include="resources\shaders\GettingStarted\default.vert" />
+    <None Include="resources\shaders\Lighting\object.vert" />
+    <None Include="resources\shaders\Lighting\light.frag" />
+    <None Include="resources\shaders\Lighting\light.vert" />
+    <None Include="resources\shaders\Lighting\object.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\wall.jpg">

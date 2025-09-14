@@ -11,9 +11,14 @@ Renderer::Renderer(const bool depth_testing, const bool wireframe, const bool fa
 	m_enable_wireframe(wireframe),
 	m_enable_face_culling(face_culling),
 	m_delta_time(0.0f),
-	m_last_frame(0.0f),
-	m_active_cam(nullptr)
-{}
+	m_last_frame(0.0f)
+{
+	// Log OpenGL stats
+	std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+	std::cout << "Maximum number of vertex attributes supported: " << GetMaxVertexAttribs() << std::endl;
+
+	state = std::make_unique<AppState>();
+}
 
 Renderer::~Renderer() {}
 

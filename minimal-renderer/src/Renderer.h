@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <memory>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -32,6 +33,18 @@ static bool GLLogCall(const char* function, const char* file, int line)
     return true;
 }
 
+struct AppState
+{
+    unsigned int scr_width = 1280;
+    unsigned int scr_height = 720;
+
+    bool cursor_disabled = false;
+
+    float last_x = 640;
+    float last_y = 360;
+
+    Camera* active_camera = nullptr;
+};
 
 class Renderer
 {
@@ -45,7 +58,7 @@ class Renderer
         double m_last_frame;
 
     public:
-        Camera* m_active_cam = nullptr  ;
+        std::unique_ptr<AppState> state;
 
     public:
 	    Renderer(const bool depth_testing = true, const bool wireframe = false, const bool face_culling = false);
