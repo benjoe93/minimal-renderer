@@ -14,12 +14,18 @@
 #include "Renderer.h"
 #include "Camera.h"
 
-#include "scenes/SceneColor.h"
+#include "scenes/ScenePhongLight.h"
 
-
+/* glfw: whenever the window size changed(by OS or user resize) this callback function executes */
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+
+/* process all input : query GLFW whether relevant keys are pressed / released this frame and react accordingly */
 void ProcessInput(GLFWwindow* window);
+
+/* process mouse movement input */
 void MouseCallback(GLFWwindow* window, double xpos, double ypos);
+
+/* process mouse scroll input */
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 int main(void)
@@ -70,7 +76,7 @@ int main(void)
     renderer.state->active_camera = &cam;
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneColor scene(renderer);
+    scene::ScenePhongLight scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))
@@ -104,15 +110,13 @@ int main(void)
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
-    glfwDestroyWindow(window);
-
     /* glfw: terminate, clearing all previously allocated GLFW resources */
     glfwTerminate();
     return 0;
 }
 
 
-/* glfw: whenever the window size changed(by OS or user resize) this callback function executes */
+
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     auto renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
@@ -121,7 +125,6 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
     renderer->state->scr_height = height;
 }
 
-/* process all input : query GLFW whether relevant keys are pressed / released this frame and react accordingly */
 void ProcessInput(GLFWwindow* window)
 {
     Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));

@@ -7,7 +7,7 @@ class IndexBuffer
 		unsigned int m_count;
 
 	public:
-		IndexBuffer(const unsigned int* data, unsigned int count);
+		IndexBuffer(const unsigned int* data, size_t count);
 		~IndexBuffer();
 
 		void Bind() const;

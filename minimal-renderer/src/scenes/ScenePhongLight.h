@@ -10,7 +10,7 @@ class Shader;
 
 namespace scene {
 
-	class SceneColor : public Scene
+	class ScenePhongLight : public Scene
 	{
 	private:
 		std::unique_ptr<VertexArray> object_va;
@@ -25,13 +25,12 @@ namespace scene {
 
 		float light_color[3];
 		float object_color[3];
-		
+
 		float light_position[3];
 
-
 	public:
-		SceneColor(Renderer& in_renderer);
-		
+		ScenePhongLight(Renderer& in_renderer);
+
 		void OnRender() override;
 		void OnImGuiRender() override;
 	};

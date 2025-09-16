@@ -75,7 +75,7 @@
     <ClCompile Include="src\scenes\SceneCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scenes\SceneColor.cpp">
+    <ClCompile Include="src\scenes\ScenePhongLight.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,17 +143,21 @@
     <ClInclude Include="src\scenes\SceneCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\SceneColor.h">
+    <ClInclude Include="src\scenes\ScenePhongLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\GettingStarted\default.frag" />
     <None Include="resources\shaders\GettingStarted\default.vert" />
-    <None Include="resources\shaders\Lighting\object.vert" />
-    <None Include="resources\shaders\Lighting\light.frag" />
-    <None Include="resources\shaders\Lighting\light.vert" />
-    <None Include="resources\shaders\Lighting\object.frag" />
+    <None Include="resources\shaders\Lighting\PhongLighting\object.vert" />
+    <None Include="resources\shaders\Lighting\PhongLighting\light.frag" />
+    <None Include="resources\shaders\Lighting\PhongLighting\light.vert" />
+    <None Include="resources\shaders\Lighting\PhongLighting\object.frag" />
+    <None Include="resources\shaders\Lighting\Materials\light.frag" />
+    <None Include="resources\shaders\Lighting\Materials\light.vert" />
+    <None Include="resources\shaders\Lighting\Materials\object.frag" />
+    <None Include="resources\shaders\Lighting\Materials\object.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\wall.jpg">
