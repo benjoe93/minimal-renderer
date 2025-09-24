@@ -157,6 +157,7 @@
     <ClCompile Include="src\IndexBuffer.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\scenes\SceneClearColor.cpp" />
+    <ClCompile Include="src\scenes\SceneMaterials.cpp" />
     <ClCompile Include="src\scenes\ScenePhongLight.cpp" />
     <ClCompile Include="src\scenes\SceneCube.cpp" />
     <ClCompile Include="src\scenes\SceneCubeMultiple.cpp" />
@@ -181,9 +182,11 @@
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\scenes\Scene.h" />
     <ClInclude Include="src\scenes\SceneClearColor.h" />
+    <ClInclude Include="src\scenes\SceneMaterials.h" />
     <ClInclude Include="src\scenes\ScenePhongLight.h" />
     <ClInclude Include="src\scenes\SceneCube.h" />
     <ClInclude Include="src\scenes\SceneCubeMultiple.h" />
+    <ClInclude Include="src\ShapeLib.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Shader.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
