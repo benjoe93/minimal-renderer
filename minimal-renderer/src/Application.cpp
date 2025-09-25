@@ -14,7 +14,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 
-#include "scenes/SceneMaterials.h"
+#include "scenes/SceneSurfMaps.h"
 
 /* glfw: whenever the window size changed(by OS or user resize) this callback function executes */
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
@@ -76,7 +76,7 @@ int main(void)
     renderer.state->active_camera = &cam;
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneMaterials scene(renderer);
+    scene::SceneSurfMaps scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))

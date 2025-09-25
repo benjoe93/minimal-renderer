@@ -161,6 +161,7 @@
     <ClCompile Include="src\scenes\ScenePhongLight.cpp" />
     <ClCompile Include="src\scenes\SceneCube.cpp" />
     <ClCompile Include="src\scenes\SceneCubeMultiple.cpp" />
+    <ClCompile Include="src\scenes\SceneSurfMaps.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\vendor\glad\glad.c" />
@@ -186,6 +187,7 @@
     <ClInclude Include="src\scenes\ScenePhongLight.h" />
     <ClInclude Include="src\scenes\SceneCube.h" />
     <ClInclude Include="src\scenes\SceneCubeMultiple.h" />
+    <ClInclude Include="src\scenes\SceneSurfMaps.h" />
     <ClInclude Include="src\ShapeLib.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Shader.h" />
@@ -213,10 +215,16 @@
     <None Include="resources\shaders\Lighting\PhongLighting\light.vert" />
     <None Include="resources\shaders\Lighting\PhongLighting\object.frag" />
     <None Include="resources\shaders\Lighting\PhongLighting\object.vert" />
+    <None Include="resources\shaders\Lighting\SurfaceMaps\light.frag" />
+    <None Include="resources\shaders\Lighting\SurfaceMaps\light.vert" />
+    <None Include="resources\shaders\Lighting\SurfaceMaps\object.frag" />
+    <None Include="resources\shaders\Lighting\SurfaceMaps\object.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\awesomeface.png" />
     <Image Include="resources\textures\container.jpg" />
+    <Image Include="resources\textures\container2.png" />
+    <Image Include="resources\textures\container2_specular.png" />
     <Image Include="resources\textures\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -12,11 +12,11 @@
 #include "Texture.h"
 #include "Shader.h"
 
-#include "SceneMaterials.h"
+#include "SceneSurfMaps.h"
 
 namespace scene {
 
-	SceneMaterials::SceneMaterials(Renderer& in_renderer)
+	SceneSurfMaps::SceneSurfMaps(Renderer& in_renderer)
 		:Scene(in_renderer),
 		light_color		{ 1.0f, 1.0f, 1.0f },
 		object_color	{ 1.0f, 0.5f, 0.31f },
@@ -24,49 +24,49 @@ namespace scene {
 	{
 		/* QUAD DEFINITION */
 		float vertices[] = {
-			// Positions			Normal
+			// Positions			// Normal				// uv
 			// Front face (z = -0.5)
-			-0.5f, -0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,
-			 0.5f, -0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,
-			 0.5f,  0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,
-			 0.5f,  0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,
-			-0.5f,  0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,
-			-0.5f, -0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,
+			-0.5f, -0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
+			 0.5f, -0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	1.0f, 0.0f,
+			 0.5f,  0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
+			 0.5f,  0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	1.0f, 1.0f,
+			-0.5f,  0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,	 0.0f,  0.0f, -1.0f,	0.0f, 0.0f,
 			// Back face (z = 0.5)
-			-0.5f, -0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,
-			 0.5f, -0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,
-			 0.5f,  0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,
-			 0.5f,  0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,
-			-0.5f,  0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,
-			-0.5f, -0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,
+			-0.5f, -0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,		0.0f, 0.0f,
+			 0.5f, -0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,		1.0f, 0.0f,
+			 0.5f,  0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,		1.0f, 1.0f,
+			 0.5f,  0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,		1.0f, 1.0f,
+			-0.5f,  0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,		0.0f, 1.0f,
+			-0.5f, -0.5f,  0.5f,	 0.0f,  0.0f, 1.0f,		0.0f, 0.0f,
 			// Left face (x = -0.5)
-			-0.5f,  0.5f,  0.5f,	-1.0f,  0.0f,  0.0f,
-			-0.5f,  0.5f, -0.5f,	-1.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f,	-1.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f,	-1.0f,  0.0f,  0.0f,
-			-0.5f, -0.5f,  0.5f,	-1.0f,  0.0f,  0.0f,
-			-0.5f,  0.5f,  0.5f,	-1.0f,  0.0f,  0.0f,
+			-0.5f,  0.5f,  0.5f,	-1.0f,  0.0f,  0.0f,	1.0f, 0.0f,
+			-0.5f,  0.5f, -0.5f,	-1.0f,  0.0f,  0.0f,	1.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,	-1.0f,  0.0f,  0.0f,	0.0f, 1.0f,
+			-0.5f, -0.5f, -0.5f,	-1.0f,  0.0f,  0.0f,	0.0f, 1.0f,
+			-0.5f, -0.5f,  0.5f,	-1.0f,  0.0f,  0.0f,	0.0f, 0.0f,
+			-0.5f,  0.5f,  0.5f,	-1.0f,  0.0f,  0.0f,	1.0f, 0.0f,
 			// Right face (x = 0.5)
-			 0.5f,  0.5f,  0.5f,	 1.0f,  0.0f,  0.0f,
-			 0.5f,  0.5f, -0.5f,	 1.0f,  0.0f,  0.0f,
-			 0.5f, -0.5f, -0.5f,	 1.0f,  0.0f,  0.0f,
-			 0.5f, -0.5f, -0.5f,	 1.0f,  0.0f,  0.0f,
-			 0.5f, -0.5f,  0.5f,	 1.0f,  0.0f,  0.0f,
-			 0.5f,  0.5f,  0.5f,	 1.0f,  0.0f,  0.0f,
+			 0.5f,  0.5f,  0.5f,	 1.0f,  0.0f,  0.0f,	1.0f, 0.0f,
+			 0.5f,  0.5f, -0.5f,	 1.0f,  0.0f,  0.0f,	1.0f, 1.0f,
+			 0.5f, -0.5f, -0.5f,	 1.0f,  0.0f,  0.0f,	0.0f, 1.0f,
+			 0.5f, -0.5f, -0.5f,	 1.0f,  0.0f,  0.0f,	0.0f, 1.0f,
+			 0.5f, -0.5f,  0.5f,	 1.0f,  0.0f,  0.0f,	0.0f, 0.0f,
+			 0.5f,  0.5f,  0.5f,	 1.0f,  0.0f,  0.0f,	1.0f, 0.0f,
 			// Bottom face (y = -0.5)
-			-0.5f, -0.5f, -0.5f,	 0.0f, -1.0f,  0.0f,
-			 0.5f, -0.5f, -0.5f,	 0.0f, -1.0f,  0.0f,
-			 0.5f, -0.5f,  0.5f,	 0.0f, -1.0f,  0.0f,
-			 0.5f, -0.5f,  0.5f,	 0.0f, -1.0f,  0.0f,
-			-0.5f, -0.5f,  0.5f,	 0.0f, -1.0f,  0.0f,
-			-0.5f, -0.5f, -0.5f,	 0.0f, -1.0f,  0.0f,
+			-0.5f, -0.5f, -0.5f,	 0.0f, -1.0f,  0.0f,	0.0f, 1.0f,
+			 0.5f, -0.5f, -0.5f,	 0.0f, -1.0f,  0.0f,	1.0f, 1.0f,
+			 0.5f, -0.5f,  0.5f,	 0.0f, -1.0f,  0.0f,	1.0f, 0.0f,
+			 0.5f, -0.5f,  0.5f,	 0.0f, -1.0f,  0.0f,	1.0f, 0.0f,
+			-0.5f, -0.5f,  0.5f,	 0.0f, -1.0f,  0.0f,	0.0f, 0.0f,
+			-0.5f, -0.5f, -0.5f,	 0.0f, -1.0f,  0.0f,	0.0f, 1.0f,
 			// Top face (y = 0.5)
-			-0.5f,  0.5f, -0.5f,	 0.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f, -0.5f,	 0.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f,  0.5f,	 0.0f,  1.0f,  0.0f,
-			 0.5f,  0.5f,  0.5f,	 0.0f,  1.0f,  0.0f,
-			-0.5f,  0.5f,  0.5f,	 0.0f,  1.0f,  0.0f,
-			-0.5f,  0.5f, -0.5f,	 0.0f,  1.0f,  0.0f
+			-0.5f,  0.5f, -0.5f,	 0.0f,  1.0f,  0.0f,	0.0f, 1.0f,
+			 0.5f,  0.5f, -0.5f,	 0.0f,  1.0f,  0.0f,	1.0f, 1.0f,
+			 0.5f,  0.5f,  0.5f,	 0.0f,  1.0f,  0.0f,	1.0f, 0.0f,
+			 0.5f,  0.5f,  0.5f,	 0.0f,  1.0f,  0.0f,	1.0f, 0.0f,
+			-0.5f,  0.5f,  0.5f,	 0.0f,  1.0f,  0.0f,	0.0f, 0.0f,
+			-0.5f,  0.5f, -0.5f,	 0.0f,  1.0f,  0.0f,	0.0f, 1.0f
 		};
 		unsigned int indices[] = {
 			// Front face
@@ -90,7 +90,7 @@ namespace scene {
 		};
 
 		size_t element_size = 36;
-		size_t buffer_size = element_size * 6 * sizeof(float);
+		size_t buffer_size = element_size * 8 * sizeof(float);
 
 		// Object setup
 		object_va = std::make_unique<VertexArray>();
@@ -101,10 +101,15 @@ namespace scene {
 		object_ib = std::make_unique<IndexBuffer>(indices, element_size);
 		object_ib->Bind();
 
-		object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-		object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+		object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+		object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
-		object_shader = std::make_unique<Shader>("resources/shaders/Lighting/Materials/object.vert", "resources/shaders/Lighting/Materials/object.frag");
+		object_shader = std::make_unique<Shader>("resources/shaders/Lighting/SurfaceMaps/object.vert", "resources/shaders/Lighting/SurfaceMaps/object.frag");
+
+		// Bind Textures
+		diffuse_tex = std::make_unique<Texture>("resources/textures/container2.png", GL_RGBA);
+		specular_tex = std::make_unique<Texture>("resources/textures/container2_specular.png", GL_RGBA);
 
 		object_va->Unbind();
 		object_vb->Unbind();
@@ -120,10 +125,9 @@ namespace scene {
 		light_ib = std::make_unique<IndexBuffer>(indices, element_size);
 		light_ib->Bind();
 
-		light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-		//light_va->SetLayout(*light_vb, 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(6 * sizeof(float)));
+		light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 
-		light_shader = std::make_unique<Shader>("resources/shaders/Lighting/Materials/light.vert", "resources/shaders/Lighting/Materials/light.frag");
+		light_shader = std::make_unique<Shader>("resources/shaders/Lighting/SurfaceMaps/light.vert", "resources/shaders/Lighting/SurfaceMaps/light.frag");
 		light_shader->Bind();
 
 		light_va->Unbind();
@@ -132,7 +136,7 @@ namespace scene {
 		light_shader->Unbind();
 	}
 
-	void SceneMaterials::OnRender()
+	void SceneSurfMaps::OnRender()
 	{
 		Camera* cam = m_renderer.state->active_camera;
 		glm::vec3 cam_pos = cam->GetPosition();
@@ -144,12 +148,17 @@ namespace scene {
 		glm::mat4 mvp_matrix = projection * cam->GetCurrentView() * model;
 
 		object_shader->Bind();
+
+		diffuse_tex->Bind();
+		specular_tex->Bind(1);
+
 		object_shader->SetMat4("model", model);
 		object_shader->SetMat4("view", cam->GetCurrentView());
 		object_shader->SetMat4("projection", projection);
 
-		object_shader->SetVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-		object_shader->SetVec3("material.diffuse", object_color[0], object_color[1], object_color[2]);
+
+		object_shader->SetInt("material.diffuse", 0);
+		object_shader->SetInt("material.specular", 1);
 		object_shader->SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
 		object_shader->SetFloat("material.shininess", 32.f);
 
@@ -166,6 +175,7 @@ namespace scene {
 		light_shader->Bind();
 		glm::mat4 light_transform = glm::mat4(1.0f);
 		light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
+		light_transform = glm::scale(light_transform, glm::vec3(0.1f, 0.1f, 0.1f));
 		light_shader->SetMat4("model", light_transform);
 		light_shader->SetMat4("view", cam->GetCurrentView());
 		light_shader->SetMat4("projection", projection);
@@ -175,7 +185,7 @@ namespace scene {
 		m_renderer.Draw(*light_va, *light_ib, *light_shader);
 	}
 
-	void SceneMaterials::OnImGuiRender()
+	void SceneSurfMaps::OnImGuiRender()
 	{
 		ImGui::Begin("Colors");
 		ImGui::SliderFloat3("Light Position", light_position, -10.f, 10.f);

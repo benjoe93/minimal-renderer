@@ -81,6 +81,9 @@
     <ClCompile Include="src\scenes\SceneMaterials.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scenes\SceneSurfMaps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
@@ -155,6 +158,9 @@
     <ClInclude Include="src\ShapeLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\scenes\SceneSurfMaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\GettingStarted\default.frag" />
@@ -167,6 +173,10 @@
     <None Include="resources\shaders\Lighting\Materials\light.vert" />
     <None Include="resources\shaders\Lighting\Materials\object.frag" />
     <None Include="resources\shaders\Lighting\Materials\object.vert" />
+    <None Include="resources\shaders\Lighting\SurfaceMaps\light.frag" />
+    <None Include="resources\shaders\Lighting\SurfaceMaps\light.vert" />
+    <None Include="resources\shaders\Lighting\SurfaceMaps\object.frag" />
+    <None Include="resources\shaders\Lighting\SurfaceMaps\object.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\wall.jpg">
@@ -176,6 +186,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="resources\textures\awesomeface.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\container2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\container2_specular.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
