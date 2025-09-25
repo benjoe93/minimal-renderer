@@ -10,7 +10,7 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "Texture.h"
-#include "Shader.h"
+#include "Material.h"
 
 #include "SceneSurfMaps.h"
 
@@ -105,16 +105,15 @@ namespace scene {
 		object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 		object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
-		object_shader = std::make_unique<Shader>("resources/shaders/Lighting/SurfaceMaps/object.vert", "resources/shaders/Lighting/SurfaceMaps/object.frag");
+		object_material = std::make_unique<Material>("resources/shaders/Lighting/SurfaceMaps/object.vert", "resources/shaders/Lighting/SurfaceMaps/object.frag");
 
 		// Bind Textures
-		diffuse_tex = std::make_unique<Texture>("resources/textures/container2.png", GL_RGBA);
-		specular_tex = std::make_unique<Texture>("resources/textures/container2_specular.png", GL_RGBA);
+		object_material->AddTexture("material.diffuse", "resources/textures/container2.png", true);
+		object_material->AddTexture("material.specular", "resources/textures/container2_specular.png", true);
 
 		object_va->Unbind();
 		object_vb->Unbind();
 		object_ib->Unbind();
-		object_shader->Unbind();
 
 		// Light setup
 		light_va = std::make_unique<VertexArray>();
@@ -127,62 +126,58 @@ namespace scene {
 
 		light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 
-		light_shader = std::make_unique<Shader>("resources/shaders/Lighting/SurfaceMaps/light.vert", "resources/shaders/Lighting/SurfaceMaps/light.frag");
-		light_shader->Bind();
+		light_material = std::make_unique<Material>("resources/shaders/Lighting/SurfaceMaps/light.vert", "resources/shaders/Lighting/SurfaceMaps/light.frag");
 
 		light_va->Unbind();
 		light_vb->Unbind();
 		light_ib->Unbind();
-		light_shader->Unbind();
+	}
+
+	void SceneSurfMaps::OnUpdate(double delta_time)
+	{
+		Camera* cam = m_renderer.state->active_camera;
+		glm::vec3 cam_pos = cam->GetPosition();
+		glm::mat4 projection = glm::perspective(glm::radians(cam->GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+
+		// Object
+		glm::mat4 model = glm::mat4(1.0f);
+
+		object_material->SetUniformMat4("model", model);
+		object_material->SetUniformMat4("view", cam->GetCurrentView());
+		object_material->SetUniformMat4("projection", projection);
+
+		object_material->SetUniformFloat("material.shininess", 32.f);
+
+		object_material->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+		object_material->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
+		object_material->SetUniformVec3("light.position", glm::vec3(light_position[0], light_position[1], light_position[2]));
+		object_material->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		object_material->SetUniformVec3("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
+		object_material->SetUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+		// Light
+		glm::mat4 light_transform = glm::mat4(1.0f);
+		light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
+		light_transform = glm::scale(light_transform, glm::vec3(0.1f, 0.1f, 0.1f));
+		
+		light_material->SetUniformMat4("model", light_transform);
+		light_material->SetUniformMat4("view", cam->GetCurrentView());
+		light_material->SetUniformMat4("projection", projection);
+
+		light_material->SetUniformVec3("u_lightColor", glm::vec3(light_color[0], light_color[1], light_color[2]));
 	}
 
 	void SceneSurfMaps::OnRender()
 	{
-		Camera* cam = m_renderer.state->active_camera;
-		glm::vec3 cam_pos = cam->GetPosition();
-
 		// Object rendering
-		glm::mat4 projection = glm::perspective(glm::radians(cam->GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
-		glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
-		glm::mat4 mvp_matrix = projection * cam->GetCurrentView() * model;
-
-		object_shader->Bind();
-
-		diffuse_tex->Bind();
-		specular_tex->Bind(1);
-
-		object_shader->SetMat4("model", model);
-		object_shader->SetMat4("view", cam->GetCurrentView());
-		object_shader->SetMat4("projection", projection);
-
-
-		object_shader->SetInt("material.diffuse", 0);
-		object_shader->SetInt("material.specular", 1);
-		object_shader->SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
-		object_shader->SetFloat("material.shininess", 32.f);
-
-		object_shader->SetVec3("u_viewPos", cam_pos[0], cam_pos[1], cam_pos[2]);
-
-		object_shader->SetVec3("light.position", light_position[0], light_position[1], light_position[2]);
-		object_shader->SetVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-		object_shader->SetVec3("light.diffuse", light_color[0], light_color[1], light_color[2]);
-		object_shader->SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
-
-		m_renderer.Draw(*object_va, *object_ib, *object_shader);
+		object_material->Bind();
+		m_renderer.Draw(*object_va, *object_ib, *(object_material->GetShader()));
+		object_material->Unbind();
 
 		// Light rendering
-		light_shader->Bind();
-		glm::mat4 light_transform = glm::mat4(1.0f);
-		light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
-		light_transform = glm::scale(light_transform, glm::vec3(0.1f, 0.1f, 0.1f));
-		light_shader->SetMat4("model", light_transform);
-		light_shader->SetMat4("view", cam->GetCurrentView());
-		light_shader->SetMat4("projection", projection);
-
-		light_shader->SetVec3("u_lightColor", light_color[0], light_color[1], light_color[2]);
-
-		m_renderer.Draw(*light_va, *light_ib, *light_shader);
+		light_material->Bind();
+		m_renderer.Draw(*light_va, *light_ib, *(light_material->GetShader()));
+		light_material->Unbind();
 	}
 
 	void SceneSurfMaps::OnImGuiRender()

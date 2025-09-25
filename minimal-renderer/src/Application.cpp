@@ -16,6 +16,8 @@
 
 #include "scenes/SceneSurfMaps.h"
 
+#define WINDOW_TITLE "LearnOpenGL"
+
 /* glfw: whenever the window size changed(by OS or user resize) this callback function executes */
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -28,6 +30,9 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos);
 /* process mouse scroll input */
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
+/* Update window title */
+void UpdateWindowTitle(GLFWwindow* window, double delta_time);
+
 int main(void)
 {
     // GLWF: init& config
@@ -38,7 +43,7 @@ int main(void)
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
     // GLWF: create a window and its OpenGL context 
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "LearnOpenGL", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, WINDOW_TITLE, nullptr, nullptr);
     if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -84,6 +89,8 @@ int main(void)
         // render
         renderer.Tick(glfwGetTime());
         renderer.Clear();
+        
+        UpdateWindowTitle(window, renderer.GetDeltaTime());
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -116,6 +123,12 @@ int main(void)
 }
 
 
+void UpdateWindowTitle(GLFWwindow* window, double delat_time)
+{
+    char title[100];
+    snprintf(title, sizeof(title), "%s - FPS: %.1f | Frame: %.2fms", WINDOW_TITLE, 1/delat_time, delat_time* 1000.f);
+    glfwSetWindowTitle(window, title);
+}
 
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
