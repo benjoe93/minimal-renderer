@@ -12,7 +12,7 @@
 #include "Texture.h"
 #include "Shader.h"
 
-#include "ScenePhongLight.h"
+#include "03_ScenePhongLight.h"
 
 namespace scene {
 

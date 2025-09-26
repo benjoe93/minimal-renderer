@@ -12,7 +12,7 @@
 #include "Texture.h"
 #include "Material.h"
 
-#include "SceneSurfMaps.h"
+#include "05_SceneSurfMaps.h"
 
 namespace scene {
 

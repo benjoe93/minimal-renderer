@@ -12,7 +12,7 @@
 #include "Texture.h"
 #include "Shader.h"
 
-#include "SceneMaterials.h"
+#include "04_SceneMaterials.h"
 
 namespace scene {
 

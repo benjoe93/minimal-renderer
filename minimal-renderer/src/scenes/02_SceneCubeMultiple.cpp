@@ -12,7 +12,7 @@
 #include "Texture.h"
 #include "Shader.h"
 
-#include "SceneCubeMultiple.h"
+#include "02_SceneCubeMultiple.h"
 
 namespace scene {
 	scene::SceneCubeMultiple::SceneCubeMultiple(Renderer& in_renderer)

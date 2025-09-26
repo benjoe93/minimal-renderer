@@ -14,7 +14,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 
-#include "scenes/SceneLightCasters.h"
+#include "scenes/06_SceneLightCasters.h"
 
 #define WINDOW_TITLE "LearnOpenGL"
 

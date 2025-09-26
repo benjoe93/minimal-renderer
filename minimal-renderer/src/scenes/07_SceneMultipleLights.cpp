@@ -12,7 +12,7 @@
 #include "Texture.h"
 #include "Material.h"
 
-#include "SceneLightCasters.h"
+#include "07_SceneMultipleLights.h"
 
 glm::vec3 cubePositions[] = {
 	glm::vec3(0.0f,  0.0f,  0.0f),
@@ -29,7 +29,7 @@ glm::vec3 cubePositions[] = {
 
 namespace scene {
 
-	SceneLightCasters::SceneLightCasters(Renderer& in_renderer)
+	SceneMultipleLights::SceneMultipleLights(Renderer& in_renderer)
 		:Scene(in_renderer),
 		light_color		{ 1.0f, 1.0f, 1.0f },
 		object_color	{ 1.0f, 0.5f, 0.31f },
@@ -149,7 +149,7 @@ namespace scene {
 		light_ib->Unbind();
 	}
 
-	void SceneLightCasters::OnUpdate(double delta_time)
+	void SceneMultipleLights::OnUpdate(double delta_time)
 	{
 
 		Camera* cam = m_renderer.state->active_camera;
@@ -265,7 +265,7 @@ namespace scene {
 		light_material->SetUniformVec3("u_lightColor", glm::vec3(light_color[0], light_color[1], light_color[2]));
 	}
 
-	void SceneLightCasters::OnRender()
+	void SceneMultipleLights::OnRender()
 	{
 		// Object rendering
 		for (int i = 0; i < 10; i++)
@@ -281,7 +281,7 @@ namespace scene {
 		light_material->Unbind();
 	}
 
-	void SceneLightCasters::OnImGuiRender()
+	void SceneMultipleLights::OnImGuiRender()
 	{
 		ImGui::Begin("Colors");
 		ImGui::SliderFloat3("Light Position", light_position, -10.f, 10.f);
