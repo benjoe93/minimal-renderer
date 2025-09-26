@@ -87,6 +87,9 @@
     <ClCompile Include="src\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scenes\SceneLightCasters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
@@ -167,6 +170,9 @@
     <ClInclude Include="src\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\scenes\SceneLightCasters.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\GettingStarted\default.frag" />
@@ -183,6 +189,10 @@
     <None Include="resources\shaders\Lighting\SurfaceMaps\light.vert" />
     <None Include="resources\shaders\Lighting\SurfaceMaps\object.frag" />
     <None Include="resources\shaders\Lighting\SurfaceMaps\object.vert" />
+    <None Include="resources\shaders\Lighting\LightCasters\light.frag" />
+    <None Include="resources\shaders\Lighting\LightCasters\light.vert" />
+    <None Include="resources\shaders\Lighting\LightCasters\object.frag" />
+    <None Include="resources\shaders\Lighting\LightCasters\object.vert" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\wall.jpg">

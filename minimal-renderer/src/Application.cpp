@@ -14,7 +14,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 
-#include "scenes/SceneSurfMaps.h"
+#include "scenes/SceneLightCasters.h"
 
 #define WINDOW_TITLE "LearnOpenGL"
 
@@ -81,7 +81,7 @@ int main(void)
     renderer.state->active_camera = &cam;
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneSurfMaps scene(renderer);
+    scene::SceneLightCasters scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))

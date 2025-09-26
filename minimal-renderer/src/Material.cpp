@@ -34,7 +34,7 @@ void Material::SetUniformMat4(const std::string type, const glm::mat4& value)
 
 void Material::Bind()
 {
-	auto test = m_shader.get();
+	// Bind shader
 	m_shader->Bind();
 
 	// Bind uniforms
