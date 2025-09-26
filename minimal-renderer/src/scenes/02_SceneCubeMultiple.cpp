@@ -101,7 +101,7 @@ namespace scene {
 		texture_2->Bind(1);
 
 		// Create shaders
-		default_shader = std::make_unique<Shader>("resources/shaders/GettingStarted/default.vert", "resources/shaders/GettingStarted/default.frag");
+		default_shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/default.vert", "resources/shaders/00_GettingStarted/default.frag");
 
 		// Pass textures to shader
 		default_shader->Bind();

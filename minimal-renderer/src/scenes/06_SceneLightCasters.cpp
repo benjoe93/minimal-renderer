@@ -14,7 +14,7 @@
 
 #include "06_SceneLightCasters.h"
 
-glm::vec3 cubePositions[] = {
+static glm::vec3 cubePositions[] = {
 	glm::vec3(0.0f,  0.0f,  0.0f),
 	glm::vec3(2.0f,  5.0f, -15.0f),
 	glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -120,7 +120,7 @@ namespace scene {
 
 		for (int i = 0; i < 10; i++)
 		{
-			object_materials.push_back(std::make_unique<Material>("resources/shaders/Lighting/LightCasters/object.vert", "resources/shaders/Lighting/LightCasters/object.frag"));
+			object_materials.push_back(std::make_unique<Material>("resources/shaders/01_Lighting/03_LightCasters/object.vert", "resources/shaders/01_Lighting/03_LightCasters/object.frag"));
 
 			// Bind Textures
 			object_materials[i]->AddTexture("material.diffuse", "resources/textures/container2.png", true);
@@ -142,7 +142,7 @@ namespace scene {
 
 		light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 
-		light_material = std::make_unique<Material>("resources/shaders/Lighting/LightCasters/light.vert", "resources/shaders/Lighting/LightCasters/light.frag");
+		light_material = std::make_unique<Material>("resources/shaders/01_Lighting/03_LightCasters/light.vert", "resources/shaders/01_Lighting/03_LightCasters/light.frag");
 
 		light_va->Unbind();
 		light_vb->Unbind();

@@ -104,7 +104,7 @@ namespace scene {
 		object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 		object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
-		object_shader = std::make_unique<Shader>("resources/shaders/Lighting/Materials/object.vert", "resources/shaders/Lighting/Materials/object.frag");
+		object_shader = std::make_unique<Shader>("resources/shaders/01_Lighting/01_Materials/object.vert", "resources/shaders/01_Lighting/01_Materials/object.frag");
 
 		object_va->Unbind();
 		object_vb->Unbind();
@@ -123,7 +123,7 @@ namespace scene {
 		light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 		//light_va->SetLayout(*light_vb, 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(6 * sizeof(float)));
 
-		light_shader = std::make_unique<Shader>("resources/shaders/Lighting/Materials/light.vert", "resources/shaders/Lighting/Materials/light.frag");
+		light_shader = std::make_unique<Shader>("resources/shaders/01_Lighting/01_Materials/light.vert", "resources/shaders/01_Lighting/01_Materials/light.frag");
 		light_shader->Bind();
 
 		light_va->Unbind();

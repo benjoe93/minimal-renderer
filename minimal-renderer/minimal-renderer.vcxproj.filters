@@ -66,28 +66,31 @@
     <ClCompile Include="src\Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scenes\SceneClearColor.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\scenes\SceneCubeMultiple.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\scenes\SceneCube.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\scenes\ScenePhongLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\scenes\SceneMaterials.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\scenes\SceneSurfMaps.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scenes\SceneLightCasters.cpp">
+    <ClCompile Include="src\scenes\00_SceneClearColor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\01_SceneCube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\02_SceneCubeMultiple.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\03_ScenePhongLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\04_SceneMaterials.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\05_SceneSurfMaps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\06_SceneLightCasters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\07_SceneMultipleLights.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -146,31 +149,34 @@
     <ClInclude Include="src\scenes\Scene.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\SceneClearColor.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scenes\SceneCubeMultiple.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scenes\SceneCube.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scenes\ScenePhongLight.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scenes\SceneMaterials.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\ShapeLib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\scenes\SceneSurfMaps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\SceneLightCasters.h">
+    <ClInclude Include="src\scenes\07_SceneMultipleLights.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\00_SceneClearColor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\01_SceneCube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\02_SceneCubeMultiple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\03_ScenePhongLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\04_SceneMaterials.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\05_SceneSurfMaps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\06_SceneLightCasters.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -193,6 +199,28 @@
     <None Include="resources\shaders\Lighting\LightCasters\light.vert" />
     <None Include="resources\shaders\Lighting\LightCasters\object.frag" />
     <None Include="resources\shaders\Lighting\LightCasters\object.vert" />
+    <None Include="resources\shaders\00_GettingStarted\default.frag" />
+    <None Include="resources\shaders\00_GettingStarted\default.vert" />
+    <None Include="resources\shaders\01_Lighting\04_MultipleLights\object.vert" />
+    <None Include="resources\shaders\01_Lighting\00_PhongLighting\light.frag" />
+    <None Include="resources\shaders\01_Lighting\00_PhongLighting\light.vert" />
+    <None Include="resources\shaders\01_Lighting\00_PhongLighting\object.frag" />
+    <None Include="resources\shaders\01_Lighting\00_PhongLighting\object.vert" />
+    <None Include="resources\shaders\01_Lighting\01_Materials\light.frag" />
+    <None Include="resources\shaders\01_Lighting\01_Materials\light.vert" />
+    <None Include="resources\shaders\01_Lighting\01_Materials\object.frag" />
+    <None Include="resources\shaders\01_Lighting\01_Materials\object.vert" />
+    <None Include="resources\shaders\01_Lighting\02_SurfaceMaps\light.frag" />
+    <None Include="resources\shaders\01_Lighting\02_SurfaceMaps\light.vert" />
+    <None Include="resources\shaders\01_Lighting\02_SurfaceMaps\object.frag" />
+    <None Include="resources\shaders\01_Lighting\02_SurfaceMaps\object.vert" />
+    <None Include="resources\shaders\01_Lighting\03_LightCasters\light.frag" />
+    <None Include="resources\shaders\01_Lighting\03_LightCasters\light.vert" />
+    <None Include="resources\shaders\01_Lighting\03_LightCasters\object.frag" />
+    <None Include="resources\shaders\01_Lighting\03_LightCasters\object.vert" />
+    <None Include="resources\shaders\01_Lighting\04_MultipleLights\light.frag" />
+    <None Include="resources\shaders\01_Lighting\04_MultipleLights\light.vert" />
+    <None Include="resources\shaders\01_Lighting\04_MultipleLights\object.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\wall.jpg">

@@ -105,7 +105,7 @@ namespace scene {
 		object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 		object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
-		object_material = std::make_unique<Material>("resources/shaders/Lighting/SurfaceMaps/object.vert", "resources/shaders/Lighting/SurfaceMaps/object.frag");
+		object_material = std::make_unique<Material>("resources/shaders/01_Lighting/02_SurfaceMaps/object.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/object.frag");
 
 		// Bind Textures
 		object_material->AddTexture("material.diffuse", "resources/textures/container2.png", true);
@@ -126,7 +126,7 @@ namespace scene {
 
 		light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 
-		light_material = std::make_unique<Material>("resources/shaders/Lighting/SurfaceMaps/light.vert", "resources/shaders/Lighting/SurfaceMaps/light.frag");
+		light_material = std::make_unique<Material>("resources/shaders/01_Lighting/02_SurfaceMaps/light.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/light.frag");
 
 		light_va->Unbind();
 		light_vb->Unbind();
