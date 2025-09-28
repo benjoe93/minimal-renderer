@@ -4,6 +4,9 @@
 
 #include "vendor/imgui/imgui.h"
 
+#include "LightDirectional.h"
+#include "LightPoint.h"
+
 #include "Renderer.h"
 #include "Camera.h"
 #include "IndexBuffer.h"
@@ -14,7 +17,7 @@
 
 #include "07_SceneMultipleLights.h"
 
-static glm::vec3 cubePositions[] = {
+static glm::vec3 cube_positions[] = {
 	glm::vec3(0.0f,  0.0f,  0.0f),
 	glm::vec3(2.0f,  5.0f, -15.0f),
 	glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -26,14 +29,26 @@ static glm::vec3 cubePositions[] = {
 	glm::vec3(1.5f,  0.2f, -1.5f),
 	glm::vec3(-1.3f,  1.0f, -1.5f)
 };
+static glm::vec3 point_light_pos[] = {
+	glm::vec3(0.7f,  0.2f,  2.0f),
+	glm::vec3(2.3f, -3.3f, -4.0f),
+	glm::vec3(-4.0f,  2.0f, -12.0f),
+	glm::vec3(0.0f,  0.0f, -3.0f)
+};
+static glm::vec3 point_light_col[] = {
+	glm::vec3(1.0f, 0.0f, 0.0f),
+	glm::vec3(0.0f, 1.0f, 0.0f),
+	glm::vec3(0.0f, 0.0f, 1.0f),
+	glm::vec3(1.0f, 1.0f, 0.0f)
+};
 
 namespace scene {
 
 	SceneMultipleLights::SceneMultipleLights(Renderer& in_renderer)
 		:Scene(in_renderer),
-		light_color		{ 1.0f, 1.0f, 1.0f },
-		object_color	{ 1.0f, 0.5f, 0.31f },
-		light_position	{ 1.2f, 1.0f, 2.0f }
+		light_color			{ 1.0f, 1.0f, 1.0f },
+		object_color		{ 1.0f, 0.5f, 0.31f },
+		dir_light_direction { 0.0f, -1.0f, 0.0f }
 	{
 		/* QUAD DEFINITION */
 		float vertices[] = {
@@ -105,7 +120,23 @@ namespace scene {
 		size_t element_size = 36;
 		size_t buffer_size = element_size * 8 * sizeof(float);
 
-		// Object setup
+		Camera* camera = m_renderer.state->active_camera;
+
+		// light setup
+		directional_light = std::make_unique<DirectionalLight>(glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
+
+		for (int ptl_id = 0; ptl_id < 4; ptl_id++)
+		{
+			glm::vec3 color = point_light_col[ptl_id];
+			glm::vec3 position = point_light_pos[ptl_id];
+
+			point_lights.push_back(std::make_unique<PointLight>(position, color * 0.2f , color, color));
+			ptl_data.push_back(PointLightData({ position[0], position[1], position[2] }, { color[0], color[1], color[2] }));
+		}
+
+		spot_light = std::make_unique<SpotLight>(camera->GetPosition(), camera->GetDirection(), 25.0f, 30.0f, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
+
+		// object setup
 		object_va = std::make_unique<VertexArray>();
 		object_va->Bind();
 
@@ -118,170 +149,137 @@ namespace scene {
 		object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 		object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 
-		for (int i = 0; i < 10; i++)
+		for (int mat_id = 0; mat_id < 10; mat_id++)
 		{
-			object_materials.push_back(std::make_unique<Material>("resources/shaders/01_Lighting/03_LightCasters/object.vert", "resources/shaders/01_Lighting/03_LightCasters/object.frag"));
+			object_materials.push_back(std::make_unique<Material>("resources/shaders/01_Lighting/04_MultipleLights/object.vert", "resources/shaders/01_Lighting/04_MultipleLights/object.frag"));
 
-			// Bind Textures
-			object_materials[i]->AddTexture("material.diffuse", "resources/textures/container2.png", true);
-			object_materials[i]->AddTexture("material.specular", "resources/textures/container2_specular.png", true);
+			// bind textures
+			object_materials[mat_id]->AddTexture("material.diffuse", "resources/textures/container2.png", true);
+			object_materials[mat_id]->AddTexture("material.specular", "resources/textures/container2_specular.png", true);
 		}
 
 		object_va->Unbind();
 		object_vb->Unbind();
 		object_ib->Unbind();
-
-		// Light setup
-		light_va = std::make_unique<VertexArray>();
-		light_va->Bind();
-
-		light_vb = std::make_unique<VertexBuffer>(vertices, buffer_size);
-		light_vb->Bind();
-		light_ib = std::make_unique<IndexBuffer>(indices, element_size);
-		light_ib->Bind();
-
-		light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-
-		light_material = std::make_unique<Material>("resources/shaders/01_Lighting/03_LightCasters/light.vert", "resources/shaders/01_Lighting/03_LightCasters/light.frag");
-
-		light_va->Unbind();
-		light_vb->Unbind();
-		light_ib->Unbind();
 	}
 
 	void SceneMultipleLights::OnUpdate(double delta_time)
 	{
-
 		Camera* cam = m_renderer.state->active_camera;
 		glm::vec3 cam_pos = cam->GetPosition();
 
 		glm::mat4 projection, model, ModelView, MVP;
 		projection = glm::perspective(glm::radians(cam->GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
 
-		// Object
-		/* Directional light */
-		/*
-		for (int i = 0; i < 10; i++)
+		// directional light
+		directional_light->SetDirection(glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]));
+		directional_light->Update(projection, cam->GetCurrentView());
+
+		// point lights
+		for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
+		{
+			point_lights[ptl_id]->SetPosition(glm::vec3(ptl_data[ptl_id].position[0], ptl_data[ptl_id].position[1], ptl_data[ptl_id].position[2]));
+			point_lights[ptl_id]->SetAmbient (glm::vec3(ptl_data[ptl_id].color[0] * 0.2f, ptl_data[ptl_id].color[1] * 0.2f, ptl_data[ptl_id].color[2] * 0.2f));
+			point_lights[ptl_id]->SetDiffuse (glm::vec3(ptl_data[ptl_id].color[0], ptl_data[ptl_id].color[1], ptl_data[ptl_id].color[2]));
+			point_lights[ptl_id]->SetSpecular(glm::vec3(ptl_data[ptl_id].color[0], ptl_data[ptl_id].color[1], ptl_data[ptl_id].color[2]));
+
+			point_lights[ptl_id]->Update(projection, cam->GetCurrentView());
+		}
+
+		// spot light
+		spot_light->SetPosition(cam_pos);
+		spot_light->SetDirection(cam->GetDirection());
+		spot_light->Update(projection, cam->GetCurrentView());
+
+		// objects
+		for (int obj_id = 0; obj_id < 10; obj_id++)
 		{
 			model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
+			model = glm::translate(model, cube_positions[obj_id]);
+			float angle = 20.0f * obj_id;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
 			ModelView = cam->GetCurrentView() * model;
 			MVP = projection * ModelView;
 
-			object_materials[i]->SetUniformMat4("model", model);
-			object_materials[i]->SetUniformMat4("mvp", MVP);
+			object_materials[obj_id]->SetUniformMat4("model", model);
+			object_materials[obj_id]->SetUniformMat4("mvp", MVP);
+			object_materials[obj_id]->SetUniformFloat("material.shininess", 32.f);
+			object_materials[obj_id]->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+			object_materials[obj_id]->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
 
-			object_materials[i]->SetUniformFloat("material.shininess", 32.f);
+			// light data
+			object_materials[obj_id]->SetUniformVec3("dir_light.direction", directional_light->GetDirection());
+			object_materials[obj_id]->SetUniformVec3("dir_light.ambient", directional_light->GetAmbient());
+			object_materials[obj_id]->SetUniformVec3("dir_light.diffuse", directional_light->GetDiffuse());
+			object_materials[obj_id]->SetUniformVec3("dir_light.specular", directional_light->GetSpecular());
 
-			object_materials[i]->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-			object_materials[i]->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
-			object_materials[i]->SetUniformVec3("light.direction", glm::vec3(-light_position[0], -light_position[1], -light_position[2])); // Directon is need to be flipped to get the direction from the fragment to the light
-			object_materials[i]->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-			object_materials[i]->SetUniformVec3("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
-			object_materials[i]->SetUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-			object_materials[i]->SetUniformFloat("light.constant", 1.0f);
-			object_materials[i]->SetUniformFloat("light.linear", 0.09f);
-			object_materials[i]->SetUniformFloat("light.quadratic", 0.032f);
+			for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
+			{
+				std::string current_light = "point_lights[" + std::to_string(ptl_id) + "].";
 
+				object_materials[obj_id]->SetUniformVec3( current_light + "position",	point_lights[ptl_id]->GetPosition());
+				object_materials[obj_id]->SetUniformFloat(current_light + "constant",	point_lights[ptl_id]->GetConstant());
+				object_materials[obj_id]->SetUniformFloat(current_light + "linear",		point_lights[ptl_id]->GetLinear());
+				object_materials[obj_id]->SetUniformFloat(current_light + "quadratic",	point_lights[ptl_id]->GetQuadratic());
+				object_materials[obj_id]->SetUniformVec3( current_light + "ambient",	point_lights[ptl_id]->GetAmbient());
+				object_materials[obj_id]->SetUniformVec3( current_light + "diffuse",	point_lights[ptl_id]->GetDiffuse());
+				object_materials[obj_id]->SetUniformVec3( current_light + "specular",	point_lights[ptl_id]->GetSpecular());
+			}
+
+			object_materials[obj_id]->SetUniformVec3("spot_light.position",			spot_light->GetPosition());
+			object_materials[obj_id]->SetUniformVec3("spot_light.direction",		spot_light->GetDirection());
+			object_materials[obj_id]->SetUniformVec3("spot_light.ambient",			spot_light->GetAmbient());
+			object_materials[obj_id]->SetUniformVec3("spot_light.diffuse",			spot_light->GetDiffuse());
+			object_materials[obj_id]->SetUniformVec3("spot_light.specular",			spot_light->GetSpecular());
+			object_materials[obj_id]->SetUniformFloat("spot_light.constant",		spot_light->GetConstant());
+			object_materials[obj_id]->SetUniformFloat("spot_light.linear",			spot_light->GetLinear());
+			object_materials[obj_id]->SetUniformFloat("spot_light.quadratic",		spot_light->GetQuadratic());
+			object_materials[obj_id]->SetUniformFloat("spot_light.cut_off",			glm::cos(glm::radians(spot_light->GetInnerAngle()/2)));
+			object_materials[obj_id]->SetUniformFloat("spot_light.outer_cut_off",	glm::cos(glm::radians(spot_light->GetOuterAngle()/2)));
 		}
-		*/
-
-		/* Point light */
-		/*
-		for (int i = 0; i < 10; i++)
-		{
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-
-			ModelView = cam->GetCurrentView() * model;
-			MVP = projection * ModelView;
-
-			object_materials[i]->SetUniformMat4("model", model);
-			object_materials[i]->SetUniformMat4("mvp", MVP);
-
-			object_materials[i]->SetUniformFloat("material.shininess", 32.f);
-
-			object_materials[i]->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-			object_materials[i]->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
-			object_materials[i]->SetUniformVec3("light.position", glm::vec3(light_position[0], light_position[1], light_position[2]));
-			object_materials[i]->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-			object_materials[i]->SetUniformVec3("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
-			object_materials[i]->SetUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-			object_materials[i]->SetUniformFloat("light.constant", 1.0f);
-			object_materials[i]->SetUniformFloat("light.linear", 0.09f);
-			object_materials[i]->SetUniformFloat("light.quadratic", 0.032f);
-
-		}
-		*/
-
-		/* Spotlight */
-		for (int i = 0; i < 10; i++)
-		{
-			model = glm::mat4(1.0f);
-			model = glm::translate(model, cubePositions[i]);
-			float angle = 20.0f * i;
-			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-
-			ModelView = cam->GetCurrentView() * model;
-			MVP = projection * ModelView;
-
-			object_materials[i]->SetUniformMat4("model", model);
-			object_materials[i]->SetUniformMat4("mvp", MVP);
-
-			object_materials[i]->SetUniformFloat("material.shininess", 32.f);
-
-			object_materials[i]->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-			object_materials[i]->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
-
-			object_materials[i]->SetUniformVec3("light.position", cam_pos);
-			object_materials[i]->SetUniformVec3("light.direction", cam->GetDirection());
-			object_materials[i]->SetUniformFloat("light.cut_off", glm::cos(glm::radians(12.5f))); // sending cosine for perf reasons | cos(light_angle) == dot(light_dir, spot_dir)
-			object_materials[i]->SetUniformFloat("light.outer_cut_off", glm::cos(glm::radians(17.5f))); // sending cosine for perf reasons | cos(light_angle) == dot(light_dir, spot_dir)
-
-			object_materials[i]->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-			object_materials[i]->SetUniformVec3("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
-			object_materials[i]->SetUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-			object_materials[i]->SetUniformFloat("light.constant", 1.0f);
-			object_materials[i]->SetUniformFloat("light.linear", 0.09f);
-			object_materials[i]->SetUniformFloat("light.quadratic", 0.032f);
-
-		}
-
-		// Light
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(light_position[0], light_position[1], light_position[2]));
-		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
-
-		ModelView = cam->GetCurrentView() * model;
-		MVP = projection * ModelView;
-		
-		light_material->SetUniformMat4("mvp", MVP);
-
-		light_material->SetUniformVec3("u_lightColor", glm::vec3(light_color[0], light_color[1], light_color[2]));
 	}
 
 	void SceneMultipleLights::OnRender()
 	{
-		// Object rendering
-		for (int i = 0; i < 10; i++)
+		// light rendering
+		directional_light->GetMaterial()->Bind();
+		m_renderer.Draw(*directional_light->GetVertArray(), *directional_light->GetIndexBuffer(), *(directional_light->GetMaterial()->GetShader()));
+		directional_light->GetMaterial()->Unbind();
+
+		for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
 		{
-			object_materials[i]->Bind();
-			m_renderer.Draw(*object_va, *object_ib, *(object_materials[i]->GetShader()));
-			object_materials[i]->Unbind();
+			point_lights[ptl_id]->GetMaterial()->Bind();
+			m_renderer.Draw(*point_lights[ptl_id]->GetVertArray(), *point_lights[ptl_id]->GetIndexBuffer(), *(point_lights[ptl_id]->GetMaterial()->GetShader()));
+			point_lights[ptl_id]->GetMaterial()->Unbind();
 		}
 
-		// Light rendering
-		light_material->Bind();
-		m_renderer.Draw(*light_va, *light_ib, *(light_material->GetShader()));
-		light_material->Unbind();
+		// object rendering
+		for (int obj_id = 0; obj_id < 10; obj_id++)
+		{
+			object_materials[obj_id]->Bind();
+			m_renderer.Draw(*object_va, *object_ib, *(object_materials[obj_id]->GetShader()));
+			object_materials[obj_id]->Unbind();
+		}
 	}
 
 	void SceneMultipleLights::OnImGuiRender()
 	{
+		ImGui::Begin("Multiple lights");
+		ImGui::Text("Sun");
+		ImGui::SliderFloat3("Dir", dir_light_direction, -1.0f, 1.0f, "%.2f");
+		ImGui::Separator();
+
+		for (int i = 0; i < ptl_data.size(); i++)
+		{
+			std::string name = "Point Light " + std::to_string(i);
+			std::string pos_id = "##Position" + std::to_string(i);
+			std::string col_id = "##Color" + std::to_string(i);
+			ImGui::Text(name.c_str());
+			ImGui::SliderFloat3(pos_id.c_str(), ptl_data[i].position, -12.0f, 12.0f, "%.2f");
+			ImGui::ColorEdit3(col_id.c_str(), ptl_data[i].color);
+			ImGui::Separator();
+		}
+		ImGui::End();
 	}
 }
