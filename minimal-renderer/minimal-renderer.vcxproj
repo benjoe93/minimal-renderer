@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\IndexBuffer.cpp" />
+    <ClCompile Include="src\Light.cpp" />
     <ClCompile Include="src\LightDirectional.cpp" />
     <ClCompile Include="src\LightPoint.cpp" />
     <ClCompile Include="src\LightSpot.cpp" />
@@ -186,6 +187,7 @@
   <ItemGroup>
     <ClInclude Include="src\Camera.h" />
     <ClInclude Include="src\IndexBuffer.h" />
+    <ClInclude Include="src\Light.h" />
     <ClInclude Include="src\LightDirectional.h" />
     <ClInclude Include="src\LightPoint.h" />
     <ClInclude Include="src\LightSpot.h" />
@@ -235,8 +237,8 @@
     <None Include="resources\shaders\01_Lighting\03_LightCasters\light.vert" />
     <None Include="resources\shaders\01_Lighting\03_LightCasters\object.frag" />
     <None Include="resources\shaders\01_Lighting\03_LightCasters\object.vert" />
-    <None Include="resources\shaders\01_Lighting\04_MultipleLights\light.frag" />
-    <None Include="resources\shaders\01_Lighting\04_MultipleLights\light.vert" />
+    <None Include="resources\shaders\common\light.frag" />
+    <None Include="resources\shaders\common\light.vert" />
     <None Include="resources\shaders\01_Lighting\04_MultipleLights\object.frag" />
     <None Include="resources\shaders\01_Lighting\04_MultipleLights\object.vert" />
     <None Include="resources\shaders\GettingStarted\default.frag" />

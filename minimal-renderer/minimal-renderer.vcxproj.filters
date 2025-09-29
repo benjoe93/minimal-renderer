@@ -102,6 +102,9 @@
     <ClCompile Include="src\LightSpot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
@@ -197,6 +200,9 @@
     <ClInclude Include="src\LightPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\GettingStarted\default.frag" />
@@ -236,8 +242,8 @@
     <None Include="resources\shaders\01_Lighting\03_LightCasters\light.vert" />
     <None Include="resources\shaders\01_Lighting\03_LightCasters\object.frag" />
     <None Include="resources\shaders\01_Lighting\03_LightCasters\object.vert" />
-    <None Include="resources\shaders\01_Lighting\04_MultipleLights\light.frag" />
-    <None Include="resources\shaders\01_Lighting\04_MultipleLights\light.vert" />
+    <None Include="resources\shaders\common\light.frag" />
+    <None Include="resources\shaders\common\light.vert" />
     <None Include="resources\shaders\01_Lighting\04_MultipleLights\object.frag" />
   </ItemGroup>
   <ItemGroup>
