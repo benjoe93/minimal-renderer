@@ -46,9 +46,10 @@ namespace scene {
 
     SceneMultipleLights::SceneMultipleLights(Renderer& in_renderer)
         :Scene(in_renderer),
-        light_color            { 1.0f, 1.0f, 1.0f },
-        object_color        { 1.0f, 0.5f, 0.31f },
-        dir_light_direction { 0.0f, -1.0f, 0.0f }
+        light_color         { 1.0f,  1.0f, 1.0f },
+        object_color        { 1.0f,  0.5f, 0.31f },
+        dir_light_direction { 0.0f, -1.0f, 0.0f },
+        background_color    { 0.18f,  0.23f, 0.24f }
     {
         /* QUAD DEFINITION */
         float vertices[] = {
@@ -242,6 +243,8 @@ namespace scene {
 
     void SceneMultipleLights::OnRender()
     {
+        m_renderer.SetBackgroundColor(glm::vec4(background_color[0], background_color[1], background_color[2], 1.0));
+
         // light rendering
         directional_light->GetMaterial()->Bind();
         m_renderer.Draw(*directional_light->GetVertArray(), *directional_light->GetIndexBuffer(), *(directional_light->GetMaterial()->GetShader()));
@@ -253,6 +256,10 @@ namespace scene {
             m_renderer.Draw(*point_lights[ptl_id]->GetVertArray(), *point_lights[ptl_id]->GetIndexBuffer(), *(point_lights[ptl_id]->GetMaterial()->GetShader()));
             point_lights[ptl_id]->GetMaterial()->Unbind();
         }
+
+        spot_light->GetMaterial()->Bind();
+        m_renderer.Draw(*spot_light->GetVertArray(), *spot_light->GetIndexBuffer(), *(spot_light->GetMaterial()->GetShader()));
+        spot_light->GetMaterial()->Unbind();
 
         // object rendering
         for (int obj_id = 0; obj_id < 10; obj_id++)
@@ -266,6 +273,8 @@ namespace scene {
     void SceneMultipleLights::OnImGuiRender()
     {
         ImGui::Begin("Multiple lights");
+        ImGui::ColorEdit3("Background", background_color);
+        ImGui::Separator();
         ImGui::Text("Sun");
         ImGui::SliderFloat3("Dir", dir_light_direction, -1.0f, 1.0f, "%.2f");
         ImGui::Separator();

@@ -8,7 +8,6 @@
 
 SpotLight::SpotLight(glm::vec3 position, glm::vec3 direction, float inner_angle, float outer_angle, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular)
     : Light(position, ambient, diffuse, specular),
-    m_position(position),
     m_direction(direction),
     m_inner_angle(inner_angle),
     m_outer_angle(outer_angle)

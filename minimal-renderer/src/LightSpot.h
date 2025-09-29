@@ -8,15 +8,14 @@ class Material;
 class SpotLight : public Light
 {
 private:
-    glm::vec3 m_position;
     glm::vec3 m_direction;
 
     float m_inner_angle;
     float m_outer_angle;
 
-    float m_constant    = 1.0f;
-    float m_linear        = 0.09f;
-    float m_quadratic    = 0.032f;
+    float m_constant  = 1.0f;
+    float m_linear    = 0.09f;
+    float m_quadratic = 0.032f;
 
 public:
     SpotLight(glm::vec3 position, glm::vec3 direction, float inner_angle, float outer_angle, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
@@ -32,8 +31,6 @@ public:
 
 
     inline void SetDirection(glm::vec3 new_direction) { m_direction = new_direction; };
-    inline void SetPosition(glm::vec3 new_position) { m_position = new_position; };
-
     inline void SetInnerAngle(float new_angle) { m_inner_angle = new_angle; };
     inline void SetOuterAngle(float new_angle) { m_outer_angle = new_angle; };
 };

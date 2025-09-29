@@ -36,6 +36,7 @@ public:
     inline IndexBuffer* GetIndexBuffer() const { return m_ib.get(); }
     inline Material* GetMaterial() const { return m_material.get(); }
 
+    inline void SetPosition(glm::vec3 new_position) { m_position = new_position; };
     inline void SetAmbient(glm::vec3 new_ambient) { m_ambient = new_ambient; };
     inline void SetDiffuse(glm::vec3 new_diffuse) { m_diffuse = new_diffuse; };
     inline void SetSpecular(glm::vec3 new_specular) { m_specular = new_specular; };
