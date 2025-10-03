@@ -10,13 +10,12 @@ class Camera
 		float m_fov = 45.0f;
 		float m_pitch, m_yaw, m_roll;
 		glm::vec3 m_cam_position, m_cam_direction, m_cam_up;
-		glm::mat4 view;
 
 	public:
 		Camera(const unsigned int id, const glm::vec3 position, const glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f), const glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
 		~Camera();
 
-		glm::mat4 GetCurrentView() const;
+		glm::mat4 GetViewMatrix() const;
 
 		inline void SetPosition(glm::vec3 new_pos) { m_cam_position = new_pos; }
 		inline void SetSpeed(const float new_speed) { m_cam_speed = new_speed; }
@@ -30,7 +29,6 @@ class Camera
 		inline glm::vec3 GetPosition() const { return m_cam_position; }
 		inline glm::vec3 GetDirection() const { return m_cam_direction; }
 		inline glm::vec3 GetUpVector() const { return m_cam_up; }
-		inline glm::mat4 GetView() const { return view; }
 		inline float GetSpeed() const { return m_cam_speed; }
 
 		inline float GetPitch() const { return m_pitch; }

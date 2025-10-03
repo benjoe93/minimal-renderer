@@ -1,4 +1,14 @@
 #pragma once
+#include <iostream>
+
+enum TextureType
+{
+    NONE = 0,
+    DIFFUSE,
+    SPECULAR,
+    NORMAL,
+    HEIGHT,
+};
 
 class Texture
 {
@@ -6,19 +16,35 @@ class Texture
 		unsigned int m_renderer_id;
 		int m_width;
 		int m_height;
-		int m_num_channels;
+		int m_nr_channels;
+
+        std::string m_filepath;
+        std::string m_sampler_name;
+        TextureType m_type;
+
+        GLenum GetFormat() const;
+        std::string GetShaderUsage() const;
+        void LoadTexture(bool vertical_flip);
 
 	public:
 		// connstuctor to read and build the texture
-		Texture(const char* texture_path, unsigned int format, bool vertical_flip = true);
-		~Texture();
+        Texture(const std::string& filepath, TextureType type ,bool vertical_flip = true);
+        Texture(const std::string& filepath, std::string sampler_name, bool vertical_flip = true);
+        ~Texture();
 
-		// texture unit
-		void setTextureUnit(const unsigned int texture) const;
+        // Prevent copying (textures own GPU resources)
+        Texture(const Texture&) = delete;
+        Texture& operator=(const Texture&) = delete;
+
+        // Allow moving
+        Texture(Texture&& other) noexcept;
+        Texture& operator=(Texture&& other) noexcept;
 
 		void Bind(unsigned int slot = 0) const;
 		void Unbind() const;
 
 		inline int GetWidth() const { return m_width; }
 		inline int GetHeight() const { return m_height; }
+        inline std::string GetFilepath() const { return m_filepath; }
+        inline std::string GetSamplerName() const { return m_sampler_name; }
 };

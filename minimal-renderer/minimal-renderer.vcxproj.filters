@@ -105,6 +105,15 @@
     <ClCompile Include="src\Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Model.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\scenes\08_SceneModelLoading.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
@@ -203,6 +212,15 @@
     <ClInclude Include="src\Light.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\08_SceneModelLoading.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\GettingStarted\default.frag" />
@@ -245,6 +263,8 @@
     <None Include="resources\shaders\common\light.frag" />
     <None Include="resources\shaders\common\light.vert" />
     <None Include="resources\shaders\01_Lighting\04_MultipleLights\object.frag" />
+    <None Include="resources\shaders\02_LoadingMesh\object.vert" />
+    <None Include="resources\shaders\02_LoadingMesh\object.frag" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\wall.jpg">
@@ -260,6 +280,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="resources\textures\container2_specular.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\textures\common\point_light.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

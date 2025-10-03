@@ -124,14 +124,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories);$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLAD\include;$(SolutionDir)dependencies\GLM;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;$(SolutionDir)libraries\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(SolutionDir)libraries\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib;assimp-vc143-mt.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -142,14 +142,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>src;%(AdditionalIncludeDirectories);$(SolutionDir)dependencies\GLFW\include;$(SolutionDir)dependencies\GLAD\include;$(SolutionDir)dependencies\GLM;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);src;$(SolutionDir)libraries\include</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);$(SolutionDir)libraries\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);glfw3.lib;opengl32.lib;assimp-vc143-mt.lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -160,6 +160,8 @@
     <ClCompile Include="src\LightPoint.cpp" />
     <ClCompile Include="src\LightSpot.cpp" />
     <ClCompile Include="src\Material.cpp" />
+    <ClCompile Include="src\Mesh.cpp" />
+    <ClCompile Include="src\Model.cpp" />
     <ClCompile Include="src\Renderer.cpp" />
     <ClCompile Include="src\scenes\00_SceneClearColor.cpp" />
     <ClCompile Include="src\scenes\01_SceneCube.cpp" />
@@ -169,6 +171,7 @@
     <ClCompile Include="src\scenes\05_SceneSurfMaps.cpp" />
     <ClCompile Include="src\scenes\06_SceneLightCasters.cpp" />
     <ClCompile Include="src\scenes\07_SceneMultipleLights.cpp" />
+    <ClCompile Include="src\scenes\08_SceneModelLoading.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\vendor\glad\glad.c" />
@@ -192,6 +195,8 @@
     <ClInclude Include="src\LightPoint.h" />
     <ClInclude Include="src\LightSpot.h" />
     <ClInclude Include="src\Material.h" />
+    <ClInclude Include="src\Mesh.h" />
+    <ClInclude Include="src\Model.h" />
     <ClInclude Include="src\Renderer.h" />
     <ClInclude Include="src\scenes\00_SceneClearColor.h" />
     <ClInclude Include="src\scenes\01_SceneCube.h" />
@@ -201,6 +206,7 @@
     <ClInclude Include="src\scenes\05_SceneSurfMaps.h" />
     <ClInclude Include="src\scenes\06_SceneLightCasters.h" />
     <ClInclude Include="src\scenes\07_SceneMultipleLights.h" />
+    <ClInclude Include="src\scenes\08_SceneModelLoading.h" />
     <ClInclude Include="src\scenes\Scene.h" />
     <ClInclude Include="src\ShapeLib.h" />
     <ClInclude Include="src\Texture.h" />
@@ -237,6 +243,8 @@
     <None Include="resources\shaders\01_Lighting\03_LightCasters\light.vert" />
     <None Include="resources\shaders\01_Lighting\03_LightCasters\object.frag" />
     <None Include="resources\shaders\01_Lighting\03_LightCasters\object.vert" />
+    <None Include="resources\shaders\02_LoadingMesh\object.frag" />
+    <None Include="resources\shaders\02_LoadingMesh\object.vert" />
     <None Include="resources\shaders\common\light.frag" />
     <None Include="resources\shaders\common\light.vert" />
     <None Include="resources\shaders\01_Lighting\04_MultipleLights\object.frag" />
@@ -262,6 +270,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\textures\awesomeface.png" />
+    <Image Include="resources\textures\common\point_light.png" />
     <Image Include="resources\textures\container.jpg" />
     <Image Include="resources\textures\container2.png" />
     <Image Include="resources\textures\container2_specular.png" />

@@ -94,8 +94,8 @@ namespace scene {
 		va->Unbind();
 
 		// Create textures
-		texture_1 = std::make_unique<Texture>("resources/textures/container.jpg", GL_RGB);
-		texture_2 = std::make_unique<Texture>("resources/textures/awesomeface.png", GL_RGBA);
+		texture_1 = std::make_unique<Texture>("resources/textures/container.jpg", TextureType::NONE, true);
+		texture_2 = std::make_unique<Texture>("resources/textures/awesomeface.png", TextureType::NONE, true);
 
 		texture_1->Bind();
 		texture_2->Bind(1);
@@ -132,7 +132,7 @@ namespace scene {
 		};
 		
 		// Projection matrix
-		glm::mat4 projection = glm::perspective(glm::radians(m_renderer.state->active_camera->GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(m_renderer.GetActiveCamera().GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
 
 		// Model matrix
 		for (unsigned char i = 0; i < 10; i++)
@@ -144,7 +144,7 @@ namespace scene {
 			model = glm::rotate(model, glm::radians(rotation), glm::vec3(1.0f, 0.3f, 0.5f));
 
 			default_shader->SetMat4("model", model);
-			default_shader->SetMat4("view", m_renderer.state->active_camera->GetCurrentView());
+			default_shader->SetMat4("view", m_renderer.GetActiveCamera().GetViewMatrix());
 			default_shader->SetMat4("projection", projection);
 
 			// draw first triangle

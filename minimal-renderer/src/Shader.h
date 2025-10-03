@@ -9,6 +9,8 @@ class Shader
 {
 	private:
 		unsigned int m_renderer_id;
+        const char* m_vertex_path;
+        const char* m_fragment_path;
 
 	public:
 		Shader(const char* vertex_path, const char* fragment_path);
@@ -25,4 +27,6 @@ class Shader
 		void SetVec3(const std::string& name, const float x, const float y, const float z);
 		void SetVec4(const std::string& name, const float x, const float y, const float z, const float w);
 		void SetMat4(const std::string& name, glm::mat4 value);
+
+        void PrintShaderFiles() const;
 };

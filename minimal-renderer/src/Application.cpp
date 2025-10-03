@@ -14,7 +14,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 
-#include "scenes/07_SceneMultipleLights.h"
+#include "scenes/08_SceneModelLoading.h"
 
 #define WINDOW_TITLE "LearnOpenGL"
 
@@ -77,11 +77,11 @@ int main(void)
     ImGui_ImplOpenGL3_Init("#version 330");
 
     Renderer renderer;
-    Camera cam(1, glm::vec3(0.0f, 0.0f, 3.0f));
-    renderer.state->active_camera = &cam;
+    renderer.state->cameras[0] = std::make_shared<Camera>(0, glm::vec3(0.0f, 0.0f, 3.0f));
+    renderer.state->active_camera = 0;
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneMultipleLights scene(renderer);
+    scene::SceneModelLoading scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))
@@ -141,7 +141,7 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 void ProcessInput(GLFWwindow* window)
 {
     Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    Camera* cam = renderer->state->active_camera;
+    Camera& cam = renderer->GetActiveCamera();
 
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && renderer->state->cursor_disabled == false)
     {
@@ -163,39 +163,39 @@ void ProcessInput(GLFWwindow* window)
     // Move forward
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && renderer->state->cursor_disabled)
     {
-        cam->MoveFwd(renderer->GetDeltaTime());
+        cam.MoveFwd(renderer->GetDeltaTime());
     }
     // Move backward
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && renderer->state->cursor_disabled)
     {
-        cam->MoveBwd(renderer->GetDeltaTime());
+        cam.MoveBwd(renderer->GetDeltaTime());
     }
     // Move left
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && renderer->state->cursor_disabled)
     {
-        cam->MoveLeft(renderer->GetDeltaTime());
+        cam.MoveLeft(renderer->GetDeltaTime());
     }
     // Move right
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && renderer->state->cursor_disabled)
     {
-        cam->MoveRight(renderer->GetDeltaTime());
+        cam.MoveRight(renderer->GetDeltaTime());
     }
     // Move down
     if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && renderer->state->cursor_disabled)
     {
-        cam->MoveDown(renderer->GetDeltaTime());
+        cam.MoveDown(renderer->GetDeltaTime());
     }
     // Move up
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && renderer->state->cursor_disabled)
     {
-        cam->MoveUp(renderer->GetDeltaTime());
+        cam.MoveUp(renderer->GetDeltaTime());
     }
 }
 
 void MouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
     Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    Camera* cam = renderer->state->active_camera;
+    Camera& cam = renderer->GetActiveCamera();
 
     if (!renderer->state->cursor_disabled)
     {       
@@ -212,8 +212,8 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos)
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
-    cam->SetYaw(cam->GetYaw() + xoffset);
-    float new_pitch = cam->GetPitch() + -1.0f * yoffset;
+    cam.SetYaw(cam.GetYaw() + xoffset);
+    float new_pitch = cam.GetPitch() + -1.0f * yoffset;
 
     if (new_pitch > 89.0f)
     {
@@ -223,20 +223,20 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos)
     {
         new_pitch = -89.0f;
     }
-    cam->SetPitch(new_pitch);
-    cam->UpdateRotation(1.0f);
+    cam.SetPitch(new_pitch);
+    cam.UpdateRotation(1.0f);
 }
 
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
     Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
-    Camera* cam = renderer->state->active_camera;
+    Camera& cam = renderer->GetActiveCamera();
 
-    float fov = cam->GetFov();
+    float fov = cam.GetFov();
     fov -= static_cast<float>(yoffset);
     if (fov < 1.0f)
         fov = 1.0f;
     if (fov > 90.0f)
         fov = 90.0f;
-    cam->SetFov(fov);
+    cam.SetFov(fov);
 }

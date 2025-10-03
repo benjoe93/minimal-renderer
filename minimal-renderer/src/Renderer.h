@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <memory>
+#include <vector>
+#include <unordered_map>
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
@@ -12,6 +14,7 @@ class Camera;
 class Shader;
 class IndexBuffer;
 class VertexArray;
+class Model;
 
 #define ASSERT(x) if (!(x)) __debugbreak();
 #define GLCall(x) GLClearError();\
@@ -43,7 +46,8 @@ struct AppState
     float last_x = 640;
     float last_y = 360;
 
-    Camera* active_camera = nullptr;
+    unsigned int active_camera;
+    std::unordered_map<unsigned int, std::shared_ptr<Camera>> cameras;
 };
 
 class Renderer
@@ -66,13 +70,16 @@ class Renderer
 
 	    void Clear();
 	    void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+        void Draw(Model& obj);
 
 	    int GetMaxVertexAttribs() const;
+        Camera& GetActiveCamera() const;
+
 
 	    inline void SetBackgroundColor(glm::vec4 new_color) { m_background_color = new_color; }
         inline void SetDepthTest(bool enabled) { m_use_depth_buffer = enabled; }
-        inline void Setwireframe(bool enabled) { m_enable_wireframe = enabled; }
-        inline void Setface_culling(bool enabled) { m_enable_face_culling = enabled; }
+        inline void SetWireframe(bool enabled) { m_enable_wireframe = enabled; }
+        inline void SetFaceCulling(bool enabled) { m_enable_face_culling = enabled; }
         inline double GetDeltaTime() const { return m_delta_time; }
 
         void Tick(double current_time);
@@ -80,6 +87,6 @@ class Renderer
 
     private:
         void ToggleDepthTest() const;
-	    void TogglewireframeRender() const;
-        void Toggleface_culling() const;
+	    void ToggleWireframeRender() const;
+        void ToggleFaceCulling() const;
 };

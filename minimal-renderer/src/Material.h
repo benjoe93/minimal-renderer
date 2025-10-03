@@ -11,7 +11,7 @@ class Material
 {
 private:
 	std::unique_ptr<Shader> m_shader;
-	std::vector<std::pair<std::string, std::unique_ptr<Texture>>> m_textures;
+	std::vector<std::pair<std::string, std::shared_ptr<Texture>>> m_textures;
 
 	std::unordered_map<std::string, float> u_floats;
 	std::unordered_map<std::string, glm::vec3> u_vec3;
@@ -21,7 +21,11 @@ public:
 	Material(const char* vertex_path, const char* fragment_path);
 	~Material();
 
-	void AddTexture(std::string type, const char* path, bool is_rgba);
+    void AddTexture(std::shared_ptr<Texture> texture, std::string sampler_name);
+    void AddTexture(std::shared_ptr<Texture> texture, TextureType type);
+
+	void AddTexture(std::string path, std::string sampler_name, bool is_flipped);
+    void AddTexture(std::string path, TextureType type,  bool is_flipped);
 
 	void SetUniformFloat(const std::string type, float value);
 	void SetUniformVec3(const std::string type, const glm::vec3& value);
@@ -30,5 +34,5 @@ public:
 	void Bind();
 	void Unbind();
 
-	inline Shader* GetShader() const { return m_shader.get(); }
+	inline Shader& GetShader() const { return *m_shader; }
 };

@@ -5,6 +5,7 @@
 #include "Shader.h"
 
 Shader::Shader(const char* vertex_path, const char* fragment_path)
+    : m_vertex_path(vertex_path), m_fragment_path(fragment_path)
 {
 	// retrive the vertex/fragment source code from file path
 	std::string vertex_code, fragment_code;
@@ -15,8 +16,8 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
 	try
 	{
 		// open file
-		v_shader_file.open(vertex_path);
-		f_shader_file.open(fragment_path);
+		v_shader_file.open(m_vertex_path);
+		f_shader_file.open(m_fragment_path);
 		std::stringstream v_shader_stream, f_shader_stream;
 
 		// read file's buffer contents into streams
@@ -31,7 +32,7 @@ Shader::Shader(const char* vertex_path, const char* fragment_path)
 	}
 	catch (std::ifstream::failure e)
 	{
-		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ" << std::endl;
+		std::cout << "ERROR::SHADER::FILE_NOT_SUCCESFULLY_READ: " << m_vertex_path << std::endl;
 	}
 	const char* v_shader_code = vertex_code.c_str();
 	const char* f_shader_code = fragment_code.c_str();
@@ -160,4 +161,11 @@ void Shader::SetMat4(const std::string& name, glm::mat4 value)
 	{
 		GLCall(glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(value)));
 	}
+}
+
+void Shader::PrintShaderFiles() const
+{
+    std::cout << "Shader ID: " << m_renderer_id << std::endl;
+    std::cout << "Vert: " << m_vertex_path << std::endl;
+    std::cout << "Frag: " << m_fragment_path << std::endl << std::endl;
 }

@@ -1,6 +1,9 @@
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "VertexArray.h"
+#include "Model.h"
+#include "Mesh.h"
+#include "Material.h"
 
 #include "Renderer.h"
 
@@ -24,9 +27,9 @@ Renderer::~Renderer() {}
 
 void Renderer::Clear()
 {
-	TogglewireframeRender();
+	ToggleWireframeRender();
 	ToggleDepthTest();
-	Toggleface_culling();
+	ToggleFaceCulling();
 
 	GLCall(glClearColor(m_background_color.x, m_background_color.y, m_background_color.z, m_background_color.w));
 	GLCall(glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ));
@@ -39,7 +42,22 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 	GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount() , GL_UNSIGNED_INT, nullptr));
 }
 
-void Renderer::TogglewireframeRender() const
+void Renderer::Draw(Model& obj)
+{
+    for (auto& mesh : obj.GetMeshes())
+    {
+        IndexBuffer* ib = mesh->GetIndexBuffer();
+        auto& material = mesh->GetMaterial();
+
+        material.Bind();
+        material.GetShader().Bind();
+        mesh->GetVertexArray()->Bind();
+        GLCall(glDrawElements(GL_TRIANGLES, ib->GetCount(), GL_UNSIGNED_INT, nullptr));
+        material.Unbind();
+    }
+}
+
+void Renderer::ToggleWireframeRender() const
 {
 	if (m_enable_wireframe)
 	{
@@ -47,12 +65,16 @@ void Renderer::TogglewireframeRender() const
 	}
 }
 
-void Renderer::Toggleface_culling() const
+void Renderer::ToggleFaceCulling() const
 {
 	if (m_enable_face_culling)
-		glEnable(GL_CULL_FACE);
-	else
-		glDisable(GL_CULL_FACE);
+    {
+		GLCall(glEnable(GL_CULL_FACE));
+    }
+    else
+    {
+        GLCall(glDisable(GL_CULL_FACE));
+    }
 }
 
 void Renderer::Tick(double current_time)
@@ -64,9 +86,13 @@ void Renderer::Tick(double current_time)
 void Renderer::ToggleDepthTest() const
 {
 	if (m_use_depth_buffer)
-		glEnable(GL_DEPTH_TEST);
-	else
-		glDisable(GL_DEPTH_TEST);
+    {
+        GLCall(glEnable(GL_DEPTH_TEST));
+    }
+    else
+    {
+		GLCall(glDisable(GL_DEPTH_TEST));
+    }
 }
 
 int Renderer::GetMaxVertexAttribs() const
@@ -74,4 +100,10 @@ int Renderer::GetMaxVertexAttribs() const
 	int nrAttr;
 	GLCall(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttr));
 	return nrAttr;
+}
+
+Camera& Renderer::GetActiveCamera() const
+{
+    std::shared_ptr<Camera> camera = state->cameras[state->active_camera];
+    return *camera;
 }

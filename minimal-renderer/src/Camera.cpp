@@ -8,15 +8,13 @@ Camera::Camera(const unsigned int id, const glm::vec3 Position, const glm::vec3 
 	m_cam_position(Position),
 	m_cam_direction(Front),
 	m_cam_up(Up)
-{
-	view = GetCurrentView();
-}
+{}
 
 Camera::~Camera()
 {
 }
 
-glm::mat4 Camera::GetCurrentView() const
+glm::mat4 Camera::GetViewMatrix() const
 {
 	return glm::lookAt(m_cam_position, m_cam_position + m_cam_direction, m_cam_up);
 }

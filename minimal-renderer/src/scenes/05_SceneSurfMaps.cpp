@@ -108,8 +108,8 @@ namespace scene {
 		object_material = std::make_unique<Material>("resources/shaders/01_Lighting/02_SurfaceMaps/object.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/object.frag");
 
 		// Bind Textures
-		object_material->AddTexture("material.diffuse", "resources/textures/container2.png", true);
-		object_material->AddTexture("material.specular", "resources/textures/container2_specular.png", true);
+		object_material->AddTexture("resources/textures/container2.png", "material.diffuse", true);
+        object_material->AddTexture("resources/textures/container2_specular.png", "material.specular", true);
 
 		object_va->Unbind();
 		object_vb->Unbind();
@@ -135,15 +135,15 @@ namespace scene {
 
 	void SceneSurfMaps::OnUpdate(double delta_time)
 	{
-		Camera* cam = m_renderer.state->active_camera;
-		glm::vec3 cam_pos = cam->GetPosition();
-		glm::mat4 projection = glm::perspective(glm::radians(cam->GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+		Camera& cam = m_renderer.GetActiveCamera();
+		glm::vec3 cam_pos = cam.GetPosition();
+		glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
 
 		// Object
 		glm::mat4 model = glm::mat4(1.0f);
 
 		object_material->SetUniformMat4("model", model);
-		object_material->SetUniformMat4("view", cam->GetCurrentView());
+		object_material->SetUniformMat4("view", cam.GetViewMatrix());
 		object_material->SetUniformMat4("projection", projection);
 
 		object_material->SetUniformFloat("material.shininess", 32.f);
@@ -161,7 +161,7 @@ namespace scene {
 		light_transform = glm::scale(light_transform, glm::vec3(0.1f, 0.1f, 0.1f));
 		
 		light_material->SetUniformMat4("model", light_transform);
-		light_material->SetUniformMat4("view", cam->GetCurrentView());
+		light_material->SetUniformMat4("view", cam.GetViewMatrix());
 		light_material->SetUniformMat4("projection", projection);
 
 		light_material->SetUniformVec3("u_lightColor", glm::vec3(light_color[0], light_color[1], light_color[2]));
@@ -171,12 +171,12 @@ namespace scene {
 	{
 		// Object rendering
 		object_material->Bind();
-		m_renderer.Draw(*object_va, *object_ib, *(object_material->GetShader()));
+		m_renderer.Draw(*object_va, *object_ib, object_material->GetShader());
 		object_material->Unbind();
 
 		// Light rendering
 		light_material->Bind();
-		m_renderer.Draw(*light_va, *light_ib, *(light_material->GetShader()));
+		m_renderer.Draw(*light_va, *light_ib, light_material->GetShader());
 		light_material->Unbind();
 	}
 

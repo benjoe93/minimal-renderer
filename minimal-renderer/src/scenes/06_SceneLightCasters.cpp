@@ -123,8 +123,8 @@ namespace scene {
 			object_materials.push_back(std::make_unique<Material>("resources/shaders/01_Lighting/03_LightCasters/object.vert", "resources/shaders/01_Lighting/03_LightCasters/object.frag"));
 
 			// Bind Textures
-			object_materials[i]->AddTexture("material.diffuse", "resources/textures/container2.png", true);
-			object_materials[i]->AddTexture("material.specular", "resources/textures/container2_specular.png", true);
+			object_materials[i]->AddTexture("resources/textures/container2.png", "material.diffuse", true);
+            object_materials[i]->AddTexture("resources/textures/container2_specular.png", "material.specular", true);
 		}
 
 		object_va->Unbind();
@@ -152,11 +152,11 @@ namespace scene {
 	void SceneLightCasters::OnUpdate(double delta_time)
 	{
 
-		Camera* cam = m_renderer.state->active_camera;
-		glm::vec3 cam_pos = cam->GetPosition();
+		Camera& cam = m_renderer.GetActiveCamera();
+		glm::vec3 cam_pos = cam.GetPosition();
 
 		glm::mat4 projection, model, ModelView, MVP;
-		projection = glm::perspective(glm::radians(cam->GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+		projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
 
 		// Object
 		/* Directional light */
@@ -168,7 +168,7 @@ namespace scene {
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
-			ModelView = cam->GetCurrentView() * model;
+			ModelView = cam->GetViewMatrix() * model;
 			MVP = projection * ModelView;
 
 			object_materials[i]->SetUniformMat4("model", model);
@@ -198,7 +198,7 @@ namespace scene {
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
-			ModelView = cam->GetCurrentView() * model;
+			ModelView = cam->GetViewMatrix() * model;
 			MVP = projection * ModelView;
 
 			object_materials[i]->SetUniformMat4("model", model);
@@ -227,7 +227,7 @@ namespace scene {
 			float angle = 20.0f * i;
 			model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
-			ModelView = cam->GetCurrentView() * model;
+			ModelView = cam.GetViewMatrix() * model;
 			MVP = projection * ModelView;
 
 			object_materials[i]->SetUniformMat4("model", model);
@@ -239,7 +239,7 @@ namespace scene {
 			object_materials[i]->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
 
 			object_materials[i]->SetUniformVec3("light.position", cam_pos);
-			object_materials[i]->SetUniformVec3("light.direction", cam->GetDirection());
+			object_materials[i]->SetUniformVec3("light.direction", cam.GetDirection());
 			object_materials[i]->SetUniformFloat("light.cut_off", glm::cos(glm::radians(12.5f))); // sending cosine for perf reasons | cos(light_angle) == dot(light_dir, spot_dir)
 			object_materials[i]->SetUniformFloat("light.outer_cut_off", glm::cos(glm::radians(17.5f))); // sending cosine for perf reasons | cos(light_angle) == dot(light_dir, spot_dir)
 
@@ -257,7 +257,7 @@ namespace scene {
 		model = glm::translate(model, glm::vec3(light_position[0], light_position[1], light_position[2]));
 		model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
 
-		ModelView = cam->GetCurrentView() * model;
+		ModelView = cam.GetViewMatrix() * model;
 		MVP = projection * ModelView;
 		
 		light_material->SetUniformMat4("mvp", MVP);
@@ -271,13 +271,13 @@ namespace scene {
 		for (int i = 0; i < 10; i++)
 		{
 			object_materials[i]->Bind();
-			m_renderer.Draw(*object_va, *object_ib, *(object_materials[i]->GetShader()));
+			m_renderer.Draw(*object_va, *object_ib, object_materials[i]->GetShader());
 			object_materials[i]->Unbind();
 		}
 
 		// Light rendering
 		light_material->Bind();
-		m_renderer.Draw(*light_va, *light_ib, *(light_material->GetShader()));
+		m_renderer.Draw(*light_va, *light_ib, light_material->GetShader());
 		light_material->Unbind();
 	}
 

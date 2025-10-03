@@ -134,17 +134,17 @@ namespace scene {
 
 	void ScenePhongLight::OnRender()
 	{
-		Camera* cam = m_renderer.state->active_camera;
-		glm::vec3 cam_pos = cam->GetPosition();
+		Camera& cam = m_renderer.GetActiveCamera();
+		glm::vec3 cam_pos = cam.GetPosition();
 
 		// Object rendering
-		glm::mat4 projection = glm::perspective(glm::radians(cam->GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+		glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
 		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 mvp_matrix = projection * cam->GetCurrentView() * model;
+		glm::mat4 mvp_matrix = projection * cam.GetViewMatrix() * model;
 
 		object_shader->Bind();
 		object_shader->SetMat4("model", model);
-		object_shader->SetMat4("view", cam->GetCurrentView());
+		object_shader->SetMat4("view", cam.GetViewMatrix());
 		object_shader->SetMat4("projection", projection);
 
 		object_shader->SetVec3("u_objectColor", object_color[0], object_color[1], object_color[2]);
@@ -160,7 +160,7 @@ namespace scene {
 		glm::mat4 light_transform = glm::mat4(1.0f);
 		light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
 		light_shader->SetMat4("model", light_transform);
-		light_shader->SetMat4("view", cam->GetCurrentView());
+		light_shader->SetMat4("view", cam.GetViewMatrix());
 		light_shader->SetMat4("projection", projection);
 
 		light_shader->SetVec3("u_lightColor", light_color[0], light_color[1], light_color[2]);

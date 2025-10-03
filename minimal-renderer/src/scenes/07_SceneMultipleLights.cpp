@@ -121,7 +121,7 @@ namespace scene {
         size_t element_size = 36;
         size_t buffer_size = element_size * 8 * sizeof(float);
 
-        Camera* camera = m_renderer.state->active_camera;
+        Camera& camera = m_renderer.GetActiveCamera();
 
         // light setup
         directional_light = std::make_unique<DirectionalLight>(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
@@ -135,7 +135,7 @@ namespace scene {
             ptl_data.push_back(PointLightData({ position[0], position[1], position[2] }, { color[0], color[1], color[2] }));
         }
 
-        spot_light = std::make_unique<SpotLight>(camera->GetPosition(), camera->GetDirection(), 25.0f, 30.0f, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
+        spot_light = std::make_unique<SpotLight>(camera.GetPosition(), camera.GetDirection(), 25.0f, 30.0f, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
 
         // object setup
         object_va = std::make_unique<VertexArray>();
@@ -155,8 +155,8 @@ namespace scene {
             object_materials.push_back(std::make_unique<Material>("resources/shaders/01_Lighting/04_MultipleLights/object.vert", "resources/shaders/01_Lighting/04_MultipleLights/object.frag"));
 
             // bind textures
-            object_materials[mat_id]->AddTexture("material.diffuse", "resources/textures/container2.png", true);
-            object_materials[mat_id]->AddTexture("material.specular", "resources/textures/container2_specular.png", true);
+            object_materials[mat_id]->AddTexture("resources/textures/container2.png", "material.diffuse", true);
+            object_materials[mat_id]->AddTexture("resources/textures/container2_specular.png", "material.specular", true);
         }
 
         object_va->Unbind();
@@ -166,15 +166,15 @@ namespace scene {
 
     void SceneMultipleLights::OnUpdate(double delta_time)
     {
-        Camera* cam = m_renderer.state->active_camera;
-        glm::vec3 cam_pos = cam->GetPosition();
+        Camera& cam = m_renderer.GetActiveCamera();
+        glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam->GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
 
         // directional light
         directional_light->SetDirection(glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]));
-        directional_light->Update(projection, cam->GetCurrentView());
+        directional_light->Update(projection, cam.GetViewMatrix());
 
         // point lights
         for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
@@ -184,13 +184,13 @@ namespace scene {
             point_lights[ptl_id]->SetDiffuse (glm::vec3(ptl_data[ptl_id].color[0], ptl_data[ptl_id].color[1], ptl_data[ptl_id].color[2]));
             point_lights[ptl_id]->SetSpecular(glm::vec3(ptl_data[ptl_id].color[0], ptl_data[ptl_id].color[1], ptl_data[ptl_id].color[2]));
 
-            point_lights[ptl_id]->Update(projection, cam->GetCurrentView());
+            point_lights[ptl_id]->Update(projection, cam.GetViewMatrix());
         }
 
         // spot light
         spot_light->SetPosition(cam_pos);
-        spot_light->SetDirection(cam->GetDirection());
-        spot_light->Update(projection, cam->GetCurrentView());
+        spot_light->SetDirection(cam.GetDirection());
+        spot_light->Update(projection, cam.GetViewMatrix());
 
         // objects
         for (int obj_id = 0; obj_id < 10; obj_id++)
@@ -200,7 +200,7 @@ namespace scene {
             float angle = 20.0f * obj_id;
             model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 
-            ModelView = cam->GetCurrentView() * model;
+            ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
             object_materials[obj_id]->SetUniformMat4("model", model);
@@ -247,25 +247,25 @@ namespace scene {
 
         // light rendering
         directional_light->GetMaterial()->Bind();
-        m_renderer.Draw(*directional_light->GetVertArray(), *directional_light->GetIndexBuffer(), *(directional_light->GetMaterial()->GetShader()));
+        m_renderer.Draw(*directional_light->GetVertArray(), *directional_light->GetIndexBuffer(), directional_light->GetMaterial()->GetShader());
         directional_light->GetMaterial()->Unbind();
 
         for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
         {
             point_lights[ptl_id]->GetMaterial()->Bind();
-            m_renderer.Draw(*point_lights[ptl_id]->GetVertArray(), *point_lights[ptl_id]->GetIndexBuffer(), *(point_lights[ptl_id]->GetMaterial()->GetShader()));
+            m_renderer.Draw(*point_lights[ptl_id]->GetVertArray(), *point_lights[ptl_id]->GetIndexBuffer(), point_lights[ptl_id]->GetMaterial()->GetShader());
             point_lights[ptl_id]->GetMaterial()->Unbind();
         }
 
         spot_light->GetMaterial()->Bind();
-        m_renderer.Draw(*spot_light->GetVertArray(), *spot_light->GetIndexBuffer(), *(spot_light->GetMaterial()->GetShader()));
+        m_renderer.Draw(*spot_light->GetVertArray(), *spot_light->GetIndexBuffer(), spot_light->GetMaterial()->GetShader());
         spot_light->GetMaterial()->Unbind();
 
         // object rendering
         for (int obj_id = 0; obj_id < 10; obj_id++)
         {
             object_materials[obj_id]->Bind();
-            m_renderer.Draw(*object_va, *object_ib, *(object_materials[obj_id]->GetShader()));
+            m_renderer.Draw(*object_va, *object_ib, object_materials[obj_id]->GetShader());
             object_materials[obj_id]->Unbind();
         }
     }

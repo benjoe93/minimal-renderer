@@ -9,12 +9,47 @@ Material::~Material()
 {
 }
 
-void Material::AddTexture(std::string type, const char* path, bool is_rgba)
+void Material::AddTexture(std::shared_ptr<Texture> texture, std::string sampler_name)
 {
-		m_textures.push_back({
-				type,
-				std::make_unique<Texture>(path, is_rgba ? GL_RGBA : GL_RGB) 
-		});
+    if (texture)
+    {
+        m_textures.push_back({
+            sampler_name,
+            texture
+        });
+    }
+}
+
+void Material::AddTexture(std::shared_ptr<Texture> texture, TextureType type)
+{
+    if (texture)
+    {
+        std::string sampler_name = texture->GetSamplerName();
+
+        m_textures.push_back({
+            sampler_name,
+            texture
+        });
+    }
+}
+
+void Material::AddTexture(std::string path, std::string sampler_name, bool is_flipped)
+{
+    m_textures.push_back({
+        sampler_name,
+        std::make_shared<Texture>(path, sampler_name, is_flipped)
+    });
+}
+
+void Material::AddTexture(std::string path, TextureType type, bool is_flipped)
+{
+    auto texture = std::make_shared<Texture>(path, type, is_flipped);
+    std::string sampler_name = texture->GetSamplerName();
+    
+    m_textures.push_back({
+        sampler_name,
+        std::move(texture)
+    });
 }
 
 void Material::SetUniformFloat(std::string type, float value)
