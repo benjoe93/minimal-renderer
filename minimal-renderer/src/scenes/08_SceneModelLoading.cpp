@@ -41,7 +41,7 @@ namespace scene {
         );
 
         // object setup
-        object = std::make_unique<Model>(BACKPACK_PATH);
+        object = std::make_unique<Model>(BACKPACK_PATH, "resources/shaders/02_LoadingMesh/object.vert", "resources/shaders/02_LoadingMesh/object.frag");
     }
 
     void SceneModelLoading::OnUpdate(double delta_time)

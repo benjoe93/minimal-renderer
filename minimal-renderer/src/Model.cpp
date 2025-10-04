@@ -9,7 +9,7 @@
 #include "Model.h"
 
 
-void Model::LoadModel(std::string path)
+void Model::LoadModel(const std::string& path)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
@@ -28,9 +28,7 @@ void Model::LoadModel(std::string path)
     }
 
     m_directory = path.substr(0, path.find_last_of('/'));
-
-    // pre-allocate space if we know mesh count
-    m_meshes.reserve(scene->mNumMeshes);
+    m_meshes.reserve(scene->mNumMeshes); // pre-allocate space if we know mesh count
 
     ProcessNode(scene->mRootNode, scene);
 }
@@ -57,14 +55,12 @@ std::unique_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
 
     // pre-allocate to avoid reallocations
     vertices.reserve(mesh->mNumVertices);
-    indices.reserve(mesh->mNumFaces * 3); // assuming tirangles
+    indices.reserve(mesh->mNumFaces * 3);
 
     // process vertices
     for (unsigned int i = 0; i < mesh->mNumVertices; i++)
     {
         Vertex vertex;
-        
-        // Position 
         vertex.Position = glm::vec3( mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z );
 
         // Normal
@@ -96,13 +92,12 @@ std::unique_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
         }
     }
     
-    auto mat = std::make_unique<Material>("resources/shaders/02_LoadingMesh/object.vert", "resources/shaders/02_LoadingMesh/object.frag");
+    auto mat = std::make_unique<Material>(m_vertex_shader_path.c_str(), m_fragment_shader_path.c_str());
 
     // process material
     if (mesh->mMaterialIndex >= 0)
     {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        
         LoadMaterialTextures(mat.get(), material, aiTextureType_DIFFUSE, TextureType::DIFFUSE);
         LoadMaterialTextures(mat.get(), material, aiTextureType_SPECULAR, TextureType::SPECULAR);
     }
@@ -145,7 +140,8 @@ void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, ai
     }
 }
 
-Model::Model(const char* path)
+Model::Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader)
+    : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader)
 {
     LoadModel(path);
 }
