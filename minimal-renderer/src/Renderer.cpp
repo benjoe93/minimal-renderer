@@ -8,14 +8,19 @@
 #include "Renderer.h"
 
 
-Renderer::Renderer(const bool depth_testing, const bool wireframe, const bool face_culling)
+Renderer::Renderer(const bool depth_testing, const bool stencil_testing, const bool wireframe, const bool face_culling)
 	: m_background_color({ 0.0f, 0.0f, 0.0f, 1.0f }),
 	m_use_depth_buffer(depth_testing),
+    m_use_stencil_buffer(stencil_testing),
 	m_enable_wireframe(wireframe),
 	m_enable_face_culling(face_culling),
 	m_delta_time(0.0f),
 	m_last_frame(0.0f)
 {
+	ToggleWireframeRender();
+	ToggleDepthTest();
+	ToggleFaceCulling();
+
 	// Log OpenGL stats
 	std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 	std::cout << "Maximum number of vertex attributes supported: " << GetMaxVertexAttribs() << std::endl;
@@ -27,12 +32,9 @@ Renderer::~Renderer() {}
 
 void Renderer::Clear()
 {
-	ToggleWireframeRender();
-	ToggleDepthTest();
-	ToggleFaceCulling();
 
 	GLCall(glClearColor(m_background_color.x, m_background_color.y, m_background_color.z, m_background_color.w));
-	GLCall(glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT ));
+	GLCall(glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 }
 
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
@@ -92,6 +94,18 @@ void Renderer::ToggleDepthTest() const
     else
     {
 		GLCall(glDisable(GL_DEPTH_TEST));
+    }
+}
+
+void Renderer::ToggleStencilTest(bool enabled) const
+{
+    if (enabled)
+    {
+        GLCall(glEnable(GL_STENCIL_TEST));
+    }
+    else
+    {
+        GLCall(glDisable(GL_STENCIL_TEST));
     }
 }
 

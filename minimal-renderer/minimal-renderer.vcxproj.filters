@@ -117,6 +117,9 @@
     <ClCompile Include="src\scenes\09_SceneDepthTesting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scenes\10_SceneStencilTesting.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
@@ -227,6 +230,9 @@
     <ClInclude Include="src\scenes\09_SceneDepthTesting.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\scenes\10_SceneStencilTesting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="resources\shaders\GettingStarted\default.frag" />
@@ -247,10 +253,5 @@
     <None Include="resources\shaders\Lighting\LightCasters\light.vert" />
     <None Include="resources\shaders\Lighting\LightCasters\object.frag" />
     <None Include="resources\shaders\Lighting\LightCasters\object.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="resources\textures\common\point_light.png">
-      <Filter>Resource Files</Filter>
-    </Image>
   </ItemGroup>
 </Project>

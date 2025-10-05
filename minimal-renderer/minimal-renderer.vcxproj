@@ -173,6 +173,7 @@
     <ClCompile Include="src\scenes\07_SceneMultipleLights.cpp" />
     <ClCompile Include="src\scenes\08_SceneModelLoading.cpp" />
     <ClCompile Include="src\scenes\09_SceneDepthTesting.cpp" />
+    <ClCompile Include="src\scenes\10_SceneStencilTesting.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\vendor\glad\glad.c" />
@@ -209,6 +210,7 @@
     <ClInclude Include="src\scenes\07_SceneMultipleLights.h" />
     <ClInclude Include="src\scenes\08_SceneModelLoading.h" />
     <ClInclude Include="src\scenes\09_SceneDepthTesting.h" />
+    <ClInclude Include="src\scenes\10_SceneStencilTesting.h" />
     <ClInclude Include="src\scenes\Scene.h" />
     <ClInclude Include="src\ShapeLib.h" />
     <ClInclude Include="src\Texture.h" />
@@ -245,9 +247,6 @@
     <None Include="resources\shaders\Lighting\SurfaceMaps\light.vert" />
     <None Include="resources\shaders\Lighting\SurfaceMaps\object.frag" />
     <None Include="resources\shaders\Lighting\SurfaceMaps\object.vert" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="resources\textures\common\point_light.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

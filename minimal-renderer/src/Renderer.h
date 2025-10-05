@@ -55,6 +55,7 @@ class Renderer
     private:
 	    glm::vec4 m_background_color;
         bool m_use_depth_buffer;
+        bool m_use_stencil_buffer;
         bool m_enable_wireframe;
         bool m_enable_face_culling;
 
@@ -65,7 +66,7 @@ class Renderer
         std::unique_ptr<AppState> state;
 
     public:
-	    Renderer(const bool depth_testing = true, const bool wireframe = false, const bool face_culling = false);
+	    Renderer(const bool depth_testing = true, const bool stencil_testing = true, const bool wireframe = false, const bool face_culling = false);
 	    ~Renderer();
 
 	    void Clear();
@@ -84,6 +85,7 @@ class Renderer
 
         void Tick(double current_time);
 
+        void ToggleStencilTest(bool enabled) const;
 
     private:
         void ToggleDepthTest() const;
