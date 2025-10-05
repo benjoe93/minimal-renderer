@@ -172,6 +172,7 @@
     <ClCompile Include="src\scenes\06_SceneLightCasters.cpp" />
     <ClCompile Include="src\scenes\07_SceneMultipleLights.cpp" />
     <ClCompile Include="src\scenes\08_SceneModelLoading.cpp" />
+    <ClCompile Include="src\scenes\09_SceneDepthTesting.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\vendor\glad\glad.c" />
@@ -207,6 +208,7 @@
     <ClInclude Include="src\scenes\06_SceneLightCasters.h" />
     <ClInclude Include="src\scenes\07_SceneMultipleLights.h" />
     <ClInclude Include="src\scenes\08_SceneModelLoading.h" />
+    <ClInclude Include="src\scenes\09_SceneDepthTesting.h" />
     <ClInclude Include="src\scenes\Scene.h" />
     <ClInclude Include="src\ShapeLib.h" />
     <ClInclude Include="src\Texture.h" />
@@ -225,30 +227,6 @@
     <ClInclude Include="src\VertexBuffer.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\shaders\00_GettingStarted\default.frag" />
-    <None Include="resources\shaders\00_GettingStarted\default.vert" />
-    <None Include="resources\shaders\01_Lighting\00_PhongLighting\light.frag" />
-    <None Include="resources\shaders\01_Lighting\00_PhongLighting\light.vert" />
-    <None Include="resources\shaders\01_Lighting\00_PhongLighting\object.frag" />
-    <None Include="resources\shaders\01_Lighting\00_PhongLighting\object.vert" />
-    <None Include="resources\shaders\01_Lighting\01_Materials\light.frag" />
-    <None Include="resources\shaders\01_Lighting\01_Materials\light.vert" />
-    <None Include="resources\shaders\01_Lighting\01_Materials\object.frag" />
-    <None Include="resources\shaders\01_Lighting\01_Materials\object.vert" />
-    <None Include="resources\shaders\01_Lighting\02_SurfaceMaps\light.frag" />
-    <None Include="resources\shaders\01_Lighting\02_SurfaceMaps\light.vert" />
-    <None Include="resources\shaders\01_Lighting\02_SurfaceMaps\object.frag" />
-    <None Include="resources\shaders\01_Lighting\02_SurfaceMaps\object.vert" />
-    <None Include="resources\shaders\01_Lighting\03_LightCasters\light.frag" />
-    <None Include="resources\shaders\01_Lighting\03_LightCasters\light.vert" />
-    <None Include="resources\shaders\01_Lighting\03_LightCasters\object.frag" />
-    <None Include="resources\shaders\01_Lighting\03_LightCasters\object.vert" />
-    <None Include="resources\shaders\02_LoadingMesh\object.frag" />
-    <None Include="resources\shaders\02_LoadingMesh\object.vert" />
-    <None Include="resources\shaders\common\light.frag" />
-    <None Include="resources\shaders\common\light.vert" />
-    <None Include="resources\shaders\01_Lighting\04_MultipleLights\object.frag" />
-    <None Include="resources\shaders\01_Lighting\04_MultipleLights\object.vert" />
     <None Include="resources\shaders\GettingStarted\default.frag" />
     <None Include="resources\shaders\GettingStarted\default.vert" />
     <None Include="resources\shaders\Lighting\LightCasters\light.frag" />
@@ -269,12 +247,7 @@
     <None Include="resources\shaders\Lighting\SurfaceMaps\object.vert" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\textures\awesomeface.png" />
     <Image Include="resources\textures\common\point_light.png" />
-    <Image Include="resources\textures\container.jpg" />
-    <Image Include="resources\textures\container2.png" />
-    <Image Include="resources\textures\container2_specular.png" />
-    <Image Include="resources\textures\wall.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

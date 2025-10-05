@@ -14,7 +14,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 
-#include "scenes/08_SceneModelLoading.h"
+#include "scenes/09_SceneDepthTesting.h"
 
 #define WINDOW_TITLE "LearnOpenGL"
 
@@ -81,7 +81,7 @@ int main(void)
     renderer.state->active_camera = 0;
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneModelLoading scene(renderer);
+    scene::SceneDepthTesting scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))
