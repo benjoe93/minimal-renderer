@@ -17,9 +17,10 @@ Renderer::Renderer(const bool depth_testing, const bool stencil_testing, const b
 	m_delta_time(0.0f),
 	m_last_frame(0.0f)
 {
-	ToggleWireframeRender();
-	ToggleDepthTest();
-	ToggleFaceCulling();
+	SetDepthTest(depth_testing);
+    SetStencilTest(stencil_testing);
+	SetWireframeRender(wireframe);
+	SetFaceCulling(face_culling);
 
 	// Log OpenGL stats
 	std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
@@ -30,9 +31,8 @@ Renderer::Renderer(const bool depth_testing, const bool stencil_testing, const b
 
 Renderer::~Renderer() {}
 
-void Renderer::Clear()
+void Renderer::Clear() const
 {
-
 	GLCall(glClearColor(m_background_color.x, m_background_color.y, m_background_color.z, m_background_color.w));
 	GLCall(glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
 }
@@ -59,35 +59,17 @@ void Renderer::Draw(Model& obj)
     }
 }
 
-void Renderer::ToggleWireframeRender() const
-{
-	if (m_enable_wireframe)
-	{
-		GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
-	}
-}
-
-void Renderer::ToggleFaceCulling() const
-{
-	if (m_enable_face_culling)
-    {
-		GLCall(glEnable(GL_CULL_FACE));
-    }
-    else
-    {
-        GLCall(glDisable(GL_CULL_FACE));
-    }
-}
-
 void Renderer::Tick(double current_time)
 {
 	m_delta_time = current_time - m_last_frame;
 	m_last_frame = current_time;
 }
 
-void Renderer::ToggleDepthTest() const
+void Renderer::SetDepthTest(bool enabled)
 {
-	if (m_use_depth_buffer)
+    m_use_depth_buffer = enabled;
+
+	if (enabled)
     {
         GLCall(glEnable(GL_DEPTH_TEST));
     }
@@ -97,8 +79,24 @@ void Renderer::ToggleDepthTest() const
     }
 }
 
-void Renderer::ToggleStencilTest(bool enabled) const
+void Renderer::SetFaceCulling(bool enabled)
 {
+    m_enable_face_culling = enabled;
+
+	if (enabled)
+    {
+		GLCall(glEnable(GL_CULL_FACE));
+    }
+    else
+    {
+        GLCall(glDisable(GL_CULL_FACE));
+    }
+}
+
+void Renderer::SetStencilTest(bool enabled)
+{
+    m_use_stencil_buffer = enabled;
+
     if (enabled)
     {
         GLCall(glEnable(GL_STENCIL_TEST));
@@ -107,6 +105,36 @@ void Renderer::ToggleStencilTest(bool enabled) const
     {
         GLCall(glDisable(GL_STENCIL_TEST));
     }
+}
+
+void Renderer::SetWireframeRender(bool enabled)
+{
+    m_enable_wireframe = enabled;
+
+	if (enabled)
+	{
+		GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
+	}
+}
+
+void Renderer::SetDepthFunction(GLenum function)
+{
+   GLCall(glDepthFunc(function));
+}
+
+void Renderer::SetStencilFunction(GLenum function, GLint reference_value, GLuint bit_mask)
+{
+    GLCall(glStencilFunc(function, reference_value, bit_mask));
+}
+
+void Renderer::SetStencilMask(GLuint bit_mask)
+{
+    GLCall(glStencilMask(bit_mask));
+}
+
+void Renderer::SetStencilOperation(GLenum stencil_fail, GLenum depth_fail, GLenum pass)
+{
+    GLCall(glStencilOp(stencil_fail, depth_fail, pass));
 }
 
 int Renderer::GetMaxVertexAttribs() const
