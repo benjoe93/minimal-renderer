@@ -141,7 +141,25 @@ void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, ai
 }
 
 Model::Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader)
-    : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader)
+    : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader), m_transform(Transform(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.0f)))
 {
     LoadModel(path);
+}
+
+Model::Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader, Transform transform)
+    : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader), m_transform(transform)
+{
+    LoadModel(path);
+}
+
+void Model::UpdateModelMatrix()
+{
+    m_model_matrix = glm::mat4(1.0);
+    m_model_matrix = glm::translate(m_model_matrix, m_transform.Location);
+
+    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    m_model_matrix = glm::scale(m_model_matrix, m_transform.Scale);
 }
