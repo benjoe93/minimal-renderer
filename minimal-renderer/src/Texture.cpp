@@ -143,3 +143,13 @@ void Texture::Unbind() const
 {
     GLCall(glBindTexture(GL_TEXTURE_2D, 0));
 }
+
+void Texture::SetWrappingHorizontal(const GLint new_wrapping)
+{
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, new_wrapping));
+}
+
+void Texture::SetWrappingVertical(const GLint new_wrapping)
+{
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, new_wrapping));
+}

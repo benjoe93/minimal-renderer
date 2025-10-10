@@ -16,9 +16,9 @@ enum TextureType;
 
 struct Transform
 {
-    glm::vec3 Location;
-    glm::vec3 Rotation;
-    glm::vec3 Scale;
+    glm::vec3 Location = glm::vec3(0.0f);
+    glm::vec3 Rotation = glm::vec3(0.0f);
+    glm::vec3 Scale    = glm::vec3(1.0f);
 };
 
 class Model
@@ -53,7 +53,11 @@ public:
     std::vector<std::unique_ptr<Mesh>>& GetMeshes() { return m_meshes; }
     const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return m_meshes; }
 
-    glm::mat4 GetModelMatrix() const { return m_model_matrix; }
+    glm::mat4 GetModelMatrix();
+    inline Transform GetTransform() const { return m_transform; }
+    inline glm::vec3 GetLocation() const { return m_transform.Location; }
+    inline glm::vec3 GetRotation() const { return m_transform.Rotation; }
+    inline glm::vec3 GetScale() const { return m_transform.Scale; }
 
 private:
     void UpdateModelMatrix();

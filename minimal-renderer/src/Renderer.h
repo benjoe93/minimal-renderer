@@ -36,37 +36,68 @@ static bool GLLogCall(const char* function, const char* file, int line)
     return true;
 }
 
+enum BlendFunc
+{
+    ZERO = 0,
+    ONE,
+    SRC_COLOR,
+    ONE_MINUS_SRC_COLOR,
+    DST_COLOR,
+    ONE_MINUS_DST_COLOR,
+    SRC_ALPHA,
+    ONE_MINUS_SRC_ALPHA,
+    DST_ALPHA,
+    ONE_MINUS_DST_ALPHA,
+    CONSTANT_COLOR,
+    ONE_MINUS_CONSTANT_COLOR,
+    CONSTANT_ALPHA,
+    ONE_MINUS_CONSTANT_ALPHA
+};
+enum BlendEquation
+{
+    ADD = 0,
+    SUBTRACT,
+    REVERSE_SUBTRACT,
+    MIN,
+    MAX
+};
+
 struct AppState
 {
     unsigned int scr_width = 1280;
     unsigned int scr_height = 720;
+
+    float near_plane = 0.1f;
+    float far_plane  = 100.0f;
 
     bool cursor_disabled = false;
 
     float last_x = 640;
     float last_y = 360;
 
-    unsigned int active_camera;
+    unsigned int active_camera = 0;
     std::unordered_map<unsigned int, std::shared_ptr<Camera>> cameras;
 };
 
 class Renderer
 {
     private:
-	    glm::vec4 m_background_color;
-        bool m_use_depth_buffer;
-        bool m_use_stencil_buffer;
-        bool m_enable_wireframe;
-        bool m_enable_face_culling;
+	    glm::vec4 m_background_color = { 0.1f, 0.1f, 0.1f, 1.0f };
 
-        double m_delta_time;
-        double m_last_frame;
+        bool m_blending       = true;
+        bool m_depth_buffer   = true;
+        bool m_stencil_buffer = true;
+        bool m_wireframe      = false;
+        bool m_face_culling   = false;
+
+        double m_delta_time = 0.0;
+        double m_last_frame = 0.0;
 
     public:
         std::unique_ptr<AppState> state;
 
     public:
-	    Renderer(const bool depth_testing = true, const bool stencil_testing = true, const bool wireframe = false, const bool face_culling = false);
+	    Renderer();
 	    ~Renderer();
 
 	    void Clear() const;
@@ -75,6 +106,7 @@ class Renderer
 
         void Tick(double current_time);
 
+        void SetBlending(bool enabled);
         void SetDepthTest(bool enabled);
         void SetFaceCulling(bool enabled);
         void SetStencilTest(bool enabled);
@@ -93,7 +125,15 @@ class Renderer
         */
         void SetStencilOperation(GLenum stencil_fail, GLenum depth_fail, GLenum pass);
 
+        /*Sets the source and destination factors*/
+        void SetBlendFunction(BlendFunc src_factor, BlendFunc dst_factor);
+        /*Sets the operation between source and destination component of the blending equation*/
+        void SetBlendEquation(BlendEquation eq);
+
 	    inline void SetBackgroundColor(glm::vec4 new_color) { m_background_color = new_color; }
+    private:
+        GLenum GetBlendFunction(BlendFunc id) const;
+        GLenum GetBlendEquation(BlendEquation id) const;
 
     public:
         Camera& GetActiveCamera() const;
@@ -102,7 +142,9 @@ class Renderer
         inline double GetDeltaTime() const { return m_delta_time; }
         inline float GetDeltaTimeFloat() const { return static_cast<float>(m_delta_time); }
 
-        inline bool GetDepthTest() const { return m_use_depth_buffer; }
-        inline bool GetWireframe() const { return m_enable_wireframe; }
-        inline bool GetFaceCulling() const { return m_enable_face_culling; }
+        inline bool BlendingState() const { return m_blending; }
+        inline bool DepthTestState() const { return m_depth_buffer; }
+        inline bool StencilTestState() const { return m_stencil_buffer; }
+        inline bool WireframeState() const { return m_wireframe; }
+        inline bool FaceCullingState() const { return m_face_culling; }
 };

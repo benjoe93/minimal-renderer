@@ -117,9 +117,16 @@ void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, ai
     for (unsigned int i = 0; i < texture_count; i++)
     {
         aiString current_path;
-        ai_material->GetTexture(type, i, &current_path);
+        if (ai_material->GetTexture(type, i, &current_path) != AI_SUCCESS)
+            continue;
+        std::cout << current_path.C_Str() << std::endl;
 
         std::string texture_path = current_path.C_Str();
+
+        std::cout << texture_path << std::endl;
+        if (texture_path.empty())
+            continue;
+
         std::string full_path = m_directory + '/' + texture_path;
 
         // check if texture already loaded
@@ -128,7 +135,7 @@ void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, ai
         if (it == m_texture_cache.end())
         {
             // new texture - load it and cache the path
-            auto new_texture = std::make_shared<Texture>(full_path, type_name, true);
+            std::shared_ptr<Texture> new_texture = std::make_shared<Texture>(full_path, type_name, true);
             m_texture_cache[texture_path] = new_texture;
             material->AddTexture(new_texture, type_name);
         }
@@ -141,7 +148,7 @@ void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, ai
 }
 
 Model::Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader)
-    : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader), m_transform(Transform(glm::vec3(0.0f), glm::vec3(0.0f), glm::vec3(0.0f)))
+    : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader)
 {
     LoadModel(path);
 }
@@ -150,6 +157,12 @@ Model::Model(const std::string& path, const std::string& vertex_shader, const st
     : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader), m_transform(transform)
 {
     LoadModel(path);
+}
+
+glm::mat4 Model::GetModelMatrix()
+{
+    UpdateModelMatrix();
+    return m_model_matrix;
 }
 
 void Model::UpdateModelMatrix()

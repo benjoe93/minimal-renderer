@@ -120,6 +120,9 @@
     <ClCompile Include="src\scenes\10_SceneStencilTesting.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scenes\11_SceneBlending.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
@@ -231,6 +234,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\scenes\10_SceneStencilTesting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\11_SceneBlending.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

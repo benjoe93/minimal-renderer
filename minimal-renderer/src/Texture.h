@@ -47,4 +47,7 @@ class Texture
 		inline int GetHeight() const { return m_height; }
         inline std::string GetFilepath() const { return m_filepath; }
         inline std::string GetSamplerName() const { return m_sampler_name; }
+
+        void SetWrappingHorizontal(const GLint new_wrapping);
+        void SetWrappingVertical(const GLint new_wrapping);
 };

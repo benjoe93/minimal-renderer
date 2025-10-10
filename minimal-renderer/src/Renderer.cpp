@@ -8,19 +8,17 @@
 #include "Renderer.h"
 
 
-Renderer::Renderer(const bool depth_testing, const bool stencil_testing, const bool wireframe, const bool face_culling)
-	: m_background_color({ 0.0f, 0.0f, 0.0f, 1.0f }),
-	m_use_depth_buffer(depth_testing),
-    m_use_stencil_buffer(stencil_testing),
-	m_enable_wireframe(wireframe),
-	m_enable_face_culling(face_culling),
-	m_delta_time(0.0f),
-	m_last_frame(0.0f)
-{
-	SetDepthTest(depth_testing);
-    SetStencilTest(stencil_testing);
-	SetWireframeRender(wireframe);
-	SetFaceCulling(face_culling);
+Renderer::Renderer()
+{   
+    SetBlending(m_blending);
+    SetBlendFunction(BlendFunc::SRC_ALPHA, BlendFunc::ONE_MINUS_SRC_ALPHA);
+    SetBlendEquation(BlendEquation::ADD); // this is the default 
+
+	SetDepthTest(m_depth_buffer);
+    SetStencilTest(m_stencil_buffer);
+
+	SetWireframeRender(m_wireframe);
+	SetFaceCulling(m_face_culling);
 
 	// Log OpenGL stats
 	std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
@@ -65,9 +63,23 @@ void Renderer::Tick(double current_time)
 	m_last_frame = current_time;
 }
 
+void Renderer::SetBlending(bool enabled)
+{
+    m_blending = enabled;
+
+    if (enabled)
+    {
+        GLCall(glEnable(GL_BLEND));
+    }
+    else
+    {
+        GLCall(glDisable(GL_BLEND));
+    }
+}
+
 void Renderer::SetDepthTest(bool enabled)
 {
-    m_use_depth_buffer = enabled;
+    m_depth_buffer = enabled;
 
 	if (enabled)
     {
@@ -81,7 +93,7 @@ void Renderer::SetDepthTest(bool enabled)
 
 void Renderer::SetFaceCulling(bool enabled)
 {
-    m_enable_face_culling = enabled;
+    m_face_culling = enabled;
 
 	if (enabled)
     {
@@ -95,7 +107,7 @@ void Renderer::SetFaceCulling(bool enabled)
 
 void Renderer::SetStencilTest(bool enabled)
 {
-    m_use_stencil_buffer = enabled;
+    m_stencil_buffer = enabled;
 
     if (enabled)
     {
@@ -109,7 +121,7 @@ void Renderer::SetStencilTest(bool enabled)
 
 void Renderer::SetWireframeRender(bool enabled)
 {
-    m_enable_wireframe = enabled;
+    m_wireframe = enabled;
 
 	if (enabled)
 	{
@@ -137,11 +149,56 @@ void Renderer::SetStencilOperation(GLenum stencil_fail, GLenum depth_fail, GLenu
     GLCall(glStencilOp(stencil_fail, depth_fail, pass));
 }
 
+void Renderer::SetBlendFunction(BlendFunc src_factor, BlendFunc dst_factor)
+{
+    GLCall(glBlendFunc(GetBlendFunction(src_factor), GetBlendFunction(dst_factor)));
+}
+
+void Renderer::SetBlendEquation(BlendEquation eq)
+{
+    GLCall(glBlendEquation(GetBlendEquation(eq)));
+}
+
 int Renderer::GetMaxVertexAttribs() const
 {
 	int nrAttr;
 	GLCall(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttr));
 	return nrAttr;
+}
+
+GLenum Renderer::GetBlendFunction(BlendFunc id) const
+{
+    switch (id)
+    {
+    case ZERO:                      return GL_ZERO;
+    case ONE:                       return GL_ONE;
+    case SRC_COLOR:                 return GL_SRC_COLOR;
+    case ONE_MINUS_SRC_COLOR:       return GL_ONE_MINUS_SRC_COLOR;
+    case DST_COLOR:                 return GL_DST_COLOR;
+    case ONE_MINUS_DST_COLOR:       return GL_ONE_MINUS_DST_COLOR;
+    case SRC_ALPHA:                 return GL_SRC_ALPHA;
+    case ONE_MINUS_SRC_ALPHA:       return GL_ONE_MINUS_SRC_ALPHA;
+    case DST_ALPHA:                 return GL_DST_ALPHA;
+    case ONE_MINUS_DST_ALPHA:       return GL_ONE_MINUS_DST_ALPHA;
+    case CONSTANT_COLOR:            return GL_CONSTANT_COLOR;
+    case ONE_MINUS_CONSTANT_COLOR:  return GL_ONE_MINUS_CONSTANT_COLOR;
+    case CONSTANT_ALPHA:            return GL_CONSTANT_ALPHA;
+    case ONE_MINUS_CONSTANT_ALPHA:  return GL_ONE_MINUS_CONSTANT_ALPHA;
+    default:                        return GL_ZERO;;
+    }
+}
+
+GLenum Renderer::GetBlendEquation(BlendEquation id) const
+{
+    switch (id)
+    {
+    case ADD:               return GL_FUNC_ADD;
+    case SUBTRACT:          return GL_FUNC_SUBTRACT;
+    case REVERSE_SUBTRACT:  return GL_FUNC_REVERSE_SUBTRACT;
+    case MIN:               return GL_MIN;
+    case MAX:               return GL_MAX;
+    default:                return GL_FUNC_ADD;
+    }
 }
 
 Camera& Renderer::GetActiveCamera() const

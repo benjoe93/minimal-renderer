@@ -12,25 +12,20 @@ class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
-static struct PointLightData
-{
-    float position[3];
-    float color[3];
-};
-
 namespace scene {
 
-    class SceneModelLoading : public Scene
+    class SceneBlending : public Scene
     {
     private:
-        std::unique_ptr<DirectionalLight>           directional_light;
-        std::vector<std::unique_ptr<PointLight>>    point_lights;
-        std::unique_ptr<SpotLight>                  spot_light;
+        std::vector<std::unique_ptr<Model>> objects;
+        std::vector<std::unique_ptr<Model>> transparent_objects;
+        std::vector<glm::vec3> window_loc;
+        std::vector<glm::vec3> vegetation_loc;
 
-        std::unique_ptr<Model> object;
+
 
     public:
-        SceneModelLoading(Renderer& in_renderer);
+        SceneBlending(Renderer& in_renderer);
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

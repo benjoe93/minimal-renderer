@@ -11,7 +11,7 @@ class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
-struct PointLightData
+static struct PointLightData
 {
     float position[3];
     float color[3];

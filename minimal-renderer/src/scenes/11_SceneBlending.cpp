@@ -1,0 +1,192 @@
+#include <map>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include "vendor/imgui/imgui.h"
+
+#include "LightDirectional.h"
+#include "LightPoint.h"
+
+#include "Renderer.h"
+#include "Camera.h"
+#include "IndexBuffer.h"
+#include "VertexArray.h"
+#include "VertexBuffer.h"
+#include "Texture.h"
+#include "Material.h"
+#include "Mesh.h"
+#include "Model.h"
+
+#include "11_SceneBlending.h"
+
+namespace scene {
+
+    SceneBlending::SceneBlending(Renderer& in_renderer)
+        :Scene(in_renderer)
+    {
+        window_loc.push_back(glm::vec3(-1.5f, 0.0f, -0.48f));
+        window_loc.push_back(glm::vec3( 1.5f, 0.0f,  0.51f));
+        window_loc.push_back(glm::vec3( 0.0f, 0.0f,  0.7f));
+        window_loc.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
+        window_loc.push_back(glm::vec3( 0.5f, 0.0f, -0.6f));
+
+        vegetation_loc.push_back(glm::vec3( 0.5f, -0.25f,  0.48f));
+        vegetation_loc.push_back(glm::vec3(-2.5f, -0.25f, -0.51f));
+        vegetation_loc.push_back(glm::vec3( 0.0f, -0.25f,  0.2f));
+
+        // object setup
+        // floor
+        {
+            std::unique_ptr<Model> floor = std::make_unique<Model>(
+                "resources/models/plane.fbx",
+                "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
+                "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
+                Transform(
+                    glm::vec3(0.0f, -0.5f, 0.0f),
+                    glm::vec3(90.0f, 0.0f, 0.0f),
+                    glm::vec3(1.0f)
+                )
+            );
+
+            for (auto& mesh : floor->GetMeshes())
+                mesh->GetMaterial().AddTexture("resources/textures/metal.png", TextureType::DIFFUSE, true);
+            objects.push_back(std::move(floor));
+        }
+
+        std::shared_ptr<Texture> marble_tex = std::make_shared<Texture>("resources/textures/marble.jpg", TextureType::DIFFUSE, true);
+        
+        // Box 1
+        {
+            std::unique_ptr<Model> box1 = std::make_unique<Model>(
+                "resources/models/box.fbx",
+                "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
+                "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
+                Transform(
+                    glm::vec3(-1.5f, 0.0f, -1.0f),
+                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    glm::vec3(1.0f)
+                )
+            );
+
+            for (auto& mesh : box1->GetMeshes())
+                mesh->GetMaterial().AddTexture(marble_tex, TextureType::DIFFUSE);
+            objects.push_back(std::move(box1));
+
+        }
+        // Box 2
+        {
+            std::unique_ptr<Model> box2 = std::make_unique<Model>(
+                "resources/models/box.fbx",
+                "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
+                "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
+                Transform(
+                    glm::vec3(1.5f, 0.0f, 0.0f),
+                    glm::vec3(0.0f, 0.0f, 0.0f),
+                    glm::vec3(1.0f)
+                )
+            );
+
+            for (auto& mesh : box2->GetMeshes())
+                mesh->GetMaterial().AddTexture(marble_tex, TextureType::DIFFUSE);
+            objects.push_back(std::move(box2));
+        }
+
+        // windows
+        std::shared_ptr<Texture> window_tex = std::make_shared<Texture>("resources/textures/window.png", TextureType::DIFFUSE, true);
+        for (unsigned int i = 0; i < window_loc.size(); i++)
+        {
+            std::unique_ptr<Model> window = std::make_unique<Model>(
+                "resources/models/plane.fbx",
+                "resources/shaders/03_AdvancedOpenGL/03_Blending/window.vert",
+                "resources/shaders/03_AdvancedOpenGL/03_Blending/window.frag",
+                Transform(
+                    window_loc[i], 
+                    glm::vec3(180.0f, 0.0f, 0.0f),
+                    glm::vec3(0.1f)
+                )
+            );
+
+            for (auto& mesh : window->GetMeshes())
+                mesh->GetMaterial().AddTexture(window_tex, TextureType::DIFFUSE);
+            transparent_objects.push_back(std::move(window));
+        }
+
+        // grass
+        std::shared_ptr<Texture> grass_tex = std::make_shared<Texture>("resources/textures/grass.png", TextureType::DIFFUSE, true);
+        grass_tex->SetWrappingHorizontal(GL_CLAMP_TO_EDGE);
+        grass_tex->SetWrappingVertical(GL_CLAMP_TO_EDGE);
+        for (unsigned int i = 0; i < vegetation_loc.size(); i++)
+        {
+            std::unique_ptr<Model> grass = std::make_unique<Model>(
+                "resources/models/plane.fbx",
+                "resources/shaders/03_AdvancedOpenGL/03_Blending/grass.vert",
+                "resources/shaders/03_AdvancedOpenGL/03_Blending/grass.frag",
+                Transform(
+                    vegetation_loc[i],
+                    glm::vec3(180.0f, 0.0f, 0.0f),
+                    glm::vec3(0.05f)
+                )
+            );
+
+            for (auto& mesh : grass->GetMeshes())
+                mesh->GetMaterial().AddTexture(grass_tex, TextureType::DIFFUSE);
+            objects.push_back(std::move(grass));
+        }
+    }
+
+    void SceneBlending::OnUpdate(double delta_time)
+    {
+        m_renderer.SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+
+        Camera& cam = m_renderer.GetActiveCamera();
+
+        glm::mat4 projection, ModelView, MVP;
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), m_renderer.state->near_plane, m_renderer.state->far_plane);
+
+        // objects
+        for (auto& obj : objects)
+        {
+            ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
+            MVP = projection * ModelView;
+
+            for (auto& mesh : obj->GetMeshes())
+            {
+                mesh->GetMaterial().SetUniformMat4("mvp", MVP);
+            }
+        }
+
+        for (auto& obj : transparent_objects)
+        {
+            ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
+            MVP = projection * ModelView;
+
+            for (auto& mesh : obj->GetMeshes())
+            {
+                mesh->GetMaterial().SetUniformMat4("mvp", MVP);
+            }
+        }
+    }
+
+    void SceneBlending::OnRender()
+    {
+        // sort transparent objects based on distance from camera
+        std::map<float, Model*> sorted;
+        for (unsigned int i = 0; i < transparent_objects.size(); i++)
+        {
+            float distance = glm::length(m_renderer.GetActiveCamera().GetPosition() - transparent_objects[i]->GetLocation());
+            sorted[distance] = transparent_objects[i].get();
+        }
+
+        for (auto& obj : objects)
+            m_renderer.Draw(*obj);
+
+        // render object in reverse distance order
+        for (std::map<float, Model*>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+            m_renderer.Draw(*it->second);
+    }
+
+    void SceneBlending::OnImGuiRender()
+    {
+    }
+}

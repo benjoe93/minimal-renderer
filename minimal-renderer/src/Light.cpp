@@ -6,11 +6,12 @@
 
 /* QUAD DEFINITION */
 static float vertices[] = {
+    // Position            // UV
     // Front face (z = -0.5)
-    -0.5f, -0.5f, -0.5f,
-     0.5f, -0.5f, -0.5f,
-     0.5f,  0.5f, -0.5f,
-    -0.5f,  0.5f, -0.5f,
+    -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,  // Bottom-left
+     0.5f, -0.5f, -0.5f,   1.0f, 0.0f,  // Bottom-right
+     0.5f,  0.5f, -0.5f,   1.0f, 1.0f,  // Top-right
+    -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,  // Top-left
 };
 static unsigned int indices[] = {
     0, 1, 2,    // Front face (z = -0.5)
@@ -32,7 +33,8 @@ Light::Light(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3
     m_ib = std::make_unique<IndexBuffer>(indices, element_size);
     m_ib->Bind();
 
-    m_va->SetLayout(*m_vb, 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    m_va->SetLayout(*m_vb, 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+    m_va->SetLayout(*m_vb, 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 
     m_material = std::make_unique<Material>("resources/shaders/common/light.vert", "resources/shaders/common/light.frag");
 
