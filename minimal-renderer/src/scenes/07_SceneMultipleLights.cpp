@@ -132,7 +132,7 @@ namespace scene {
             glm::vec3 position = point_light_pos[ptl_id];
 
             point_lights.push_back(std::make_unique<PointLight>(position, color * 0.2f , color, color));
-            ptl_data.push_back(PointLightData({ position[0], position[1], position[2] }, { color[0], color[1], color[2] }));
+            ptl_data.push_back(LightData({ position[0], position[1], position[2] }, { color[0], color[1], color[2] }));
         }
 
         spot_light = std::make_unique<SpotLight>(camera.GetPosition(), camera.GetDirection(), 25.0f, 30.0f, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));

@@ -61,6 +61,17 @@ enum BlendEquation
     MIN,
     MAX
 };
+enum FaceCullMode
+{
+    BACK = 0,       // Culls only back face
+    FRONT,          // Culls only front face
+    FRONT_AND_BACK  // Culls both the front and back faces
+};
+enum FrontFace
+{
+    CCW = 0,
+    CW
+};
 
 struct AppState
 {
@@ -88,7 +99,7 @@ class Renderer
         bool m_depth_buffer   = true;
         bool m_stencil_buffer = true;
         bool m_wireframe      = false;
-        bool m_face_culling   = false;
+        bool m_face_culling   = true;
 
         double m_delta_time = 0.0;
         double m_last_frame = 0.0;
@@ -130,10 +141,14 @@ class Renderer
         /*Sets the operation between source and destination component of the blending equation*/
         void SetBlendEquation(BlendEquation eq);
 
+        void SetFaceCullingMode(FaceCullMode mode);
+        void SetFrontFace(FrontFace mode);
+
 	    inline void SetBackgroundColor(glm::vec4 new_color) { m_background_color = new_color; }
     private:
         GLenum GetBlendFunction(BlendFunc id) const;
         GLenum GetBlendEquation(BlendEquation id) const;
+        GLenum GetCullFaceMode(FaceCullMode id) const;
 
     public:
         Camera& GetActiveCamera() const;

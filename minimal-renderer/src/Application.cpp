@@ -14,7 +14,7 @@
 #include "Renderer.h"
 #include "Camera.h"
 
-#include "scenes/11_SceneBlending.h"
+#include "scenes/12_SceneFaceCulling.h"
 
 #define WINDOW_TITLE "LearnOpenGL"
 
@@ -81,7 +81,7 @@ int main(void)
     renderer.state->active_camera = 0;
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneBlending scene(renderer);
+    scene::SceneFaceCulling scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))

@@ -18,7 +18,9 @@ Renderer::Renderer()
     SetStencilTest(m_stencil_buffer);
 
 	SetWireframeRender(m_wireframe);
+
 	SetFaceCulling(m_face_culling);
+    SetFaceCullingMode(FaceCullMode::BACK);
 
 	// Log OpenGL stats
 	std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
@@ -159,6 +161,23 @@ void Renderer::SetBlendEquation(BlendEquation eq)
     GLCall(glBlendEquation(GetBlendEquation(eq)));
 }
 
+void Renderer::SetFaceCullingMode(FaceCullMode mode)
+{
+    GLCall(glCullFace(GetCullFaceMode(mode)));
+}
+
+void Renderer::SetFrontFace(FrontFace mode)
+{
+    if (mode == FrontFace::CCW)
+    {
+        GLCall(glFrontFace(GL_CCW));
+    }
+    else
+    {
+        GLCall(glFrontFace(GL_CW));
+    }
+}
+
 int Renderer::GetMaxVertexAttribs() const
 {
 	int nrAttr;
@@ -198,6 +217,17 @@ GLenum Renderer::GetBlendEquation(BlendEquation id) const
     case MIN:               return GL_MIN;
     case MAX:               return GL_MAX;
     default:                return GL_FUNC_ADD;
+    }
+}
+
+GLenum Renderer::GetCullFaceMode(FaceCullMode id) const
+{
+    switch (id)
+    {
+    case BACK:              return GL_BACK;
+    case FRONT:             return GL_FRONT;
+    case FRONT_AND_BACK:    return GL_FRONT_AND_BACK;
+    default:                return GL_BACK;
     }
 }
 

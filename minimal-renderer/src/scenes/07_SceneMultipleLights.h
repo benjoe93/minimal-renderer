@@ -11,7 +11,7 @@ class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
-static struct PointLightData
+struct LightData
 {
     float position[3];
     float color[3];
@@ -36,7 +36,7 @@ namespace scene {
     
         float light_color[3];
         float dir_light_direction[3];
-        std::vector<PointLightData> ptl_data;
+        std::vector<LightData> ptl_data;
     
     public:
         SceneMultipleLights(Renderer& in_renderer);

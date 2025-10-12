@@ -175,6 +175,7 @@
     <ClCompile Include="src\scenes\09_SceneDepthTesting.cpp" />
     <ClCompile Include="src\scenes\10_SceneStencilTesting.cpp" />
     <ClCompile Include="src\scenes\11_SceneBlending.cpp" />
+    <ClCompile Include="src\scenes\12_SceneFaceCulling.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\vendor\glad\glad.c" />
@@ -213,6 +214,7 @@
     <ClInclude Include="src\scenes\09_SceneDepthTesting.h" />
     <ClInclude Include="src\scenes\10_SceneStencilTesting.h" />
     <ClInclude Include="src\scenes\11_SceneBlending.h" />
+    <ClInclude Include="src\scenes\12_SceneFaceCulling.h" />
     <ClInclude Include="src\scenes\Scene.h" />
     <ClInclude Include="src\ShapeLib.h" />
     <ClInclude Include="src\Texture.h" />
@@ -229,26 +231,6 @@
     <ClInclude Include="src\vendor\stb_image\stb_image.h" />
     <ClInclude Include="src\VertexArray.h" />
     <ClInclude Include="src\VertexBuffer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="resources\shaders\GettingStarted\default.frag" />
-    <None Include="resources\shaders\GettingStarted\default.vert" />
-    <None Include="resources\shaders\Lighting\LightCasters\light.frag" />
-    <None Include="resources\shaders\Lighting\LightCasters\light.vert" />
-    <None Include="resources\shaders\Lighting\LightCasters\object.frag" />
-    <None Include="resources\shaders\Lighting\LightCasters\object.vert" />
-    <None Include="resources\shaders\Lighting\Materials\light.frag" />
-    <None Include="resources\shaders\Lighting\Materials\light.vert" />
-    <None Include="resources\shaders\Lighting\Materials\object.frag" />
-    <None Include="resources\shaders\Lighting\Materials\object.vert" />
-    <None Include="resources\shaders\Lighting\PhongLighting\light.frag" />
-    <None Include="resources\shaders\Lighting\PhongLighting\light.vert" />
-    <None Include="resources\shaders\Lighting\PhongLighting\object.frag" />
-    <None Include="resources\shaders\Lighting\PhongLighting\object.vert" />
-    <None Include="resources\shaders\Lighting\SurfaceMaps\light.frag" />
-    <None Include="resources\shaders\Lighting\SurfaceMaps\light.vert" />
-    <None Include="resources\shaders\Lighting\SurfaceMaps\object.frag" />
-    <None Include="resources\shaders\Lighting\SurfaceMaps\object.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
