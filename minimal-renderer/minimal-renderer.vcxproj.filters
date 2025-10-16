@@ -123,10 +123,10 @@
     <ClCompile Include="src\scenes\11_SceneBlending.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scenes\00_SceneTemplate.cpp">
+    <ClCompile Include="src\scenes\12_SceneFaceCulling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\scenes\12_SceneFaceCulling.cpp">
+    <ClCompile Include="src\scenes\13_SceneFrameBuffers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -245,31 +245,11 @@
     <ClInclude Include="src\scenes\11_SceneBlending.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\scenes\00_SceneTemplate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\scenes\12_SceneFaceCulling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="resources\shaders\GettingStarted\default.frag" />
-    <None Include="resources\shaders\GettingStarted\default.vert" />
-    <None Include="resources\shaders\Lighting\PhongLighting\object.vert" />
-    <None Include="resources\shaders\Lighting\PhongLighting\light.frag" />
-    <None Include="resources\shaders\Lighting\PhongLighting\light.vert" />
-    <None Include="resources\shaders\Lighting\PhongLighting\object.frag" />
-    <None Include="resources\shaders\Lighting\Materials\light.frag" />
-    <None Include="resources\shaders\Lighting\Materials\light.vert" />
-    <None Include="resources\shaders\Lighting\Materials\object.frag" />
-    <None Include="resources\shaders\Lighting\Materials\object.vert" />
-    <None Include="resources\shaders\Lighting\SurfaceMaps\light.frag" />
-    <None Include="resources\shaders\Lighting\SurfaceMaps\light.vert" />
-    <None Include="resources\shaders\Lighting\SurfaceMaps\object.frag" />
-    <None Include="resources\shaders\Lighting\SurfaceMaps\object.vert" />
-    <None Include="resources\shaders\Lighting\LightCasters\light.frag" />
-    <None Include="resources\shaders\Lighting\LightCasters\light.vert" />
-    <None Include="resources\shaders\Lighting\LightCasters\object.frag" />
-    <None Include="resources\shaders\Lighting\LightCasters\object.vert" />
+    <ClInclude Include="src\scenes\13_SceneFrameBuffers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

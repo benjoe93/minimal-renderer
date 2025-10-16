@@ -10,29 +10,30 @@ class IndexBuffer;
 
 namespace scene {
 
-	class SceneLightCasters: public Scene
-	{
-	private:
-		std::unique_ptr<VertexArray>				object_va;
-		std::unique_ptr<VertexBuffer>				object_vb;
-		std::unique_ptr<IndexBuffer>				object_ib;
-		std::vector<std::unique_ptr<Material>>		object_materials;
 
-		std::unique_ptr<VertexArray>	light_va;
-		std::unique_ptr<VertexBuffer>	light_vb;
-		std::unique_ptr<IndexBuffer>	light_ib;
-		std::unique_ptr<Material>		light_material;
+class SceneLightCasters: public Scene
+{
+private:
+    std::unique_ptr<VertexArray>            object_va;
+    std::unique_ptr<VertexBuffer>           object_vb;
+    std::unique_ptr<IndexBuffer>            object_ib;
+    std::vector<std::unique_ptr<Material>>  object_materials;
 
-		float object_color[3];
+    std::unique_ptr<VertexArray>    light_va;
+    std::unique_ptr<VertexBuffer>   light_vb;
+    std::unique_ptr<IndexBuffer>    light_ib;
+    std::unique_ptr<Material>       light_material;
 
-		float light_color[3];
-		float light_position[3];
+    float object_color[3];
 
-	public:
-		SceneLightCasters(Renderer& in_renderer);
+    float light_color[3];
+    float light_position[3];
 
-		void OnUpdate(double delta_time) override;
-		void OnRender() override;
-		void OnImGuiRender() override;
-	};
+public:
+    SceneLightCasters(Renderer& in_renderer);
+
+    void OnUpdate(double delta_time) override;
+    void OnRender() override;
+    void OnImGuiRender() override;
+};
 }

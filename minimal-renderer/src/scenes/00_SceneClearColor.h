@@ -5,15 +5,15 @@
 class Renderer;
 
 namespace scene {
-	class SceneClearColor : public Scene
-	{
-	private:
-		float m_clear_color[4];
+class SceneClearColor : public Scene
+{
+private:
+    float m_clear_color[4];
 
-	public:
-		SceneClearColor(Renderer& in_renderer);
-		
-		void OnRender() override;
-		void OnImGuiRender() override;
-	};
+public:
+    SceneClearColor(Renderer& in_renderer);
+    
+    void OnRender() override;
+    void OnImGuiRender() override;
+};
 }
