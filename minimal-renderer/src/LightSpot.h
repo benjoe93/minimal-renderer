@@ -22,15 +22,15 @@ public:
 
     void Update(glm::mat4 projection, glm::mat4 camera_view) override;
 
-    inline glm::vec3 GetDirection() const { return m_direction; };
-    inline float GetInnerAngle() const { return m_inner_angle; };
-    inline float GetOuterAngle() const { return m_outer_angle; };
-    inline float GetConstant() const { return m_constant; };
-    inline float GetLinear() const { return m_linear; };
-    inline float GetQuadratic() const { return m_quadratic; };
+    glm::vec3 GetDirection() const { return m_direction; };
+    float GetInnerAngle() const { return m_inner_angle; };
+    float GetOuterAngle() const { return m_outer_angle; };
+    float GetConstant() const { return m_constant; };
+    float GetLinear() const { return m_linear; };
+    float GetQuadratic() const { return m_quadratic; };
 
 
-    inline void SetDirection(glm::vec3 new_direction) { m_direction = new_direction; };
-    inline void SetInnerAngle(float new_angle) { m_inner_angle = new_angle; };
-    inline void SetOuterAngle(float new_angle) { m_outer_angle = new_angle; };
+    void SetDirection(glm::vec3 new_direction) { m_direction = new_direction; };
+    void SetInnerAngle(float new_angle) { m_inner_angle = new_angle; };
+    void SetOuterAngle(float new_angle) { m_outer_angle = new_angle; };
 };

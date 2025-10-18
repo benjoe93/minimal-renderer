@@ -35,11 +35,11 @@ namespace scene {
         objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
         objects.push_back(std::make_unique<Model>("resources/models/plane.fbx", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
         for (auto& mesh : objects[0]->GetMeshes())
-            mesh->GetMaterial().AddTexture("resources/textures/marble.jpg", TextureType::DIFFUSE, true);
+            mesh->GetMaterial().AddTexture2D("resources/textures/marble.jpg", "material.diffuse", true);
         for (auto& mesh : objects[1]->GetMeshes())
-            mesh->GetMaterial().AddTexture("resources/textures/marble.jpg", TextureType::DIFFUSE, true);
+            mesh->GetMaterial().AddTexture2D("resources/textures/marble.jpg", "material.diffuse", true);
         for (auto& mesh : objects[2]->GetMeshes())
-            mesh->GetMaterial().AddTexture("resources/textures/metal.png", TextureType::DIFFUSE, true);
+            mesh->GetMaterial().AddTexture2D("resources/textures/metal.png", "material.diffuse", true);
     }
 
     void SceneDepthTesting::OnUpdate(double delta_time)

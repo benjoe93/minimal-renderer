@@ -9,7 +9,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
+#include "Texture2D.h"
 #include "Shader.h"
 
 #include "01_SceneCube.h"
@@ -38,28 +38,28 @@ scene::SceneCube::SceneCube(Renderer& in_renderer)
     // Using counter-clockwise winding order
     unsigned int indices[] = {
         // Front face (z = +0.5)
-        0, 1, 2,
-        0, 2, 3,
-    
+        0, 2, 1,
+        0, 3, 2,
+
         // Back face (z = -0.5)
-        4, 7, 6,
-        4, 6, 5,
-    
+        4, 5, 6,
+        4, 6, 7,
+
         // Left face (x = -0.5)  
-        0, 3, 7,
-        0, 7, 4,
-    
+        3, 7, 6,
+        3, 6, 2,
+
         // Right face (x = +0.5)
-        1, 5, 6,
-        1, 6, 2,
-    
+        0, 1, 5,
+        0, 5, 4,
+
         // Bottom face (y = -0.5)
-        0, 4, 5,
-        0, 5, 1,
-    
+        1, 2, 5,
+        2, 6, 5,
+
         // Top face (y = +0.5)
-        3, 2, 6,
-        3, 6, 7
+        0, 4, 7,
+        0, 7, 3
     };
 
     // Crate VAO, VBO, EBO
@@ -79,8 +79,8 @@ scene::SceneCube::SceneCube(Renderer& in_renderer)
     va->Unbind();
 
     // Create textures
-    texture_1 = std::make_unique<Texture>("resources/textures/container.jpg", TextureType::NONE, true);
-    texture_2 = std::make_unique<Texture>("resources/textures/awesomeface.png", TextureType::NONE, true);
+    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", "texture_1", true);
+    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", "texture_2", true);
 
     texture_1->Bind();
     texture_2->Bind(1);

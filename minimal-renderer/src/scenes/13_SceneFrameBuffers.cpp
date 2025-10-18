@@ -5,18 +5,13 @@
 
 #include "vendor/imgui/imgui.h"
 
-#include "LightDirectional.h"
-#include "LightPoint.h"
-
 #include "Renderer.h"
 #include "Camera.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "Texture.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "FrameBuffer.h"
+#include "RenderTarget.h"
 
 #include "13_SceneFrameBuffers.h"
 
@@ -26,6 +21,14 @@ static std::vector<float> quad_verts = {
     -1.0f, -1.0f,  0.0f, 0.0f, // bot left
      1.0f, -1.0f,  1.0f, 0.0f, // bot right
      1.0f,  1.0f,  1.0f, 1.0f  // top right
+};
+
+static std::vector<Vertex> verts = {
+           // positions          // normals          // texCoords
+    Vertex({-1.0f,  1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}), // top left
+    Vertex({-1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}), // bot left
+    Vertex({ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}), // bot right
+    Vertex({ 1.0f,  1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}), // top right
 };
 
 static std::vector<unsigned int> indices = 
@@ -39,42 +42,35 @@ SceneFramebuffer::SceneFramebuffer(Renderer& in_renderer)
     :Scene(in_renderer)
 {
     // framebuffer configuration
-    glGenFramebuffers(1, &fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    framebuffer = std::make_unique<Framebuffer>();
 
     // create a color attachment texture
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_renderer.state->scr_width, m_renderer.state->scr_height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+    render_target = std::make_shared<RenderTarget>(m_renderer.state->scr_width, m_renderer.state->scr_height, 3, "screenTexture");
+    framebuffer->AttachRenderTarget(render_target.get());
+
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    glGenRenderbuffers(1, &rbo);
-    glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_renderer.state->scr_width, m_renderer.state->scr_height); // use a single renderbuffer object for both a depth AND stencil buffer.
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo); // now actually attach it
+    
+    render_buffer = std::make_unique<RenderBuffer>(m_renderer.state->scr_width, m_renderer.state->scr_height);
+    framebuffer->AttachRenderBuffer(render_buffer.get());
     // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-        std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
+    framebuffer->Validate();
     
     // unbind to prevent accidental renders
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    framebuffer->Unbind();
 
-    // Create quad
-    va = std::make_unique<VertexArray>();
-    va->Bind();
+    quad = std::make_unique<Model>(
+        std::make_unique<Mesh>(
+            verts,
+            indices,
+            std::make_unique<Material>("resources/shaders/03_AdvancedOpenGL/04_Framebuffer/framebuffer.vert", "resources/shaders/03_AdvancedOpenGL/04_Framebuffer/framebuffer.frag")
+        ),
+        Transform()
+    );
 
-    vb = std::make_unique<VertexBuffer>(quad_verts.data(), quad_verts.size() * sizeof(float));
-    vb->Bind();
-
-    ib = std::make_unique<IndexBuffer>(indices.data(), indices.size());
-    ib->Bind();
-
-    va->SetLayout(*vb, 0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-    va->SetLayout(*vb, 1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-
-    mat = std::make_unique<Material>("resources/shaders/03_AdvancedOpenGL/04_Framebuffer/framebuffer.vert", "resources/shaders/03_AdvancedOpenGL/04_Framebuffer/framebuffer.frag");
+    for (auto& m : quad->GetMeshes())
+    {
+        m->GetMaterial().AddTexture(render_target);
+    }
 
     ConstructScene();
 }
@@ -99,13 +95,12 @@ void SceneFramebuffer::OnUpdate(double delta_time)
             mesh->GetMaterial().SetUniformMat4("mvp", MVP);
         }
     }
-
 }
 
 void SceneFramebuffer::OnRender()
 {
     // first pass
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    framebuffer->Bind();
     m_renderer.Clear();
     m_renderer.SetDepthTest(true);
 
@@ -113,18 +108,12 @@ void SceneFramebuffer::OnRender()
         m_renderer.Draw(*obj);
     
     // second pass
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    framebuffer->Unbind();
     m_renderer.SetDepthTest(false);
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    mat->Bind();
-    mat->GetShader().Bind();
-    mat->GetShader().SetInt("screenTexture", 0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    m_renderer.Draw(*va, *ib, mat->GetShader());
-    mat->Unbind();
+    m_renderer.Draw(*quad);
 }
 
 void SceneFramebuffer::OnImGuiRender()
@@ -146,9 +135,9 @@ void scene::SceneFramebuffer::ConstructScene()
         );
 
         for (auto& mesh : floor->GetMeshes())
-            mesh->GetMaterial().AddTexture("resources/textures/metal.png", TextureType::DIFFUSE, true);
+            mesh->GetMaterial().AddTexture(std::make_shared<Texture2D>("resources/textures/metal.png", "material.diffuse", true));
         objects.push_back(std::move(floor));
-        std::shared_ptr<Texture> marble_tex = std::make_shared<Texture>("resources/textures/container.jpg", TextureType::DIFFUSE, true);
+        std::shared_ptr<Texture2D> marble_tex = std::make_shared<Texture2D>("resources/textures/container.jpg", "material.diffuse", true);
 
         // Box 1
         std::unique_ptr<Model> box1 = std::make_unique<Model>(
@@ -163,7 +152,7 @@ void scene::SceneFramebuffer::ConstructScene()
         );
 
         for (auto& mesh : box1->GetMeshes())
-            mesh->GetMaterial().AddTexture(marble_tex, TextureType::DIFFUSE);
+            mesh->GetMaterial().AddTexture(marble_tex);
         objects.push_back(std::move(box1));
 
         // Box 2
@@ -179,7 +168,7 @@ void scene::SceneFramebuffer::ConstructScene()
         );
 
         for (auto& mesh : box2->GetMeshes())
-            mesh->GetMaterial().AddTexture(marble_tex, TextureType::DIFFUSE);
+            mesh->GetMaterial().AddTexture(marble_tex);
         objects.push_back(std::move(box2));
     }
 }

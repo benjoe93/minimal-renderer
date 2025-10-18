@@ -15,9 +15,9 @@ private:
 public:
     PointLight(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 
-    inline float GetConstant() const { return m_constant; };
-    inline float GetLinear() const { return m_linear; };
-    inline float GetQuadratic() const { return m_quadratic; };
+    float GetConstant() const { return m_constant; };
+    float GetLinear() const { return m_linear; };
+    float GetQuadratic() const { return m_quadratic; };
 
-    inline void SetPosition(glm::vec3 new_position) { m_position = new_position; };
+    void SetPosition(glm::vec3 new_position) { m_position = new_position; };
 };

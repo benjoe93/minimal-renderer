@@ -18,7 +18,7 @@ float SHINE_FACTOR = 32.0;
 void main()
 {
 	/* Ambient light */
-	float ambientStrenght = 0.0;
+	float ambientStrenght = 0.2;
 	vec3 ambient = ambientStrenght * u_objectColor;
 
 	/* Diffuse light */

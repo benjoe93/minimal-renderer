@@ -13,7 +13,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
+#include "Texture2D.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
@@ -25,6 +25,8 @@ namespace scene {
     SceneBlending::SceneBlending(Renderer& in_renderer)
         :Scene(in_renderer)
     {
+        m_renderer.SetFaceCulling(false);
+        
         window_loc.push_back(glm::vec3(-1.5f, 0.0f, -0.48f));
         window_loc.push_back(glm::vec3( 1.5f, 0.0f,  0.51f));
         window_loc.push_back(glm::vec3( 0.0f, 0.0f,  0.7f));
@@ -44,17 +46,17 @@ namespace scene {
                 "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
                 Transform(
                     glm::vec3(0.0f, -0.5f, 0.0f),
-                    glm::vec3(90.0f, 0.0f, 0.0f),
+                    glm::vec3(-90.0f, 0.0f, 0.0f),
                     glm::vec3(1.0f)
                 )
             );
 
             for (auto& mesh : floor->GetMeshes())
-                mesh->GetMaterial().AddTexture("resources/textures/metal.png", TextureType::DIFFUSE, true);
+                mesh->GetMaterial().AddTexture2D("resources/textures/metal.png", "material.diffuse", true);
             objects.push_back(std::move(floor));
         }
 
-        std::shared_ptr<Texture> marble_tex = std::make_shared<Texture>("resources/textures/marble.jpg", TextureType::DIFFUSE, true);
+        std::shared_ptr<Texture2D> marble_tex = std::make_shared<Texture2D>("resources/textures/marble.jpg", "material.diffuse", true);
         
         // Box 1
         {
@@ -70,7 +72,7 @@ namespace scene {
             );
 
             for (auto& mesh : box1->GetMeshes())
-                mesh->GetMaterial().AddTexture(marble_tex, TextureType::DIFFUSE);
+                mesh->GetMaterial().AddTexture(marble_tex);
             objects.push_back(std::move(box1));
 
         }
@@ -88,12 +90,12 @@ namespace scene {
             );
 
             for (auto& mesh : box2->GetMeshes())
-                mesh->GetMaterial().AddTexture(marble_tex, TextureType::DIFFUSE);
+                mesh->GetMaterial().AddTexture(marble_tex);
             objects.push_back(std::move(box2));
         }
 
         // windows
-        std::shared_ptr<Texture> window_tex = std::make_shared<Texture>("resources/textures/window.png", TextureType::DIFFUSE, true);
+        std::shared_ptr<Texture2D> window_tex = std::make_shared<Texture2D>("resources/textures/window.png", "material.diffuse", true);
         for (unsigned int i = 0; i < window_loc.size(); i++)
         {
             std::unique_ptr<Model> window = std::make_unique<Model>(
@@ -102,18 +104,18 @@ namespace scene {
                 "resources/shaders/03_AdvancedOpenGL/03_Blending/window.frag",
                 Transform(
                     window_loc[i], 
-                    glm::vec3(180.0f, 0.0f, 0.0f),
+                    glm::vec3(0.0f, 0.0f, 180.0f),
                     glm::vec3(0.1f)
                 )
             );
 
             for (auto& mesh : window->GetMeshes())
-                mesh->GetMaterial().AddTexture(window_tex, TextureType::DIFFUSE);
+                mesh->GetMaterial().AddTexture(window_tex);
             transparent_objects.push_back(std::move(window));
         }
 
         // grass
-        std::shared_ptr<Texture> grass_tex = std::make_shared<Texture>("resources/textures/grass.png", TextureType::DIFFUSE, true);
+        std::shared_ptr<Texture2D> grass_tex = std::make_shared<Texture2D>("resources/textures/grass.png", "material.diffuse", true);
         grass_tex->SetWrappingHorizontal(GL_CLAMP_TO_EDGE);
         grass_tex->SetWrappingVertical(GL_CLAMP_TO_EDGE);
         for (unsigned int i = 0; i < vegetation_loc.size(); i++)
@@ -124,13 +126,13 @@ namespace scene {
                 "resources/shaders/03_AdvancedOpenGL/03_Blending/grass.frag",
                 Transform(
                     vegetation_loc[i],
-                    glm::vec3(180.0f, 0.0f, 0.0f),
+                    glm::vec3(0.0f, 0.0f, 180.0f),
                     glm::vec3(0.05f)
                 )
             );
 
             for (auto& mesh : grass->GetMeshes())
-                mesh->GetMaterial().AddTexture(grass_tex, TextureType::DIFFUSE);
+                mesh->GetMaterial().AddTexture(grass_tex);
             objects.push_back(std::move(grass));
         }
     }

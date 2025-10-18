@@ -13,7 +13,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
+#include "Texture2D.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
@@ -37,10 +37,10 @@ namespace scene {
         );
 
         for (auto& mesh : floor->GetMeshes())
-            mesh->GetMaterial().AddTexture("resources/textures/metal.png", TextureType::DIFFUSE, true);
+            mesh->GetMaterial().AddTexture2D("resources/textures/metal.png", "material.diffuse", true);
         objects.push_back(std::move(floor));
 
-        std::shared_ptr<Texture> marble_tex = std::make_shared<Texture>("resources/textures/marble.jpg", TextureType::DIFFUSE, true);
+        std::shared_ptr<Texture2D> marble_tex = std::make_shared<Texture2D>("resources/textures/marble.jpg", "material.diffuse", true);
 
         // Box 1
         std::unique_ptr<Model> box1 = std::make_unique<Model>(
@@ -55,7 +55,7 @@ namespace scene {
         );
 
         for (auto& mesh : box1->GetMeshes())
-            mesh->GetMaterial().AddTexture(marble_tex, TextureType::DIFFUSE);
+            mesh->GetMaterial().AddTexture(marble_tex);
         objects.push_back(std::move(box1));
 
         // Box 2
@@ -71,7 +71,7 @@ namespace scene {
         );
 
         for (auto& mesh : box2->GetMeshes())
-            mesh->GetMaterial().AddTexture(marble_tex, TextureType::DIFFUSE);
+            mesh->GetMaterial().AddTexture(marble_tex);
         objects.push_back(std::move(box2));
        
     }

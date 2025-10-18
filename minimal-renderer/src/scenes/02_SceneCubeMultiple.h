@@ -4,7 +4,7 @@
 
 class Renderer;
 class IndexBuffer;
-class Texture;
+class Texture2D;
 class Shader;
 class VertexArray;
 class VertexBuffer;
@@ -17,10 +17,10 @@ private:
     std::unique_ptr<VertexBuffer> vb;
     std::unique_ptr<IndexBuffer> ib;
 
-    std::unique_ptr <Texture> texture_1;
-    std::unique_ptr <Texture> texture_2;
+    std::unique_ptr<Texture2D> texture_1;
+    std::unique_ptr<Texture2D> texture_2;
 
-    std::unique_ptr <Shader> default_shader;
+    std::unique_ptr<Shader> default_shader;
 
 public:
     SceneCubeMultiple(Renderer& in_renderer);

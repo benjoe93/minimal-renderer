@@ -13,6 +13,6 @@ private:
 public:
     DirectionalLight(glm::vec3 position, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
 
-    inline glm::vec3 GetDirection() const { return m_direction; };
-    inline void SetDirection(glm::vec3 new_direction) { m_direction = new_direction; };
+    glm::vec3 GetDirection() const { return m_direction; };
+    void SetDirection(glm::vec3 new_direction) { m_direction = new_direction; };
 };

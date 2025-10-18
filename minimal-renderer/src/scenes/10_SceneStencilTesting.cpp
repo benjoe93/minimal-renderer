@@ -45,11 +45,11 @@ namespace scene {
         outline_objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.vert", "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.frag"));
 
         for (auto& mesh : objects[0]->GetMeshes())
-            mesh->GetMaterial().AddTexture("resources/textures/metal.png", TextureType::DIFFUSE, true);
+            mesh->GetMaterial().AddTexture2D("resources/textures/metal.png", "material.diffuse", true);
         for (auto& mesh : objects[1]->GetMeshes())
-            mesh->GetMaterial().AddTexture("resources/textures/marble.jpg", TextureType::DIFFUSE, true);
+            mesh->GetMaterial().AddTexture2D("resources/textures/marble.jpg", "material.diffuse", true);
         for (auto& mesh : objects[2]->GetMeshes())
-            mesh->GetMaterial().AddTexture("resources/textures/marble.jpg", TextureType::DIFFUSE, true);
+            mesh->GetMaterial().AddTexture2D("resources/textures/marble.jpg", "material.diffuse", true);
     }
 
     void SceneStencilTesting::OnUpdate(double delta_time)
@@ -68,7 +68,7 @@ namespace scene {
         {
             model = glm::mat4(1.0);
             model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));
-            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+            model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 

@@ -10,7 +10,7 @@
 #include "IndexBuffer.h"
 
 class Material;
-class Texture;
+class Texture2D;
 
 struct Vertex
 {
@@ -28,9 +28,9 @@ private:
     std::unique_ptr<Material>     m_material;
 
 public:
-    std::vector<Vertex>       m_vertices;
-    std::vector<unsigned int> m_indices;
-    std::vector<Texture>      m_textures;
+    std::vector<Vertex>         m_vertices;
+    std::vector<unsigned int>   m_indices;
+    std::vector<Texture2D>      m_textures;
 
     Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::unique_ptr<Material> material);
 
@@ -39,4 +39,3 @@ public:
     IndexBuffer* GetIndexBuffer() const { return m_ib.get(); }
     Material& GetMaterial() const { return *m_material; };
 };
-

@@ -9,7 +9,7 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
+#include "Texture2D.h"
 #include "Shader.h"
 
 #include "02_SceneCubeMultiple.h"
@@ -94,8 +94,8 @@ scene::SceneCubeMultiple::SceneCubeMultiple(Renderer& in_renderer)
     va->Unbind();
 
     // Create textures
-    texture_1 = std::make_unique<Texture>("resources/textures/container.jpg", TextureType::NONE, true);
-    texture_2 = std::make_unique<Texture>("resources/textures/awesomeface.png", TextureType::NONE, true);
+    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", "texture_1", true);
+    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", "texture_2", true);
 
     texture_1->Bind();
     texture_2->Bind(1);

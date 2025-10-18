@@ -69,23 +69,23 @@ SceneSurfMaps::SceneSurfMaps(Renderer& in_renderer)
     };
     unsigned int indices[] = {
         // Front face
-         0,  1,  2,
-         3,  4,  5,
-        // Back face
+         2,  1,  0,
+         5,  4,  3,
+         // Back face
          6,  7,  8,
          9, 10, 11,
-        // Left face
-        12, 13, 14,
-        15, 16, 17,
-        // Right face
-        18, 19, 20,
-        21, 22, 23,
-        // Bottom face
-        24, 25, 26,
-        27, 28, 29,
-        // Top face
-        30, 31, 32,
-        33, 34, 35
+         // Left face
+         12, 13, 14,
+         15, 16, 17,
+         // Right face
+         20, 19, 18,
+         23, 22, 21,
+         // Bottom face
+         24, 25, 26,
+         27, 28, 29,
+         // Top face
+         32, 31, 30,
+         35, 34, 33
     };
 
     size_t element_size = 36;
@@ -107,8 +107,8 @@ SceneSurfMaps::SceneSurfMaps(Renderer& in_renderer)
     object_material = std::make_unique<Material>("resources/shaders/01_Lighting/02_SurfaceMaps/object.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/object.frag");
 
     // Bind Textures
-    object_material->AddTexture("resources/textures/container2.png", "material.diffuse", true);
-    object_material->AddTexture("resources/textures/container2_specular.png", "material.specular", true);
+    object_material->AddTexture2D("resources/textures/container2.png", "material.diffuse", true);
+    object_material->AddTexture2D("resources/textures/container2_specular.png", "material.specular", true);
 
     object_va->Unbind();
     object_vb->Unbind();

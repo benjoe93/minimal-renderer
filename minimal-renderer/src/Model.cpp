@@ -98,8 +98,8 @@ std::unique_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
     if (mesh->mMaterialIndex >= 0)
     {
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        LoadMaterialTextures(mat.get(), material, aiTextureType_DIFFUSE, TextureType::DIFFUSE);
-        LoadMaterialTextures(mat.get(), material, aiTextureType_SPECULAR, TextureType::SPECULAR);
+        LoadMaterialTextures(mat.get(), material, aiTextureType_DIFFUSE, "material.diffuse");
+        LoadMaterialTextures(mat.get(), material, aiTextureType_SPECULAR, "material.specular");
     }
     
 
@@ -110,7 +110,7 @@ std::unique_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
      );
 }
 
-void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, aiTextureType type, TextureType type_name)
+void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, aiTextureType type, std::string type_name)
 {
     unsigned int texture_count = ai_material->GetTextureCount(type);
 
@@ -135,14 +135,14 @@ void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, ai
         if (it == m_texture_cache.end())
         {
             // new texture - load it and cache the path
-            std::shared_ptr<Texture> new_texture = std::make_shared<Texture>(full_path, type_name, true);
+            std::shared_ptr<Texture2D> new_texture = std::make_shared<Texture2D>(full_path, type_name, true);
             m_texture_cache[texture_path] = new_texture;
-            material->AddTexture(new_texture, type_name);
+            material->AddTexture(new_texture);
         }
         else
         {
             // texture already exists - reuse it]
-            material->AddTexture(it->second, type_name);
+            material->AddTexture(it->second);
         }
     }
 }
@@ -157,6 +157,14 @@ Model::Model(const std::string& path, const std::string& vertex_shader, const st
     : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader), m_transform(transform)
 {
     LoadModel(path);
+}
+
+Model::Model(std::unique_ptr<Mesh> mesh, Transform transform)
+    : m_transform(transform)
+{
+    m_vertex_shader_path = mesh->GetMaterial().GetVertexPath();
+    m_fragment_shader_path = mesh->GetMaterial().GetFragmentPath();
+    m_meshes.push_back(std::move(mesh));
 }
 
 glm::mat4 Model::GetModelMatrix()

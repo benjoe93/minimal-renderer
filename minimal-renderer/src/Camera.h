@@ -17,25 +17,25 @@ public:
 
     glm::mat4 GetViewMatrix() const;
 
-    inline void SetPosition(glm::vec3 new_pos) { m_cam_position = new_pos; }
-    inline void SetSpeed(const float new_speed) { m_cam_speed = new_speed; }
-    inline void SetPitch(const float new_pitch) { m_pitch = new_pitch; }
-    inline void SetYaw(const float new_yaw) { m_yaw = new_yaw; }
-    inline void SetRoll(const float new_roll) { m_roll = new_roll; }
-    inline void SetFov(const float new_fov) { m_fov = new_fov; }
+    void SetPosition(glm::vec3 new_pos) { m_cam_position = new_pos; }
+    void SetSpeed(const float new_speed) { m_cam_speed = new_speed; }
+    void SetPitch(const float new_pitch) { m_pitch = new_pitch; }
+    void SetYaw(const float new_yaw) { m_yaw = new_yaw; }
+    void SetRoll(const float new_roll) { m_roll = new_roll; }
+    void SetFov(const float new_fov) { m_fov = new_fov; }
 
 
-    inline unsigned int GetId() const { return m_renderer_id; }
-    inline glm::vec3 GetPosition() const { return m_cam_position; }
-    inline glm::vec3 GetDirection() const { return m_cam_direction; }
-    inline glm::vec3 GetUpVector() const { return m_cam_up; }
-    inline float GetSpeed() const { return m_cam_speed; }
+    unsigned int GetId() const { return m_renderer_id; }
+    glm::vec3 GetPosition() const { return m_cam_position; }
+    glm::vec3 GetDirection() const { return m_cam_direction; }
+    glm::vec3 GetUpVector() const { return m_cam_up; }
+    float GetSpeed() const { return m_cam_speed; }
 
-    inline float GetPitch() const { return m_pitch; }
-    inline float GetYaw() const { return m_yaw; }
-    inline float GetRoll() const { return m_roll; }
+    float GetPitch() const { return m_pitch; }
+    float GetYaw() const { return m_yaw; }
+    float GetRoll() const { return m_roll; }
 
-    inline float GetFov() const { return m_fov; }
+    float GetFov() const { return m_fov; }
 
 
     void MoveFwd(const double delta_time);

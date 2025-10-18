@@ -1,6 +1,7 @@
 #include "Material.h"
 
 Material::Material(const char* vertex_path, const char* fragment_path)
+    : m_vertex_path(vertex_path), m_fragment_path(fragment_path)
 {
 	m_shader = std::make_unique<Shader>(vertex_path, fragment_path);
 }
@@ -9,46 +10,22 @@ Material::~Material()
 {
 }
 
-void Material::AddTexture(std::shared_ptr<Texture> texture, std::string sampler_name)
+void Material::AddTexture(std::shared_ptr<Texture> texture)
 {
     if (texture)
     {
         m_textures.push_back({
-            sampler_name,
+            texture->GetSamplerName(),
             texture
         });
     }
 }
 
-void Material::AddTexture(std::shared_ptr<Texture> texture, TextureType type)
-{
-    if (texture)
-    {
-        std::string sampler_name = texture->GetSamplerName();
-
-        m_textures.push_back({
-            sampler_name,
-            texture
-        });
-    }
-}
-
-void Material::AddTexture(std::string path, std::string sampler_name, bool is_flipped)
+void Material::AddTexture2D(std::string path, std::string sampler_name, bool is_flipped)
 {
     m_textures.push_back({
         sampler_name,
-        std::make_shared<Texture>(path, sampler_name, is_flipped)
-    });
-}
-
-void Material::AddTexture(std::string path, TextureType type, bool is_flipped)
-{
-    auto texture = std::make_shared<Texture>(path, type, is_flipped);
-    std::string sampler_name = texture->GetSamplerName();
-    
-    m_textures.push_back({
-        sampler_name,
-        std::move(texture)
+        std::make_shared<Texture2D>(path, sampler_name, is_flipped)
     });
 }
 

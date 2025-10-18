@@ -1,32 +1,24 @@
 #pragma once
 #include <memory>
-#include "LightDirectional.h"
-#include "LightPoint.h"
-#include "LightSpot.h"
 #include "Scene.h"
-#include "Material.h"
 #include "Model.h"
+#include "Framebuffer.h"
+#include "RenderBuffer.h"
 
 class Renderer;
-class VertexArray;
-class VertexBuffer;
-class IndexBuffer;
+class RenderTarget;
 
 namespace scene {
 
     class SceneFramebuffer: public Scene
     {
     private:
+        std::unique_ptr<Framebuffer> framebuffer;
+        std::unique_ptr<RenderBuffer> render_buffer;
+
+        std::shared_ptr<RenderTarget> render_target;
         std::vector<std::unique_ptr<Model>> objects;
-        unsigned int fbo;
-        unsigned int texture;
-        unsigned int rbo;
-
-        std::unique_ptr<VertexArray>    va;
-        std::unique_ptr<VertexBuffer>   vb;
-        std::unique_ptr<IndexBuffer>    ib;
-        std::unique_ptr<Material>       mat;
-
+        std::unique_ptr<Model> quad;
 
     public:
         SceneFramebuffer(Renderer& in_renderer);

@@ -18,9 +18,9 @@ namespace scene {
 
 ScenePhongLight::ScenePhongLight(Renderer& in_renderer)
     :Scene(in_renderer),
-    light_color        { 1.0f, 1.0f, 1.0f },
-    object_color    { 1.0f, 0.5f, 0.31f },
-    light_position    { 1.2f, 1.0f, 2.0f }
+    light_color    { 1.0f, 1.0f, 1.0f },
+    object_color   { 1.0f, 0.5f, 0.31f },
+    light_position { 1.2f, 1.0f, 2.0f }
 {
     /* QUAD DEFINITION */
     float vertices[] = {
@@ -70,8 +70,8 @@ ScenePhongLight::ScenePhongLight(Renderer& in_renderer)
         };
     unsigned int indices[] = {
             // Front face
-             0,  1,  2,
-             3,  4,  5,
+             2,  1,  0,
+             5,  4,  3,
             // Back face
              6,  7,  8,
              9, 10, 11,
@@ -79,14 +79,14 @@ ScenePhongLight::ScenePhongLight(Renderer& in_renderer)
             12, 13, 14,
             15, 16, 17,
             // Right face
-            18, 19, 20,
-            21, 22, 23,
+            20, 19, 18,
+            23, 22, 21,
             // Bottom face
             24, 25, 26,
             27, 28, 29,
             // Top face
-            30, 31, 32,
-            33, 34, 35
+            32, 31, 30,
+            35, 34, 33
         };
 
     size_t element_size = 36;
@@ -121,7 +121,6 @@ ScenePhongLight::ScenePhongLight(Renderer& in_renderer)
     light_ib->Bind();
 
     light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    //light_va->SetLayout(*light_vb, 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(6 * sizeof(float)));
 
     light_shader = std::make_unique<Shader>("resources/shaders/01_Lighting/00_PhongLighting/light.vert", "resources/shaders/01_Lighting/00_PhongLighting/light.frag");
     light_shader->Bind();
@@ -159,6 +158,7 @@ void ScenePhongLight::OnRender()
     light_shader->Bind();
     glm::mat4 light_transform = glm::mat4(1.0f);
     light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
+    light_transform = glm::scale(light_transform, glm::vec3(0.1f));
     light_shader->SetMat4("model", light_transform);
     light_shader->SetMat4("view", cam.GetViewMatrix());
     light_shader->SetMat4("projection", projection);

@@ -3,6 +3,7 @@
 #include <vector>
 #include <unordered_map>
 #include <memory>
+#include <vector>
 
 #include <assimp/scene.h>
 
@@ -10,7 +11,7 @@
 
 class Mesh;
 class Material;
-class Texture;
+class Texture2D;
 
 enum TextureType;
 
@@ -29,18 +30,19 @@ private:
     std::string m_vertex_shader_path;
     std::string m_fragment_shader_path;
     std::vector<std::unique_ptr<Mesh>> m_meshes;
-    std::unordered_map<std::string, std::shared_ptr<Texture>> m_texture_cache; // tracks loaded paths
+    std::unordered_map<std::string, std::shared_ptr<Texture2D>> m_texture_cache; // tracks loaded paths
 
     glm::mat4 m_model_matrix = glm::mat4(1.0);
 
     void LoadModel(const std::string& path);
     void ProcessNode(aiNode* node, const aiScene* scene);
     std::unique_ptr<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
-    void LoadMaterialTextures(Material* material, aiMaterial* ai_material, aiTextureType type, TextureType type_name);
+    void LoadMaterialTextures(Material* material, aiMaterial* ai_material, aiTextureType type, std::string type_name);
 
 public:
     Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader);
     Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader, Transform transform);
+    Model(std::unique_ptr<Mesh> mesh, Transform transform);
 
     inline void SetTransform(Transform new_transform) { m_transform = new_transform; }
     inline void SetLocation(glm::vec3 new_location) { m_transform.Location = new_location; }
