@@ -23,18 +23,21 @@ Renderer::Renderer()
     SetFaceCullingMode(FaceCullMode::BACK);
 
     // Log OpenGL stats
-    std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
-    std::cout << "Maximum number of vertex attributes supported: " << GetMaxVertexAttribs() << std::endl;
+    std::cout << "OpenGL Version: \t" << glGetString(GL_VERSION) << std::endl;
+    std::cout << "GLSL Version: \t\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+    std::cout << "OpenGL Driver Vendor: \t" << glGetString(GL_VENDOR) << std::endl;
+    std::cout << "OpenGL Renderer: \t" << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "Max vertex attribs: \t" << GetMaxVertexAttribs() << std::endl << std::endl;
 
     state = std::make_unique<AppState>();
 }
 
 Renderer::~Renderer() {}
 
-void Renderer::Clear() const
+void Renderer::Clear(GLbitfield bits) const
 {
     GLCall(glClearColor(m_background_color.x, m_background_color.y, m_background_color.z, m_background_color.w));
-    GLCall(glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT));
+    GLCall(glClear(bits));
 }
 
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
@@ -133,49 +136,42 @@ void Renderer::SetWireframeRender(bool enabled)
 
 void Renderer::SetDepthFunction(TestingFunc function)
 {
-   GLCall(glDepthFunc(GetTestingFunction(function)));
+    GLCall(glDepthFunc(static_cast<unsigned int>(function)));
 }
 
-void Renderer::SetStencilFunction(TestingFunc function, GLint reference_value, GLuint bit_mask)
+void Renderer::SetStencilFunction(TestingFunc function, int reference_value, unsigned int bit_mask)
 {
-    GLCall(glStencilFunc(GetTestingFunction(function), reference_value, bit_mask));
+    GLCall(glStencilFunc(static_cast<unsigned int>(function), reference_value, bit_mask));
 }
 
-void Renderer::SetStencilMask(GLuint bit_mask)
+void Renderer::SetStencilMask(unsigned int bit_mask)
 {
     GLCall(glStencilMask(bit_mask));
 }
 
 void Renderer::SetStencilOperation(StencilOp stencil_fail, StencilOp depth_fail, StencilOp pass)
 {
-    GLCall(glStencilOp(GetStencilOperation(stencil_fail), GetStencilOperation(depth_fail), GetStencilOperation(pass)));
+    GLCall(glStencilOp(static_cast<unsigned int>(stencil_fail), static_cast<unsigned int>(depth_fail), static_cast<unsigned int>(pass)));
 }
 
 void Renderer::SetBlendFunction(BlendFunc src_factor, BlendFunc dst_factor)
 {
-    GLCall(glBlendFunc(GetBlendFunction(src_factor), GetBlendFunction(dst_factor)));
+    GLCall(glBlendFunc(static_cast<unsigned int>(src_factor), static_cast<unsigned int>(dst_factor)));
 }
 
 void Renderer::SetBlendEquation(BlendEquation eq)
 {
-    GLCall(glBlendEquation(GetBlendEquation(eq)));
+    GLCall(glBlendEquation(static_cast<unsigned int>(eq)));
 }
 
 void Renderer::SetFaceCullingMode(FaceCullMode mode)
 {
-    GLCall(glCullFace(GetCullFaceMode(mode)));
+    GLCall(glCullFace(static_cast<unsigned int>(mode)));
 }
 
 void Renderer::SetFrontFace(FrontFace mode)
 {
-    if (mode == FrontFace::CCW)
-    {
-        GLCall(glFrontFace(GL_CCW));
-    }
-    else
-    {
-        GLCall(glFrontFace(GL_CW));
-    }
+    GLCall(glFrontFace(static_cast<unsigned int>(mode)));
 }
 
 int Renderer::GetMaxVertexAttribs() const
@@ -190,83 +186,3 @@ Camera& Renderer::GetActiveCamera() const
     std::shared_ptr<Camera> camera = state->cameras[state->active_camera];
     return *camera;
 }
-
-#pragma region GL_Enums
-GLenum Renderer::GetTestingFunction(TestingFunc id) const
-{
-    switch (id)
-    {
-    case TestingFunc::ALWAYS:   return GL_ALWAYS;
-    case TestingFunc::NEVER:    return GL_NEVER;
-    case TestingFunc::LESS:     return GL_LESS;
-    case TestingFunc::EQUAL:    return GL_EQUAL;
-    case TestingFunc::LEQUAL:   return GL_LEQUAL;
-    case TestingFunc::GREATER:  return GL_GREATER;
-    case TestingFunc::NOTEQUAL: return GL_NOTEQUAL;
-    case TestingFunc::GEQUAL:   return GL_GEQUAL;
-    default:                    return GL_ALWAYS;
-    }
-}
-
-GLenum Renderer::GetStencilOperation(StencilOp id) const
-{
-    switch (id)
-    {
-    case StencilOp::KEEP:       return GL_KEEP;
-    case StencilOp::ZERO:       return GL_ZERO;
-    case StencilOp::REPLACE:    return GL_REPLACE;
-    case StencilOp::INCR:       return GL_INCR;
-    case StencilOp::INCR_WRAP:  return GL_INCR_WRAP;
-    case StencilOp::DECR:       return GL_DECR;
-    case StencilOp::DECR_WRAP:  return GL_DECR_WRAP;
-    case StencilOp::INVE:       return GL_INVERT;
-    default:                    return GL_KEEP;
-    }
-}
-
-GLenum Renderer::GetBlendFunction(BlendFunc id) const
-{
-    switch (id)
-    {
-    case BlendFunc::ZERO:                      return GL_ZERO;
-    case BlendFunc::ONE:                       return GL_ONE;
-    case BlendFunc::SRC_COLOR:                 return GL_SRC_COLOR;
-    case BlendFunc::ONE_MINUS_SRC_COLOR:       return GL_ONE_MINUS_SRC_COLOR;
-    case BlendFunc::DST_COLOR:                 return GL_DST_COLOR;
-    case BlendFunc::ONE_MINUS_DST_COLOR:       return GL_ONE_MINUS_DST_COLOR;
-    case BlendFunc::SRC_ALPHA:                 return GL_SRC_ALPHA;
-    case BlendFunc::ONE_MINUS_SRC_ALPHA:       return GL_ONE_MINUS_SRC_ALPHA;
-    case BlendFunc::DST_ALPHA:                 return GL_DST_ALPHA;
-    case BlendFunc::ONE_MINUS_DST_ALPHA:       return GL_ONE_MINUS_DST_ALPHA;
-    case BlendFunc::CONSTANT_COLOR:            return GL_CONSTANT_COLOR;
-    case BlendFunc::ONE_MINUS_CONSTANT_COLOR:  return GL_ONE_MINUS_CONSTANT_COLOR;
-    case BlendFunc::CONSTANT_ALPHA:            return GL_CONSTANT_ALPHA;
-    case BlendFunc::ONE_MINUS_CONSTANT_ALPHA:  return GL_ONE_MINUS_CONSTANT_ALPHA;
-    default:                                   return GL_ZERO;;
-    }
-}
-
-GLenum Renderer::GetBlendEquation(BlendEquation id) const
-{
-    switch (id)
-    {
-    case ADD:                return GL_FUNC_ADD;
-    case SUBTRACT:           return GL_FUNC_SUBTRACT;
-    case REVERSE_SUBTRACT:   return GL_FUNC_REVERSE_SUBTRACT;
-    case MIN:                return GL_MIN;
-    case MAX:                return GL_MAX;
-    default:                                return GL_FUNC_ADD;
-    }
-}
-
-GLenum Renderer::GetCullFaceMode(FaceCullMode id) const
-{
-    switch (id)
-    {
-    case BACK:                return GL_BACK;
-    case FRONT:               return GL_FRONT;
-    case FRONT_AND_BACK:      return GL_FRONT_AND_BACK;
-    default:                                return GL_BACK;
-    }
-}
-#pragma endregion

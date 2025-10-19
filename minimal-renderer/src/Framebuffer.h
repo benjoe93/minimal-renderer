@@ -1,13 +1,59 @@
 #pragma once
+#include <iostream>
+#include <unordered_map>
+#include <memory>
+
 #include "Renderer.h"
 
 class RenderTarget;
 class RenderBuffer;
 
+enum class AttachmentTarget
+{
+    COLOR0          = GL_COLOR_ATTACHMENT0,
+    COLOR1          = GL_COLOR_ATTACHMENT1,
+    COLOR2          = GL_COLOR_ATTACHMENT2,
+    COLOR3          = GL_COLOR_ATTACHMENT3,
+    COLOR4          = GL_COLOR_ATTACHMENT4,
+    COLOR5          = GL_COLOR_ATTACHMENT5,
+    COLOR6          = GL_COLOR_ATTACHMENT6,
+    COLOR7          = GL_COLOR_ATTACHMENT7,
+    COLOR8          = GL_COLOR_ATTACHMENT8,
+    COLOR9          = GL_COLOR_ATTACHMENT9,
+    COLOR10         = GL_COLOR_ATTACHMENT10,
+    COLOR11         = GL_COLOR_ATTACHMENT11,
+    COLOR12         = GL_COLOR_ATTACHMENT12,
+    COLOR13         = GL_COLOR_ATTACHMENT13,
+    COLOR14         = GL_COLOR_ATTACHMENT14,
+    COLOR15         = GL_COLOR_ATTACHMENT15,
+    COLOR16         = GL_COLOR_ATTACHMENT16,
+    COLOR17         = GL_COLOR_ATTACHMENT17,
+    COLOR18         = GL_COLOR_ATTACHMENT18,
+    COLOR19         = GL_COLOR_ATTACHMENT19,
+    COLOR20         = GL_COLOR_ATTACHMENT20,
+    COLOR21         = GL_COLOR_ATTACHMENT21,
+    COLOR22         = GL_COLOR_ATTACHMENT22,
+    COLOR23         = GL_COLOR_ATTACHMENT23,
+    COLOR24         = GL_COLOR_ATTACHMENT24,
+    COLOR25         = GL_COLOR_ATTACHMENT25,
+    COLOR26         = GL_COLOR_ATTACHMENT26,
+    COLOR27         = GL_COLOR_ATTACHMENT27,
+    COLOR28         = GL_COLOR_ATTACHMENT28,
+    COLOR29         = GL_COLOR_ATTACHMENT29,
+    COLOR30         = GL_COLOR_ATTACHMENT30,
+    COLOR31         = GL_COLOR_ATTACHMENT31,
+    DEPTH           = GL_DEPTH_ATTACHMENT,
+    STENCIL         = GL_STENCIL_ATTACHMENT,
+    DEPTH_STENCIL   = GL_DEPTH_STENCIL_ATTACHMENT
+};
+
 class Framebuffer
 {
 private:
     unsigned int m_renderer_id;
+    std::unordered_map<unsigned int, std::shared_ptr<RenderTarget>> render_targets;
+
+    void Validate() const;
 
 public:
     Framebuffer();
@@ -16,8 +62,8 @@ public:
     void Bind() const;
     void Unbind() const;
 
-    void AttachRenderTarget(RenderTarget* render_target, unsigned int slot = 0) const;
-    void AttachRenderBuffer(RenderBuffer* render_buffer) const;
+    void AttachRenderTarget(AttachmentTarget target, std::shared_ptr<RenderTarget> render_target);
+    void AttachRenderBuffer(AttachmentTarget target, std::shared_ptr<RenderBuffer> render_buffer);
 
-    void Validate() const;
+    std::shared_ptr<RenderTarget> GetRenderTarget(AttachmentTarget target) const;
 };

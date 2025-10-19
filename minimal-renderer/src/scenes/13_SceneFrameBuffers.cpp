@@ -39,21 +39,18 @@ static std::vector<unsigned int> indices =
 
 namespace scene {
 SceneFramebuffer::SceneFramebuffer(Renderer& in_renderer)
-    :Scene(in_renderer)
+    :Scene(in_renderer, "Frame Buffers")
 {
     // framebuffer configuration
     framebuffer = std::make_unique<Framebuffer>();
 
     // create a color attachment texture
     render_target = std::make_shared<RenderTarget>(m_renderer.state->scr_width, m_renderer.state->scr_height, 3, "screenTexture");
-    framebuffer->AttachRenderTarget(render_target.get());
+    framebuffer->AttachRenderTarget(AttachmentTarget::COLOR0, render_target);
 
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    
-    render_buffer = std::make_unique<RenderBuffer>(m_renderer.state->scr_width, m_renderer.state->scr_height);
-    framebuffer->AttachRenderBuffer(render_buffer.get());
-    // now that we actually created the framebuffer and added all attachments we want to check if it is actually complete now
-    framebuffer->Validate();
+    render_buffer = std::make_shared<RenderBuffer>(m_renderer.state->scr_width, m_renderer.state->scr_height);
+    framebuffer->AttachRenderBuffer(AttachmentTarget::DEPTH_STENCIL, render_buffer);
     
     // unbind to prevent accidental renders
     framebuffer->Unbind();
@@ -110,8 +107,8 @@ void SceneFramebuffer::OnRender()
     // second pass
     framebuffer->Unbind();
     m_renderer.SetDepthTest(false);
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    m_renderer.SetBackgroundColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+    m_renderer.Clear(GL_COLOR_BUFFER_BIT);
 
     m_renderer.Draw(*quad);
 }

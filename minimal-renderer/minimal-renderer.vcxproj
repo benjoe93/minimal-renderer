@@ -180,6 +180,7 @@
     <ClCompile Include="src\scenes\11_SceneBlending.cpp" />
     <ClCompile Include="src\scenes\12_SceneFaceCulling.cpp" />
     <ClCompile Include="src\scenes\13_SceneFrameBuffers.cpp" />
+    <ClCompile Include="src\scenes\14_SceneRearViewMirror.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Texture2D.cpp" />
     <ClCompile Include="src\Application.cpp" />
@@ -224,6 +225,7 @@
     <ClInclude Include="src\scenes\11_SceneBlending.h" />
     <ClInclude Include="src\scenes\12_SceneFaceCulling.h" />
     <ClInclude Include="src\scenes\13_SceneFrameBuffers.h" />
+    <ClInclude Include="src\scenes\14_SceneRearViewMirror.h" />
     <ClInclude Include="src\scenes\Scene.h" />
     <ClInclude Include="src\ShapeLib.h" />
     <ClInclude Include="src\Texture.h" />

@@ -19,6 +19,42 @@ glm::mat4 Camera::GetViewMatrix() const
     return glm::lookAt(m_cam_position, m_cam_position + m_cam_direction, m_cam_up);
 }
 
+void Camera::SetPitch(const float new_pitch)
+{
+    m_pitch = new_pitch;
+    UpdateRotation();
+}
+
+void Camera::SetYaw(const float new_yaw)
+{
+    m_yaw = new_yaw;
+    UpdateRotation();
+}
+
+void Camera::SetRoll(const float new_roll)
+{
+    m_roll = new_roll;
+    UpdateRotation();
+}
+
+void Camera::AddPitch(const float new_pitch)
+{
+    m_pitch += new_pitch;
+    UpdateRotation();
+}
+
+void Camera::AddYaw(const float new_yaw)
+{
+    m_yaw += new_yaw;
+    UpdateRotation();
+}
+
+void Camera::AddRoll(const float new_roll)
+{
+    m_roll += new_roll;
+    UpdateRotation();
+}
+
 void Camera::MoveFwd(const double delta_time)
 {
     m_cam_position += static_cast<float>(delta_time * m_cam_speed) * m_cam_direction;
@@ -49,7 +85,7 @@ void Camera::MoveUp(const double delta_time)
     m_cam_position += static_cast<float>(delta_time * m_cam_speed) * glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
-void Camera::UpdateRotation(const double delta_time)
+void Camera::UpdateRotation()
 {
     glm::vec3 temp_dir{
         cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch)),  // x

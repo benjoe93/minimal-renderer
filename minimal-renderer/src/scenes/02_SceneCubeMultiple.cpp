@@ -16,7 +16,7 @@
 
 namespace scene {
 scene::SceneCubeMultiple::SceneCubeMultiple(Renderer& in_renderer)
-    :Scene(in_renderer)
+    :Scene(in_renderer, "Multiple Cubes")
 {
     float vertices[] = {
         // positions            // uvs        // colors           

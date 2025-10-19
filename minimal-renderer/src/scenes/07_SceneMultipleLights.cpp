@@ -45,7 +45,7 @@ static glm::vec3 point_light_col[] = {
 namespace scene {
 
     SceneMultipleLights::SceneMultipleLights(Renderer& in_renderer)
-        :Scene(in_renderer),
+        :Scene(in_renderer, "Multiple Lights"),
         light_color         { 1.0f,  1.0f, 1.0f },
         object_color        { 1.0f,  0.5f, 0.31f },
         dir_light_direction { 0.0f, -1.0f, 0.0f },

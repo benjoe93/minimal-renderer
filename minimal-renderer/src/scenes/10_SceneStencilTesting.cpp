@@ -24,7 +24,7 @@
 namespace scene {
 
     SceneStencilTesting::SceneStencilTesting(Renderer& in_renderer)
-        :Scene(in_renderer)
+        :Scene(in_renderer, "Stencil Testing")
     {
         m_renderer.SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
         

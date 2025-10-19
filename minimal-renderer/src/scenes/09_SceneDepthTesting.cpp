@@ -24,7 +24,7 @@
 namespace scene {
 
     SceneDepthTesting::SceneDepthTesting(Renderer& in_renderer)
-        :Scene(in_renderer)
+        :Scene(in_renderer, "Depth Testing")
     {
         m_renderer.SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
 

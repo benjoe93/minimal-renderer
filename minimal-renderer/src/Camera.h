@@ -19,10 +19,14 @@ public:
 
     void SetPosition(glm::vec3 new_pos) { m_cam_position = new_pos; }
     void SetSpeed(const float new_speed) { m_cam_speed = new_speed; }
-    void SetPitch(const float new_pitch) { m_pitch = new_pitch; }
-    void SetYaw(const float new_yaw) { m_yaw = new_yaw; }
-    void SetRoll(const float new_roll) { m_roll = new_roll; }
+    void SetPitch(const float new_pitch);
+    void SetYaw(const float new_yaw);
+    void SetRoll(const float new_roll);
+    void AddPitch(const float new_pitch);
+    void AddYaw(const float new_yaw);
+    void AddRoll(const float new_roll);
     void SetFov(const float new_fov) { m_fov = new_fov; }
+
 
 
     unsigned int GetId() const { return m_renderer_id; }
@@ -44,5 +48,5 @@ public:
     void MoveLeft(const double delta_time);
     void MoveDown(const double delta_time);
     void MoveUp(const double delta_time);
-    void UpdateRotation(const double delta_time);
+    void UpdateRotation();
 };

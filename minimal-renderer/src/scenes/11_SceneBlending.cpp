@@ -23,7 +23,7 @@
 namespace scene {
 
     SceneBlending::SceneBlending(Renderer& in_renderer)
-        :Scene(in_renderer)
+        :Scene(in_renderer, "Blending")
     {
         m_renderer.SetFaceCulling(false);
         

@@ -23,7 +23,7 @@
 namespace scene {
 
     SceneFaceCulling::SceneFaceCulling(Renderer& in_renderer)
-        :Scene(in_renderer)
+        :Scene(in_renderer, "Face Culling")
     {
         std::unique_ptr<Model> floor = std::make_unique<Model>(
             "resources/models/plane.fbx",

@@ -17,7 +17,7 @@
 namespace scene {
 
 ScenePhongLight::ScenePhongLight(Renderer& in_renderer)
-    :Scene(in_renderer),
+    :Scene(in_renderer, "Phong Lighting"),
     light_color    { 1.0f, 1.0f, 1.0f },
     object_color   { 1.0f, 0.5f, 0.31f },
     light_position { 1.2f, 1.0f, 2.0f }

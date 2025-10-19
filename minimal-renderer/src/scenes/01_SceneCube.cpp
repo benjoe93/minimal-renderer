@@ -16,7 +16,7 @@
 
 namespace scene {
 scene::SceneCube::SceneCube(Renderer& in_renderer)
-    :Scene(in_renderer),
+    :Scene(in_renderer, "Cube"),
     offset{ 0.0f, 0.0f, 0.0f },
     rotation{ 0.0f, 0.0f, 0.0f }
 {

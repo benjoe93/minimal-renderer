@@ -28,6 +28,7 @@
 #include "scenes/11_SceneBlending.h"
 #include "scenes/12_SceneFaceCulling.h"
 #include "scenes/13_SceneFrameBuffers.h"
+#include "scenes/14_SceneRearViewMirror.h"
 
 #define WINDOW_TITLE "LearnOpenGL"
 
@@ -44,7 +45,7 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 /* Update window title */
-void UpdateWindowTitle(GLFWwindow* window, double delta_time);
+void UpdateWindowTitle(GLFWwindow* window, std::string scene_name, double delat_time);
 
 int main(void)
 {
@@ -94,7 +95,7 @@ int main(void)
     renderer.state->active_camera = 0;
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneFramebuffer scene(renderer);
+    scene::SceneRearViewMirror scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))
@@ -103,7 +104,7 @@ int main(void)
         renderer.Tick(glfwGetTime());
         renderer.Clear();
         
-        UpdateWindowTitle(window, renderer.GetDeltaTime());
+        UpdateWindowTitle(window, scene.GetSceneName(), renderer.GetDeltaTime());
 
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -136,10 +137,10 @@ int main(void)
 }
 
 
-void UpdateWindowTitle(GLFWwindow* window, double delat_time)
+void UpdateWindowTitle(GLFWwindow* window, std::string scene_name, double delat_time)
 {
-    char title[100];
-    snprintf(title, sizeof(title), "%s - FPS: %.1f | Frame: %.2fms", WINDOW_TITLE, 1/delat_time, delat_time* 1000.f);
+    char title[200];
+    snprintf(title, sizeof(title), "%s / %s - FPS: %.1f | Frame: %.2fms", WINDOW_TITLE, scene_name.c_str(), 1 / delat_time, delat_time * 1000.f);
     glfwSetWindowTitle(window, title);
 }
 
@@ -237,7 +238,7 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos)
         new_pitch = -89.0f;
     }
     cam.SetPitch(new_pitch);
-    cam.UpdateRotation(1.0f);
+    cam.UpdateRotation();
 }
 
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
