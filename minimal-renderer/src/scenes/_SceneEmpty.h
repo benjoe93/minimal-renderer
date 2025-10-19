@@ -13,14 +13,13 @@ class VertexBuffer;
 class IndexBuffer;
 
 namespace scene {
-
-    class SceneFaceCulling : public Scene
+    class SceneCubeMap : public Scene
     {
     private:
         std::vector<std::unique_ptr<Model>> objects;
 
     public:
-        SceneFaceCulling(Renderer& in_renderer);
+        SceneCubeMap(Renderer& in_renderer);
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

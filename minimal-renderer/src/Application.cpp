@@ -29,6 +29,7 @@
 #include "scenes/12_SceneFaceCulling.h"
 #include "scenes/13_SceneFrameBuffers.h"
 #include "scenes/14_SceneRearViewMirror.h"
+#include "scenes/15_ScenceCubeMap.h"
 
 #define WINDOW_TITLE "LearnOpenGL"
 
@@ -95,7 +96,7 @@ int main(void)
     renderer.state->active_camera = 0;
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneRearViewMirror scene(renderer);
+    scene::SceneCubeMap scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))
@@ -246,11 +247,11 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
     Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
     Camera& cam = renderer->GetActiveCamera();
 
-    float fov = cam.GetFov();
-    fov -= static_cast<float>(yoffset);
-    if (fov < 1.0f)
-        fov = 1.0f;
-    if (fov > 90.0f)
-        fov = 90.0f;
-    cam.SetFov(fov);
+    float speed = cam.GetSpeed();
+    speed += static_cast<float>(yoffset) / 5.0f;
+    if (speed < 0.1f)
+        speed = 0.1f;
+    if (speed > 10.0f)
+        speed = 10.0f;
+    cam.SetSpeed(speed);
 }

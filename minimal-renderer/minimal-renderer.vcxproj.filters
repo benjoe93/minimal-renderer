@@ -144,6 +144,9 @@
     <ClCompile Include="src\scenes\14_SceneRearViewMirror.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scenes\15_ScenceCubeMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Shader.h">
@@ -279,6 +282,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\scenes\14_SceneRearViewMirror.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes\15_ScenceCubeMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
