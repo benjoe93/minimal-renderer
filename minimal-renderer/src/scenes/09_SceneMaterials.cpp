@@ -12,87 +12,83 @@
 #include "Texture.h"
 #include "Shader.h"
 
-#include "04_SceneMaterials.h"
+#include "09_SceneMaterials.h"
+
+static float vertices[] = {
+    // Positions            Normal
+    // Front face (z = -0.5)
+    -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+     0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+     0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+     0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+    -0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+    -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
+    // Back face (z = 0.5)
+    -0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
+    // Left face (x = -0.5)
+    -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,
+    // Right face (x = 0.5)
+     0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,     1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,     1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,
+     // Bottom face (y = -0.5)
+     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,
+      0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,
+      0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,
+      0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,
+     -0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,
+     -0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,
+     // Top face (y = 0.5)
+     -0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,
+      0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,
+     -0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,
+     -0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f
+};
+static unsigned int indices[] = {
+    // Front face
+     2,  1,  0,
+     5,  4,  3,
+     // Back face
+      6,  7,  8,
+      9, 10, 11,
+      // Left face
+      12, 13, 14,
+      15, 16, 17,
+      // Right face
+      20, 19, 18,
+      23, 22, 21,
+      // Bottom face
+      24, 25, 26,
+      27, 28, 29,
+      // Top face
+      32, 31, 30,
+      35, 34, 33
+};
+static size_t element_size = 36;
+static size_t buffer_size = element_size * 6 * sizeof(float);
 
 namespace scene {
-
 SceneMaterials::SceneMaterials(Renderer& in_renderer)
-    :Scene(in_renderer, "Materials"),
-    light_color        { 1.0f, 1.0f, 1.0f },
-    object_color    { 1.0f, 0.5f, 0.31f },
-    light_position    { 1.2f, 1.0f, 2.0f }
+    :Scene(in_renderer, "Materials")
 {
-    /* QUAD DEFINITION */
-    float vertices[] = {
-        // Positions            Normal
-        // Front face (z = -0.5)
-        -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-         0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-         0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-        -0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-        -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
-        // Back face (z = 0.5)
-        -0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
-        -0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,
-        // Left face (x = -0.5)
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,
-        -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,
-        -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,
-        // Right face (x = 0.5)
-         0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f, -0.5f,     1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,
-         0.5f, -0.5f,  0.5f,     1.0f,  0.0f,  0.0f,
-         0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,
-         // Bottom face (y = -0.5)
-         -0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,
-          0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,
-          0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,
-          0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,
-         -0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,
-         -0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,
-         // Top face (y = 0.5)
-         -0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,
-          0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,
-          0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,
-          0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,
-         -0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,
-         -0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f
-    };
-    unsigned int indices[] = {
-        // Front face
-         2,  1,  0,
-         5,  4,  3,
-         // Back face
-         6,  7,  8,
-         9, 10, 11,
-        // Left face
-        12, 13, 14,
-        15, 16, 17,
-        // Right face
-        20, 19, 18,
-        23, 22, 21,
-        // Bottom face
-        24, 25, 26,
-        27, 28, 29,
-        // Top face
-        32, 31, 30,
-        35, 34, 33
-    };
-
-    size_t element_size = 36;
-    size_t buffer_size = element_size * 6 * sizeof(float);
-
-    // Object setup
+    ////////////////////////////////////////////////////////////////////////////
+    //                            geometery setup                             //
+    ////////////////////////////////////////////////////////////////////////////
     object_va = std::make_unique<VertexArray>();
     object_va->Bind();
 
@@ -111,7 +107,9 @@ SceneMaterials::SceneMaterials(Renderer& in_renderer)
     object_ib->Unbind();
     object_shader->Unbind();
 
-    // Light setup
+    ////////////////////////////////////////////////////////////////////////////
+    //                              light setup                               //
+    ////////////////////////////////////////////////////////////////////////////
     light_va = std::make_unique<VertexArray>();
     light_va->Bind();
 
@@ -121,7 +119,6 @@ SceneMaterials::SceneMaterials(Renderer& in_renderer)
     light_ib->Bind();
 
     light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    //light_va->SetLayout(*light_vb, 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(6 * sizeof(float)));
 
     light_shader = std::make_unique<Shader>("resources/shaders/01_Lighting/01_Materials/light.vert", "resources/shaders/01_Lighting/01_Materials/light.frag");
     light_shader->Bind();
@@ -137,7 +134,9 @@ void SceneMaterials::OnRender()
     Camera& cam = m_renderer.GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
 
-    // Object rendering
+    ////////////////////////////////////////////////////////////////////////////
+    //                          geometery rendering                           //
+    ////////////////////////////////////////////////////////////////////////////
     glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
     glm::mat4 model = glm::mat4(1.0f);
     //model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
@@ -162,7 +161,9 @@ void SceneMaterials::OnRender()
 
     m_renderer.Draw(*object_va, *object_ib, *object_shader);
 
-    // Light rendering
+    ////////////////////////////////////////////////////////////////////////////
+    //                            light rendering                             //
+    ////////////////////////////////////////////////////////////////////////////
     light_shader->Bind();
     glm::mat4 light_transform = glm::mat4(1.0f);
     light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
@@ -177,8 +178,8 @@ void SceneMaterials::OnRender()
 
 void SceneMaterials::OnImGuiRender()
 {
-    ImGui::Begin("Colors");
-    ImGui::SliderFloat3("Light Position", light_position, -10.f, 10.f);
+    ImGui::Begin(m_name.c_str());
+    ImGui::DragFloat3("Light Position", light_position, 0.1f, -10.f, 10.f, "%.1f");
 
     ImGui::Separator();
 

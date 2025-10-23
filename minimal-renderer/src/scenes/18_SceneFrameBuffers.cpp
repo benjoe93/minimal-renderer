@@ -13,7 +13,7 @@
 #include "FrameBuffer.h"
 #include "RenderTarget.h"
 
-#include "13_SceneFrameBuffers.h"
+#include "18_SceneFrameBuffers.h"
 
 static std::vector<float> quad_verts = {
     // positions   // texCoords
@@ -22,7 +22,6 @@ static std::vector<float> quad_verts = {
      1.0f, -1.0f,  1.0f, 0.0f, // bot right
      1.0f,  1.0f,  1.0f, 1.0f  // top right
 };
-
 static std::vector<Vertex> verts = {
            // positions          // normals          // texCoords
     Vertex({-1.0f,  1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}), // top left
@@ -30,9 +29,7 @@ static std::vector<Vertex> verts = {
     Vertex({ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}), // bot right
     Vertex({ 1.0f,  1.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}), // top right
 };
-
-static std::vector<unsigned int> indices = 
-{
+static std::vector<unsigned int> indices = {
     0, 1, 2,
     0, 2, 3
 };
@@ -55,7 +52,7 @@ SceneFramebuffer::SceneFramebuffer(Renderer& in_renderer)
     // unbind to prevent accidental renders
     framebuffer->Unbind();
 
-    quad = std::make_unique<Model>(
+    quad_normal = std::make_unique<Model>(
         std::make_unique<Mesh>(
             verts,
             indices,
@@ -64,10 +61,8 @@ SceneFramebuffer::SceneFramebuffer(Renderer& in_renderer)
         Transform()
     );
 
-    for (auto& m : quad->GetMeshes())
-    {
+    for (auto& m : quad_normal->GetMeshes())
         m->GetMaterial().AddTexture(render_target);
-    }
 
     ConstructScene();
 }
@@ -88,9 +83,7 @@ void SceneFramebuffer::OnUpdate(double delta_time)
         MVP = projection * ModelView;
 
         for (auto& mesh : obj->GetMeshes())
-        {
             mesh->GetMaterial().SetUniformMat4("mvp", MVP);
-        }
     }
 }
 

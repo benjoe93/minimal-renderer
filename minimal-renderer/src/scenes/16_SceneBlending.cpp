@@ -18,7 +18,7 @@
 #include "Mesh.h"
 #include "Model.h"
 
-#include "11_SceneBlending.h"
+#include "16_SceneBlending.h"
 
 namespace scene {
 
@@ -37,7 +37,9 @@ namespace scene {
         vegetation_loc.push_back(glm::vec3(-2.5f, -0.25f, -0.51f));
         vegetation_loc.push_back(glm::vec3( 0.0f, -0.25f,  0.2f));
 
-        // object setup
+        ////////////////////////////////////////////////////////////////////////////
+        //                            geometery setup                             //
+        ////////////////////////////////////////////////////////////////////////////
         // floor
         {
             std::unique_ptr<Model> floor = std::make_unique<Model>(
@@ -146,7 +148,9 @@ namespace scene {
         glm::mat4 projection, ModelView, MVP;
         projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), m_renderer.state->near_plane, m_renderer.state->far_plane);
 
-        // objects
+        ////////////////////////////////////////////////////////////////////////////
+        //                           geometery update                             //
+        ////////////////////////////////////////////////////////////////////////////
         for (auto& obj : objects)
         {
             ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();

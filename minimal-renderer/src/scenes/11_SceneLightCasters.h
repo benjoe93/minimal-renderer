@@ -24,10 +24,10 @@ private:
     std::unique_ptr<IndexBuffer>    light_ib;
     std::unique_ptr<Material>       light_material;
 
-    float object_color[3];
+    float object_color[3]   = { 1.0f, 0.5f, 0.31f };
 
-    float light_color[3];
-    float light_position[3];
+    float light_color[3]    = { 1.0f, 1.0f, 1.0f };
+    float light_position[3] = { 1.2f, 1.0f, 2.0f };
 
 public:
     SceneLightCasters(Renderer& in_renderer);

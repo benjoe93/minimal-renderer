@@ -17,7 +17,7 @@
 #include "Mesh.h"
 #include "Model.h"
 
-#include "08_SceneModelLoading.h"
+#include "13_SceneModelLoading.h"
 
 #define BACKPACK_PATH "resources/models/backpack/backpack.obj"
 #define SPHERE_PATH "resources/models/sphere.fbx"
@@ -31,7 +31,9 @@ namespace scene {
 
         Camera& camera = m_renderer.GetActiveCamera();
 
-        // ligths
+        ////////////////////////////////////////////////////////////////////////////
+        //                           directional light                            //
+        ////////////////////////////////////////////////////////////////////////////
         directional_light = std::make_unique<DirectionalLight>(
             glm::vec3(1.0f, 1.0f, 1.0f),
             glm::vec3(-1.0f, -1.0f, -1.0f),
@@ -40,7 +42,9 @@ namespace scene {
             glm::vec3(1.0f)
         );
 
-        // object setup
+        ////////////////////////////////////////////////////////////////////////////
+        //                            geometry loading                            //
+        ////////////////////////////////////////////////////////////////////////////
         object = std::make_unique<Model>(BACKPACK_PATH, "resources/shaders/02_LoadingMesh/object.vert", "resources/shaders/02_LoadingMesh/object.frag");
     }
 
@@ -54,7 +58,9 @@ namespace scene {
 
         directional_light->Update(projection, cam.GetViewMatrix());
 
-        // objects
+        ////////////////////////////////////////////////////////////////////////////
+        //                               geometry                                 //
+        ////////////////////////////////////////////////////////////////////////////
         for (auto& m : object->GetMeshes())
         {
             model = glm::mat4(1.0);
@@ -79,12 +85,17 @@ namespace scene {
     {
         m_renderer.SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
 
-        // light rendering
+        ////////////////////////////////////////////////////////////////////////////
+        //                            light rendering                             //
+        ////////////////////////////////////////////////////////////////////////////
         directional_light->GetMaterial()->Bind();
         m_renderer.Draw(*directional_light->GetVertArray(), *directional_light->GetIndexBuffer(), directional_light->GetMaterial()->GetShader());
         directional_light->GetMaterial()->Unbind();
 
-        // object rendering
+
+        ////////////////////////////////////////////////////////////////////////////
+        //                          geometery rendering                           //
+        ////////////////////////////////////////////////////////////////////////////
         m_renderer.Draw(*object);
     }
 

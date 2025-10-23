@@ -22,8 +22,8 @@ private:
 
     std::unique_ptr <Shader> default_shader;
 
-    float offset[3];
-    float rotation[3];
+    float location[3] = { 0.0f, 0.0f, 0.0f };
+    float rotation[3] = { 0.0f, 0.0f, 0.0f };
 
 public:
     SceneCube(Renderer& in_renderer);

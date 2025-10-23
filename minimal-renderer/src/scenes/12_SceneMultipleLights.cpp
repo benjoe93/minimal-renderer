@@ -15,7 +15,75 @@
 #include "Texture.h"
 #include "Material.h"
 
-#include "07_SceneMultipleLights.h"
+#include "12_SceneMultipleLights.h"
+
+static float vertices[] = {
+    // Positions            // Normal               // uv
+    // Front face (z = -0.5)
+    -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
+    // Back face (z = 0.5)
+    -0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,     0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,     1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,     1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,     1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,     0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,     0.0f, 0.0f,
+    // Left face (x = -0.5)
+    -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
+    // Right face (x = 0.5)
+     0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,     1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,     1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
+     // Bottom face (y = -0.5)
+     -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,    0.0f, 1.0f,
+      0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,    1.0f, 1.0f,
+      0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,    1.0f, 0.0f,
+      0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,    1.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,    0.0f, -1.0f,  0.0f,    0.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,    0.0f, -1.0f,  0.0f,    0.0f, 1.0f,
+     // Top face (y = 0.5)
+     -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 1.0f,
+      0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    1.0f, 1.0f,
+      0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    1.0f, 0.0f,
+      0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    1.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 0.0f,
+     -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 1.0f
+};
+static unsigned int indices[] = {
+    // Front face
+     2,  1,  0,
+     5,  4,  3,
+     // Back face
+      6,  7,  8,
+      9, 10, 11,
+      // Left face
+      12, 13, 14,
+      15, 16, 17,
+      // Right face
+      20, 19, 18,
+      23, 22, 21,
+      // Bottom face
+      24, 25, 26,
+      27, 28, 29,
+      // Top face
+      32, 31, 30,
+      35, 34, 33
+};
+static size_t element_size = 36;
+static size_t buffer_size = element_size * 8 * sizeof(float);
 
 static glm::vec3 cube_positions[] = {
     glm::vec3(0.0f,  0.0f,  0.0f),
@@ -43,87 +111,14 @@ static glm::vec3 point_light_col[] = {
 };
 
 namespace scene {
-
     SceneMultipleLights::SceneMultipleLights(Renderer& in_renderer)
-        :Scene(in_renderer, "Multiple Lights"),
-        light_color         { 1.0f,  1.0f, 1.0f },
-        object_color        { 1.0f,  0.5f, 0.31f },
-        dir_light_direction { 0.0f, -1.0f, 0.0f },
-        background_color    { 0.18f,  0.23f, 0.24f }
+        :Scene(in_renderer, "Multiple Lights")
     {
-        /* QUAD DEFINITION */
-        float vertices[] = {
-            // Positions            // Normal                // uv
-            // Front face (z = -0.5)
-            -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
-             0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    1.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    1.0f, 1.0f,
-            -0.5f,  0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
-            // Back face (z = 0.5)
-            -0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,        0.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,        1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,        1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,        1.0f, 1.0f,
-            -0.5f,  0.5f,  0.5f,     0.0f,  0.0f, 1.0f,        0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,     0.0f,  0.0f, 1.0f,        0.0f, 0.0f,
-            // Left face (x = -0.5)
-            -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-            -0.5f, -0.5f, -0.5f,    -1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-            -0.5f, -0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,    -1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-            // Right face (x = 0.5)
-             0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-             0.5f,  0.5f, -0.5f,     1.0f,  0.0f,  0.0f,    1.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,     1.0f,  0.0f,  0.0f,    0.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,     1.0f,  0.0f,  0.0f,    0.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,     1.0f,  0.0f,  0.0f,    1.0f, 0.0f,
-            // Bottom face (y = -0.5)
-            -0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,    0.0f, 1.0f,
-             0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,    1.0f, 1.0f,
-             0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,    1.0f, 0.0f,
-             0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,    1.0f, 0.0f,
-            -0.5f, -0.5f,  0.5f,     0.0f, -1.0f,  0.0f,    0.0f, 0.0f,
-            -0.5f, -0.5f, -0.5f,     0.0f, -1.0f,  0.0f,    0.0f, 1.0f,
-            // Top face (y = 0.5)
-            -0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,    0.0f, 1.0f,
-             0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,    1.0f, 1.0f,
-             0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,    1.0f, 0.0f,
-             0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,    1.0f, 0.0f,
-            -0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,    0.0f, 0.0f,
-            -0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f,    0.0f, 1.0f
-        };
-        unsigned int indices[] = {
-            // Front face
-             2,  1,  0,
-             5,  4,  3,
-             // Back face
-             6,  7,  8,
-             9, 10, 11,
-             // Left face
-             12, 13, 14,
-             15, 16, 17,
-             // Right face
-             20, 19, 18,
-             23, 22, 21,
-             // Bottom face
-             24, 25, 26,
-             27, 28, 29,
-             // Top face
-             32, 31, 30,
-             35, 34, 33
-        };
-
-        size_t element_size = 36;
-        size_t buffer_size = element_size * 8 * sizeof(float);
-
         Camera& camera = m_renderer.GetActiveCamera();
 
-        // light setup
+        ////////////////////////////////////////////////////////////////////////////
+        //                              light setup                               //
+        ////////////////////////////////////////////////////////////////////////////
         directional_light = std::make_unique<DirectionalLight>(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
 
         for (int ptl_id = 0; ptl_id < 4; ptl_id++)
@@ -137,7 +132,9 @@ namespace scene {
 
         spot_light = std::make_unique<SpotLight>(camera.GetPosition(), camera.GetDirection(), 25.0f, 30.0f, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
 
-        // object setup
+        ////////////////////////////////////////////////////////////////////////////
+        //                            geometery setup                             //
+        ////////////////////////////////////////////////////////////////////////////
         object_va = std::make_unique<VertexArray>();
         object_va->Bind();
 
@@ -154,7 +151,6 @@ namespace scene {
         {
             object_materials.push_back(std::make_unique<Material>("resources/shaders/01_Lighting/04_MultipleLights/object.vert", "resources/shaders/01_Lighting/04_MultipleLights/object.frag"));
 
-            // bind textures
             object_materials[mat_id]->AddTexture2D("resources/textures/container2.png", "material.diffuse", true);
             object_materials[mat_id]->AddTexture2D("resources/textures/container2_specular.png", "material.specular", true);
         }
@@ -172,11 +168,15 @@ namespace scene {
         glm::mat4 projection, model, ModelView, MVP;
         projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
 
-        // directional light
+        ////////////////////////////////////////////////////////////////////////////
+        //                           directional light                            //
+        ////////////////////////////////////////////////////////////////////////////
         directional_light->SetDirection(glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]));
         directional_light->Update(projection, cam.GetViewMatrix());
 
-        // point lights
+        ////////////////////////////////////////////////////////////////////////////
+        //                              point light                               //
+        ////////////////////////////////////////////////////////////////////////////
         for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
         {
             point_lights[ptl_id]->SetPosition(glm::vec3(ptl_data[ptl_id].position[0], ptl_data[ptl_id].position[1], ptl_data[ptl_id].position[2]));
@@ -187,12 +187,16 @@ namespace scene {
             point_lights[ptl_id]->Update(projection, cam.GetViewMatrix());
         }
 
-        // spot light
+        ////////////////////////////////////////////////////////////////////////////
+        //                               spotlight                                //
+        ////////////////////////////////////////////////////////////////////////////
         spot_light->SetPosition(cam_pos);
         spot_light->SetDirection(cam.GetDirection());
         spot_light->Update(projection, cam.GetViewMatrix());
 
-        // objects
+        ////////////////////////////////////////////////////////////////////////////
+        //                               geometry                                 //
+        ////////////////////////////////////////////////////////////////////////////
         for (int obj_id = 0; obj_id < 10; obj_id++)
         {
             model = glm::mat4(1.0f);
@@ -245,7 +249,9 @@ namespace scene {
     {
         m_renderer.SetBackgroundColor(glm::vec4(background_color[0], background_color[1], background_color[2], 1.0));
 
-        // light rendering
+        ////////////////////////////////////////////////////////////////////////////
+        //                            light rendering                             //
+        ////////////////////////////////////////////////////////////////////////////
         directional_light->GetMaterial()->Bind();
         m_renderer.Draw(*directional_light->GetVertArray(), *directional_light->GetIndexBuffer(), directional_light->GetMaterial()->GetShader());
         directional_light->GetMaterial()->Unbind();
@@ -261,7 +267,9 @@ namespace scene {
         m_renderer.Draw(*spot_light->GetVertArray(), *spot_light->GetIndexBuffer(), spot_light->GetMaterial()->GetShader());
         spot_light->GetMaterial()->Unbind();
 
-        // object rendering
+        ////////////////////////////////////////////////////////////////////////////
+        //                          geometery rendering                           //
+        ////////////////////////////////////////////////////////////////////////////
         for (int obj_id = 0; obj_id < 10; obj_id++)
         {
             object_materials[obj_id]->Bind();
@@ -272,7 +280,7 @@ namespace scene {
 
     void SceneMultipleLights::OnImGuiRender()
     {
-        ImGui::Begin("Multiple lights");
+        ImGui::Begin(m_name.c_str());
         ImGui::ColorEdit3("Background", background_color);
         ImGui::Separator();
         ImGui::Text("Sun");

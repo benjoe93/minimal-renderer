@@ -13,7 +13,7 @@
 #include "FrameBuffer.h"
 #include "RenderTarget.h"
 
-#include "14_SceneRearViewMirror.h"
+#include "19_SceneRearViewMirror.h"
 
 static std::vector<float> quad_verts = {
     // positions   // texCoords
@@ -22,7 +22,6 @@ static std::vector<float> quad_verts = {
      1.0f, -1.0f,  1.0f, 0.0f, // bot right
      1.0f,  1.0f,  1.0f, 1.0f  // top right
 };
-
 static std::vector<Vertex> verts = {
            // positions          // normals          // texCoords
     Vertex({-0.5f,  0.9f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}), // top left
@@ -30,9 +29,7 @@ static std::vector<Vertex> verts = {
     Vertex({ 0.5f,  0.4f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 0.0f}), // bot right
     Vertex({ 0.5f,  0.9f, 0.0f}, {1.0f, 0.0f, 0.0f}, {1.0f, 1.0f}), // top right
 };
-
-static std::vector<unsigned int> indices = 
-{
+static std::vector<unsigned int> indices = {
     0, 1, 2,
     0, 2, 3
 };
@@ -65,9 +62,7 @@ SceneRearViewMirror::SceneRearViewMirror(Renderer& in_renderer)
     );
 
     for (auto& m : quad->GetMeshes())
-    {
         m->GetMaterial().AddTexture(render_target);
-    }
 
     ConstructScene();
 }
@@ -97,9 +92,8 @@ void SceneRearViewMirror::OnRender()
         MVP = projection * ModelView;
 
         for (auto& mesh : obj->GetMeshes())
-        {
             mesh->GetMaterial().SetUniformMat4("mvp", MVP);
-        }
+
         m_renderer.Draw(*obj);
     }
 
@@ -114,9 +108,7 @@ void SceneRearViewMirror::OnRender()
         MVP = projection * ModelView;
 
         for (auto& mesh : obj->GetMeshes())
-        {
             mesh->GetMaterial().SetUniformMat4("mvp", MVP);
-        }
         m_renderer.Draw(*obj);
     }
 

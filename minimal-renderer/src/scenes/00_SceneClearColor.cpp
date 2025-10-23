@@ -4,8 +4,7 @@
 
 namespace scene {
 scene::SceneClearColor::SceneClearColor(Renderer& in_renderer)
-    : Scene(in_renderer, "ClearColor"),
-    m_clear_color { 0.2f, 0.3f, 0.8f, 1.0f }
+    : Scene(in_renderer, "ClearColor")
 {}
 
 void scene::SceneClearColor::OnRender()
@@ -15,6 +14,8 @@ void scene::SceneClearColor::OnRender()
 
 void scene::SceneClearColor::OnImGuiRender()
 {
+    ImGui::Begin(m_name.c_str());
     ImGui::ColorEdit4("Clear Color", m_clear_color);
+    ImGui::End();
 }
 }

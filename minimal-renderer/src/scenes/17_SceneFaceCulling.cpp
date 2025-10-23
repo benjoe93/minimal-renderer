@@ -18,7 +18,7 @@
 #include "Mesh.h"
 #include "Model.h"
 
-#include "12_SceneFaceCulling.h"
+#include "17_SceneFaceCulling.h"
 
 namespace scene {
 
@@ -92,9 +92,7 @@ namespace scene {
             MVP = projection * ModelView;
 
             for (auto& mesh : obj->GetMeshes())
-            {
                 mesh->GetMaterial().SetUniformMat4("mvp", MVP);
-            }
         }
     }
 
@@ -106,6 +104,5 @@ namespace scene {
 
     void SceneFaceCulling::OnImGuiRender()
     {
-        
     }
 }

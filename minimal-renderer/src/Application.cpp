@@ -15,21 +15,26 @@
 #include "Camera.h"
 
 #include "scenes/00_SceneClearColor.h"
-#include "scenes/01_SceneCube.h"
-#include "scenes/02_SceneCubeMultiple.h"
-#include "scenes/03_ScenePhongLight.h"
-#include "scenes/04_SceneMaterials.h"
-#include "scenes/05_SceneSurfMaps.h"
-#include "scenes/06_SceneLightCasters.h"
-#include "scenes/07_SceneMultipleLights.h"
-#include "scenes/08_SceneModelLoading.h"
-#include "scenes/09_SceneDepthTesting.h"
-#include "scenes/10_SceneStencilTesting.h"
-#include "scenes/11_SceneBlending.h"
-#include "scenes/12_SceneFaceCulling.h"
-#include "scenes/13_SceneFrameBuffers.h"
-#include "scenes/14_SceneRearViewMirror.h"
-#include "scenes/15_ScenceCubeMap.h"
+#include "scenes/01_SceneHelloTriagle.h"
+#include "scenes/02_SceneHelloTriagleIndexed.h"
+#include "scenes/03_SceneTextures.h"
+#include "scenes/04_SceneTransformation.h"
+#include "scenes/05_SceneCoordinateSystem.h"
+#include "scenes/06_SceneCube.h"
+#include "scenes/07_SceneCubeMultiple.h"
+#include "scenes/08_ScenePhongLight.h"
+#include "scenes/09_SceneMaterials.h"
+#include "scenes/10_SceneSurfMaps.h"
+#include "scenes/11_SceneLightCasters.h"
+#include "scenes/12_SceneMultipleLights.h"
+#include "scenes/13_SceneModelLoading.h"
+#include "scenes/14_SceneDepthTesting.h"
+#include "scenes/15_SceneStencilTesting.h"
+#include "scenes/16_SceneBlending.h"
+#include "scenes/17_SceneFaceCulling.h"
+#include "scenes/18_SceneFrameBuffers.h"
+#include "scenes/19_SceneRearViewMirror.h"
+
 
 #define WINDOW_TITLE "LearnOpenGL"
 
@@ -96,7 +101,7 @@ int main(void)
     renderer.state->active_camera = 0;
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneCubeMap scene(renderer);
+    scene::SceneRearViewMirror scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))

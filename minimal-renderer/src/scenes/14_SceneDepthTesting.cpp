@@ -17,7 +17,7 @@
 #include "Mesh.h"
 #include "Model.h"
 
-#include "09_SceneDepthTesting.h"
+#include "14_SceneDepthTesting.h"
 
 
 
@@ -30,7 +30,9 @@ namespace scene {
 
         Camera& camera = m_renderer.GetActiveCamera();
 
-        // object setup
+        ////////////////////////////////////////////////////////////////////////////
+        //                            geometery setup                             //
+        ////////////////////////////////////////////////////////////////////////////
         objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
         objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
         objects.push_back(std::make_unique<Model>("resources/models/plane.fbx", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
@@ -50,7 +52,9 @@ namespace scene {
         glm::mat4 projection, model, ModelView, MVP;
         projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
 
-        // objects
+        ////////////////////////////////////////////////////////////////////////////
+        //                           geometery update                             //
+        ////////////////////////////////////////////////////////////////////////////
         // boxes
         for (auto& m : objects[0]->GetMeshes())
         {
@@ -97,11 +101,11 @@ namespace scene {
     {
         m_renderer.SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
 
-        // object rendering
+        ////////////////////////////////////////////////////////////////////////////
+        //                          geometery rendering                           //
+        ////////////////////////////////////////////////////////////////////////////
         for (auto& obj : objects)
-        {
             m_renderer.Draw(*obj);
-        }
     }
 
     void SceneDepthTesting::OnImGuiRender()

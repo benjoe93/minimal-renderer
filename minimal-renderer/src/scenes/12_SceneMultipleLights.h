@@ -31,11 +31,11 @@ namespace scene {
         std::vector<std::unique_ptr<PointLight>>    point_lights;
         std::unique_ptr<SpotLight>                  spot_light;
     
-        float background_color[3];
-        float object_color[3];
+        float background_color[3] = { 0.18f,  0.23f, 0.24f };
+        float object_color[3] = { 1.0f,  0.5f, 0.31f };
     
-        float light_color[3];
-        float dir_light_direction[3];
+        float light_color[3] = { 1.0f,  1.0f, 1.0f };
+        float dir_light_direction[3] = { 0.0f, -1.0f, 0.0f };
         std::vector<LightData> ptl_data;
     
     public:

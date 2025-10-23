@@ -18,7 +18,12 @@ namespace scene {
         std::shared_ptr<RenderTarget> render_target;
 
         std::vector<std::unique_ptr<Model>> objects;
-        std::unique_ptr<Model> quad;
+        std::unique_ptr<Model> quad_normal;
+        std::unique_ptr<Model> quad_negative;
+        std::unique_ptr<Model> quad_grayscale;
+        std::unique_ptr<Model> quad_blur;
+        std::unique_ptr<Model> quad_sharpen;
+        std::unique_ptr<Model> quad_edge;
 
     public:
         SceneFramebuffer(Renderer& in_renderer);

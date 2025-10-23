@@ -12,16 +12,10 @@
 #include "Texture2D.h"
 #include "Shader.h"
 
-#include "01_SceneCube.h"
+#include "06_SceneCube.h"
 
-namespace scene {
-scene::SceneCube::SceneCube(Renderer& in_renderer)
-    :Scene(in_renderer, "Cube"),
-    offset{ 0.0f, 0.0f, 0.0f },
-    rotation{ 0.0f, 0.0f, 0.0f }
-{
-    /* QUAD DEFINITION */
-    float vertices[] = {
+
+    static float vertices[] = {
         // positions          // uvs        // colors
          0.5f,  0.5f,  0.5f,   1.0f, 1.0f,   1.0f, 0.0f, 0.0f,   // 0: front top right
          0.5f, -0.5f,  0.5f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   // 1: front bottom right
@@ -33,10 +27,7 @@ scene::SceneCube::SceneCube(Renderer& in_renderer)
         -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,   1.0f, 0.0f, 1.0f,   // 6: back bottom left
         -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,   1.0f, 1.0f, 1.0f    // 7: back top left
     };
-
-    // Index array: defines 12 triangles (2 per face) for 6 cube faces
-    // Using counter-clockwise winding order
-    unsigned int indices[] = {
+    static unsigned int indices[] = {
         // Front face (z = +0.5)
         0, 2, 1,
         0, 3, 2,
@@ -62,7 +53,35 @@ scene::SceneCube::SceneCube(Renderer& in_renderer)
         0, 7, 3
     };
 
-    // Crate VAO, VBO, EBO
+namespace scene {
+scene::SceneCube::SceneCube(Renderer& in_renderer)
+    :Scene(in_renderer, "First Cube")
+{
+    // Set scene background color
+    m_renderer.SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
+
+    ////////////////////////////////////////////////////////////////////////////
+    //                              load texture                              //
+    ////////////////////////////////////////////////////////////////////////////
+    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", "texture_1", true);
+    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", "texture_2", true);
+
+    texture_1->Bind();
+    texture_2->Bind(1);
+
+    ////////////////////////////////////////////////////////////////////////////
+    //                              shader setup                              //
+    ////////////////////////////////////////////////////////////////////////////
+    default_shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/default.vert", "resources/shaders/00_GettingStarted/default.frag");
+
+    // Pass textures to shader
+    default_shader->Bind();
+    default_shader->SetInt("texture_1", 0);
+    default_shader->SetInt("texture_2", 1);
+
+    ////////////////////////////////////////////////////////////////////////////
+    //                            geometery setup                             //
+    ////////////////////////////////////////////////////////////////////////////
     va = std::make_unique<VertexArray>();
     va->Bind();
 
@@ -77,38 +96,17 @@ scene::SceneCube::SceneCube(Renderer& in_renderer)
 
     vb->Unbind();
     va->Unbind();
-
-    // Create textures
-    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", "texture_1", true);
-    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", "texture_2", true);
-
-    texture_1->Bind();
-    texture_2->Bind(1);
-
-    // Create shaders
-    default_shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/default.vert", "resources/shaders/00_GettingStarted/default.frag");
-
-    // Pass textures to shader
-    default_shader->Bind();
-    default_shader->SetInt("texture_1", 0);
-    default_shader->SetInt("texture_2", 1);
-
-    // Set scene background color
-    m_renderer.SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
 }
 
 void scene::SceneCube::OnRender()
 {
-    // Set scene background color
-    m_renderer.SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
-
     // Projection matrix
     glm::mat4 projection = glm::perspective(glm::radians(m_renderer.GetActiveCamera().GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
 
     // Model matrix
     glm::mat4 model = glm::mat4(1.0f);
     // transform with user input
-    model = glm::translate(model, glm::vec3(offset[0], offset[1], offset[2]));
+    model = glm::translate(model, glm::vec3(location[0], location[1], location[2]));
     model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
     model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
@@ -123,11 +121,11 @@ void scene::SceneCube::OnRender()
 
 void scene::SceneCube::OnImGuiRender()
 {
-    ImGui::Begin("Cube transform");
+    ImGui::Begin(m_name.c_str());
 
     ImGui::Text("Translate");
     ImGui::SameLine();
-    ImGui::DragFloat3("##offset", offset, 0.01f);
+    ImGui::DragFloat3("##offset", location, 0.01f);
 
     ImGui::Text("Rotation ");
     ImGui::SameLine();
