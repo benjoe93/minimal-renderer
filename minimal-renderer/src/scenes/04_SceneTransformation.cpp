@@ -51,8 +51,8 @@ namespace scene {
         ////////////////////////////////////////////////////////////////////////////
         shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/transform.vert", "resources/shaders/00_GettingStarted/texture_loading.frag");
         shader->Bind();
-        shader->SetInt("texture1", 0);
-        shader->SetInt("texture2", 1);
+        shader->SetUniform("texture1", 0);
+        shader->SetUniform("texture2", 1);
 
         ////////////////////////////////////////////////////////////////////////////
         //                            geometery setup                             //
@@ -92,7 +92,7 @@ namespace scene {
         trans = glm::rotate(trans, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
         
         // draw
-        shader->SetMat4("transform", trans);
+        shader->SetUniform("transform", trans);
         m_renderer.Draw(*vao, *ebo, *shader);
     }
 

@@ -12,7 +12,7 @@ VertexArray::~VertexArray()
     GLCall(glDeleteVertexArrays(1, &m_renderer_id));
 }
 
-void VertexArray::SetLayout(const VertexBuffer& vbo, int layout, int size, unsigned int type, unsigned char normalize, int stride, const void* offset)
+void VertexArray::SetLayout(const VertexBuffer& vbo, unsigned int layout, int size, unsigned int type, unsigned char normalize, int stride, const void* offset)
 {
     vbo.Bind();
     GLCall(glVertexAttribPointer(layout, size, type, normalize, stride, offset));

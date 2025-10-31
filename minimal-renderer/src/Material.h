@@ -10,7 +10,7 @@
 class Material
 {
 private:
-    std::unique_ptr<Shader> m_shader;
+    std::shared_ptr<Shader> m_shader;
     std::vector<std::pair<std::string, std::shared_ptr<Texture>>> m_textures;
 
     std::unordered_map<std::string, float> u_floats;
@@ -21,15 +21,15 @@ private:
     std::string m_fragment_path;
 
 public:
-    Material(const char* vertex_path, const char* fragment_path);
+    Material(std::string vertex_path, std::string fragment_path);
     ~Material();
 
     void AddTexture(std::shared_ptr<Texture> texture);
     void AddTexture2D(std::string path, std::string sampler_name, bool is_flipped);
 
-    void SetUniformFloat(const std::string type, float value);
-    void SetUniformVec3(const std::string type, const glm::vec3& value);
-    void SetUniformMat4(const std::string type, const glm::mat4& value);
+    void SetUniform(const std::string type, float value);
+    void SetUniform(const std::string type, const glm::vec3& value);
+    void SetUniform(const std::string type, const glm::mat4& value);
 
     void Bind();
     void Unbind();

@@ -54,7 +54,7 @@ namespace scene {
         glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
 
         directional_light->Update(projection, cam.GetViewMatrix());
 
@@ -69,15 +69,15 @@ namespace scene {
             MVP = projection * ModelView;
 
             auto& material = m->GetMaterial();
-            material.SetUniformMat4("model", model);
-            material.SetUniformMat4("mvp", MVP);
+            material.SetUniform("model", model);
+            material.SetUniform("mvp", MVP);
             //material.SetUniformVec3("material.base_color", glm::vec3(1.0f, 0.0f, 0.0f));
-            material.SetUniformFloat("material.shininess", 32.0f);
+            material.SetUniform("material.shininess", 32.0f);
 
-            material.SetUniformVec3("dir_light.direction", directional_light->GetDirection());
-            material.SetUniformVec3("dir_light.ambient", directional_light->GetAmbient());
-            material.SetUniformVec3("dir_light.diffuse", directional_light->GetDiffuse());
-            material.SetUniformVec3("dir_light.specular", directional_light->GetSpecular());
+            material.SetUniform("dir_light.direction", directional_light->GetDirection());
+            material.SetUniform("dir_light.ambient", directional_light->GetAmbient());
+            material.SetUniform("dir_light.diffuse", directional_light->GetDiffuse());
+            material.SetUniform("dir_light.specular", directional_light->GetSpecular());
         }
     }
 
@@ -88,9 +88,9 @@ namespace scene {
         ////////////////////////////////////////////////////////////////////////////
         //                            light rendering                             //
         ////////////////////////////////////////////////////////////////////////////
-        directional_light->GetMaterial()->Bind();
-        m_renderer.Draw(*directional_light->GetVertArray(), *directional_light->GetIndexBuffer(), directional_light->GetMaterial()->GetShader());
-        directional_light->GetMaterial()->Unbind();
+        directional_light->GetMaterial().Bind();
+        m_renderer.Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), directional_light->GetMaterial().GetShader());
+        directional_light->GetMaterial().Unbind();
 
 
         ////////////////////////////////////////////////////////////////////////////

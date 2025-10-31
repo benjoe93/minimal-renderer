@@ -97,8 +97,8 @@ namespace scene {
         
         shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/texture_loading.vert", "resources/shaders/00_GettingStarted/texture_loading.frag");
         shader->Bind();
-        shader->SetInt("texture1", 0);
-        shader->SetInt("texture2", 1);
+        shader->SetUniform("texture1", 0);
+        shader->SetUniform("texture2", 1);
 
         ////////////////////////////////////////////////////////////////////////////
         //                            geometery setup                             //

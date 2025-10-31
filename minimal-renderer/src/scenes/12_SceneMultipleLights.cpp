@@ -166,7 +166,7 @@ namespace scene {
         glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
 
         ////////////////////////////////////////////////////////////////////////////
         //                           directional light                            //
@@ -207,41 +207,41 @@ namespace scene {
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            object_materials[obj_id]->SetUniformMat4("model", model);
-            object_materials[obj_id]->SetUniformMat4("mvp", MVP);
-            object_materials[obj_id]->SetUniformFloat("material.shininess", 32.f);
-            object_materials[obj_id]->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-            object_materials[obj_id]->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
+            object_materials[obj_id]->SetUniform("model", model);
+            object_materials[obj_id]->SetUniform("mvp", MVP);
+            object_materials[obj_id]->SetUniform("material.shininess", 32.f);
+            object_materials[obj_id]->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+            object_materials[obj_id]->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
 
             // light data
-            object_materials[obj_id]->SetUniformVec3("dir_light.direction", directional_light->GetDirection());
-            object_materials[obj_id]->SetUniformVec3("dir_light.ambient", directional_light->GetAmbient());
-            object_materials[obj_id]->SetUniformVec3("dir_light.diffuse", directional_light->GetDiffuse());
-            object_materials[obj_id]->SetUniformVec3("dir_light.specular", directional_light->GetSpecular());
+            object_materials[obj_id]->SetUniform("dir_light.direction", directional_light->GetDirection());
+            object_materials[obj_id]->SetUniform("dir_light.ambient", directional_light->GetAmbient());
+            object_materials[obj_id]->SetUniform("dir_light.diffuse", directional_light->GetDiffuse());
+            object_materials[obj_id]->SetUniform("dir_light.specular", directional_light->GetSpecular());
 
             for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
             {
                 std::string current_light = "point_lights[" + std::to_string(ptl_id) + "].";
 
-                object_materials[obj_id]->SetUniformVec3( current_light + "position",    point_lights[ptl_id]->GetPosition());
-                object_materials[obj_id]->SetUniformFloat(current_light + "constant",    point_lights[ptl_id]->GetConstant());
-                object_materials[obj_id]->SetUniformFloat(current_light + "linear",        point_lights[ptl_id]->GetLinear());
-                object_materials[obj_id]->SetUniformFloat(current_light + "quadratic",    point_lights[ptl_id]->GetQuadratic());
-                object_materials[obj_id]->SetUniformVec3( current_light + "ambient",    point_lights[ptl_id]->GetAmbient());
-                object_materials[obj_id]->SetUniformVec3( current_light + "diffuse",    point_lights[ptl_id]->GetDiffuse());
-                object_materials[obj_id]->SetUniformVec3( current_light + "specular",    point_lights[ptl_id]->GetSpecular());
+                object_materials[obj_id]->SetUniform(current_light + "position",    point_lights[ptl_id]->GetPosition());
+                object_materials[obj_id]->SetUniform(current_light + "constant",    point_lights[ptl_id]->GetConstant());
+                object_materials[obj_id]->SetUniform(current_light + "linear",      point_lights[ptl_id]->GetLinear());
+                object_materials[obj_id]->SetUniform(current_light + "quadratic",   point_lights[ptl_id]->GetQuadratic());
+                object_materials[obj_id]->SetUniform(current_light + "ambient",     point_lights[ptl_id]->GetAmbient());
+                object_materials[obj_id]->SetUniform(current_light + "diffuse",     point_lights[ptl_id]->GetDiffuse());
+                object_materials[obj_id]->SetUniform(current_light + "specular",    point_lights[ptl_id]->GetSpecular());
             }
 
-            object_materials[obj_id]->SetUniformVec3("spot_light.position",            spot_light->GetPosition());
-            object_materials[obj_id]->SetUniformVec3("spot_light.direction",        spot_light->GetDirection());
-            object_materials[obj_id]->SetUniformVec3("spot_light.ambient",            spot_light->GetAmbient());
-            object_materials[obj_id]->SetUniformVec3("spot_light.diffuse",            spot_light->GetDiffuse());
-            object_materials[obj_id]->SetUniformVec3("spot_light.specular",            spot_light->GetSpecular());
-            object_materials[obj_id]->SetUniformFloat("spot_light.constant",        spot_light->GetConstant());
-            object_materials[obj_id]->SetUniformFloat("spot_light.linear",            spot_light->GetLinear());
-            object_materials[obj_id]->SetUniformFloat("spot_light.quadratic",        spot_light->GetQuadratic());
-            object_materials[obj_id]->SetUniformFloat("spot_light.cut_off",            glm::cos(glm::radians(spot_light->GetInnerAngle()/2)));
-            object_materials[obj_id]->SetUniformFloat("spot_light.outer_cut_off",    glm::cos(glm::radians(spot_light->GetOuterAngle()/2)));
+            object_materials[obj_id]->SetUniform("spot_light.position",         spot_light->GetPosition());
+            object_materials[obj_id]->SetUniform("spot_light.direction",        spot_light->GetDirection());
+            object_materials[obj_id]->SetUniform("spot_light.ambient",          spot_light->GetAmbient());
+            object_materials[obj_id]->SetUniform("spot_light.diffuse",          spot_light->GetDiffuse());
+            object_materials[obj_id]->SetUniform("spot_light.specular",         spot_light->GetSpecular());
+            object_materials[obj_id]->SetUniform("spot_light.constant",         spot_light->GetConstant());
+            object_materials[obj_id]->SetUniform("spot_light.linear",           spot_light->GetLinear());
+            object_materials[obj_id]->SetUniform("spot_light.quadratic",        spot_light->GetQuadratic());
+            object_materials[obj_id]->SetUniform("spot_light.cut_off",          glm::cos(glm::radians(spot_light->GetInnerAngle()/2)));
+            object_materials[obj_id]->SetUniform("spot_light.outer_cut_off",    glm::cos(glm::radians(spot_light->GetOuterAngle()/2)));
         }
     }
 
@@ -252,20 +252,20 @@ namespace scene {
         ////////////////////////////////////////////////////////////////////////////
         //                            light rendering                             //
         ////////////////////////////////////////////////////////////////////////////
-        directional_light->GetMaterial()->Bind();
-        m_renderer.Draw(*directional_light->GetVertArray(), *directional_light->GetIndexBuffer(), directional_light->GetMaterial()->GetShader());
-        directional_light->GetMaterial()->Unbind();
+        directional_light->GetMaterial().Bind();
+        m_renderer.Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), directional_light->GetMaterial().GetShader());
+        directional_light->GetMaterial().Unbind();
 
         for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
         {
-            point_lights[ptl_id]->GetMaterial()->Bind();
-            m_renderer.Draw(*point_lights[ptl_id]->GetVertArray(), *point_lights[ptl_id]->GetIndexBuffer(), point_lights[ptl_id]->GetMaterial()->GetShader());
-            point_lights[ptl_id]->GetMaterial()->Unbind();
+            point_lights[ptl_id]->GetMaterial().Bind();
+            m_renderer.Draw(point_lights[ptl_id]->GetVertArray(), point_lights[ptl_id]->GetIndexBuffer(), point_lights[ptl_id]->GetMaterial().GetShader());
+            point_lights[ptl_id]->GetMaterial().Unbind();
         }
 
-        spot_light->GetMaterial()->Bind();
-        m_renderer.Draw(*spot_light->GetVertArray(), *spot_light->GetIndexBuffer(), spot_light->GetMaterial()->GetShader());
-        spot_light->GetMaterial()->Unbind();
+        spot_light->GetMaterial().Bind();
+        m_renderer.Draw(spot_light->GetVertArray(), spot_light->GetIndexBuffer(), spot_light->GetMaterial().GetShader());
+        spot_light->GetMaterial().Unbind();
 
         ////////////////////////////////////////////////////////////////////////////
         //                          geometery rendering                           //

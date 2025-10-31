@@ -2,7 +2,7 @@
 #include "Texture.h"
 
 
-Texture::Texture(unsigned int width, unsigned int height, unsigned int nr_channels, std::string sampler_name)
+Texture::Texture(unsigned int width, unsigned int height, unsigned int nr_channels, std::string& sampler_name)
     : m_width(width), m_height(height), m_nr_channels(nr_channels), m_sampler_name(sampler_name)
 {
 }

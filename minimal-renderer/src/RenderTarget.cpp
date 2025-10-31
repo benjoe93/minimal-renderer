@@ -3,7 +3,7 @@
 
 
 
-RenderTarget::RenderTarget(int width, int height, int nr_channels, std::string sampler_name)
+RenderTarget::RenderTarget(unsigned int width, unsigned int height, unsigned int nr_channels, std::string sampler_name)
     : Texture(width, height, nr_channels, sampler_name)
 {
     GLCall(glGenTextures(1, &m_renderer_id));
@@ -12,8 +12,4 @@ RenderTarget::RenderTarget(int width, int height, int nr_channels, std::string s
     GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GetFormat(), width, height, 0, GetFormat(), GL_UNSIGNED_BYTE, nullptr));
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-}
-
-RenderTarget::~RenderTarget()
-{
 }

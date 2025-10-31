@@ -109,7 +109,7 @@ struct AppState
     float last_y = 360;
 
     unsigned int active_camera = 0;
-    std::unordered_map<unsigned int, std::shared_ptr<Camera>> cameras;
+    std::unordered_map<unsigned int, Camera*> cameras;
 };
 
 class Renderer
@@ -127,7 +127,7 @@ class Renderer
         double m_last_frame = 0.0;
 
     public:
-        std::unique_ptr<AppState> state;
+        AppState state = AppState();
 
     public:
         Renderer();

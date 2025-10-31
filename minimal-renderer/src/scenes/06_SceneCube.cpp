@@ -76,8 +76,8 @@ scene::SceneCube::SceneCube(Renderer& in_renderer)
 
     // Pass textures to shader
     default_shader->Bind();
-    default_shader->SetInt("texture_1", 0);
-    default_shader->SetInt("texture_2", 1);
+    default_shader->SetUniform("texture_1", 0);
+    default_shader->SetUniform("texture_2", 1);
 
     ////////////////////////////////////////////////////////////////////////////
     //                            geometery setup                             //
@@ -101,7 +101,7 @@ scene::SceneCube::SceneCube(Renderer& in_renderer)
 void scene::SceneCube::OnRender()
 {
     // Projection matrix
-    glm::mat4 projection = glm::perspective(glm::radians(m_renderer.GetActiveCamera().GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(m_renderer.GetActiveCamera().GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
 
     // Model matrix
     glm::mat4 model = glm::mat4(1.0f);
@@ -111,9 +111,9 @@ void scene::SceneCube::OnRender()
     model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
-    default_shader->SetMat4("model", model);
-    default_shader->SetMat4("view", m_renderer.GetActiveCamera().GetViewMatrix());
-    default_shader->SetMat4("projection", projection);
+    default_shader->SetUniform("model", model);
+    default_shader->SetUniform("view", m_renderer.GetActiveCamera().GetViewMatrix());
+    default_shader->SetUniform("projection", projection);
 
     // draw first triangle
     m_renderer.Draw(*va, *ib , *default_shader);

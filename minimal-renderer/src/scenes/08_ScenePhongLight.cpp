@@ -139,20 +139,20 @@ void ScenePhongLight::OnRender()
     ////////////////////////////////////////////////////////////////////////////
     //                          geometery rendering                           //
     ////////////////////////////////////////////////////////////////////////////
-    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 mvp_matrix = projection * cam.GetViewMatrix() * model;
 
     object_shader->Bind();
-    object_shader->SetMat4("model", model);
-    object_shader->SetMat4("view", cam.GetViewMatrix());
-    object_shader->SetMat4("projection", projection);
+    object_shader->SetUniform("model", model);
+    object_shader->SetUniform("view", cam.GetViewMatrix());
+    object_shader->SetUniform("projection", projection);
 
-    object_shader->SetVec3("u_objectColor", object_color[0], object_color[1], object_color[2]);
-    object_shader->SetVec3("u_viewPos", cam_pos[0], cam_pos[1], cam_pos[2]);
+    object_shader->SetUniform("u_objectColor", object_color[0], object_color[1], object_color[2]);
+    object_shader->SetUniform("u_viewPos", cam_pos[0], cam_pos[1], cam_pos[2]);
 
-    object_shader->SetVec3("u_lightColor", light_color[0], light_color[1], light_color[2]);
-    object_shader->SetVec3("u_lightPos", light_position[0], light_position[1], light_position[2]);
+    object_shader->SetUniform("u_lightColor", light_color[0], light_color[1], light_color[2]);
+    object_shader->SetUniform("u_lightPos", light_position[0], light_position[1], light_position[2]);
 
     m_renderer.Draw(*object_va, *object_ib, *object_shader);
 
@@ -163,11 +163,11 @@ void ScenePhongLight::OnRender()
     glm::mat4 light_transform = glm::mat4(1.0f);
     light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
     light_transform = glm::scale(light_transform, glm::vec3(0.1f));
-    light_shader->SetMat4("model", light_transform);
-    light_shader->SetMat4("view", cam.GetViewMatrix());
-    light_shader->SetMat4("projection", projection);
+    light_shader->SetUniform("model", light_transform);
+    light_shader->SetUniform("view", cam.GetViewMatrix());
+    light_shader->SetUniform("projection", projection);
 
-    light_shader->SetVec3("u_lightColor", light_color[0], light_color[1], light_color[2]);
+    light_shader->SetUniform("u_lightColor", light_color[0], light_color[1], light_color[2]);
 
     m_renderer.Draw(*light_va, *light_ib, *light_shader);
 }

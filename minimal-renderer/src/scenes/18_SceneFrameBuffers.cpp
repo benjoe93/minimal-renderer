@@ -42,11 +42,11 @@ SceneFramebuffer::SceneFramebuffer(Renderer& in_renderer)
     framebuffer = std::make_unique<Framebuffer>();
 
     // create a color attachment texture
-    render_target = std::make_shared<RenderTarget>(m_renderer.state->scr_width, m_renderer.state->scr_height, 3, "screenTexture");
+    render_target = std::make_shared<RenderTarget>(m_renderer.state.scr_width, m_renderer.state.scr_height, 3, "screenTexture");
     framebuffer->AttachRenderTarget(AttachmentTarget::COLOR0, render_target);
 
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    render_buffer = std::make_shared<RenderBuffer>(m_renderer.state->scr_width, m_renderer.state->scr_height);
+    render_buffer = std::make_shared<RenderBuffer>(m_renderer.state.scr_width, m_renderer.state.scr_height);
     framebuffer->AttachRenderBuffer(AttachmentTarget::DEPTH_STENCIL, render_buffer);
     
     // unbind to prevent accidental renders
@@ -74,7 +74,7 @@ void SceneFramebuffer::OnUpdate(double delta_time)
     Camera& cam = m_renderer.GetActiveCamera();
 
     glm::mat4 projection, ModelView, MVP;
-    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), m_renderer.state->near_plane, m_renderer.state->far_plane);
+    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), m_renderer.state.near_plane, m_renderer.state.far_plane);
 
     // objects
     for (auto& obj : objects)
@@ -83,7 +83,7 @@ void SceneFramebuffer::OnUpdate(double delta_time)
         MVP = projection * ModelView;
 
         for (auto& mesh : obj->GetMeshes())
-            mesh->GetMaterial().SetUniformMat4("mvp", MVP);
+            mesh->GetMaterial().SetUniform("mvp", MVP);
     }
 }
 
@@ -103,7 +103,7 @@ void SceneFramebuffer::OnRender()
     m_renderer.SetBackgroundColor(glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
     m_renderer.Clear(GL_COLOR_BUFFER_BIT);
 
-    m_renderer.Draw(*quad);
+    m_renderer.Draw(*quad_normal);
 }
 
 void SceneFramebuffer::OnImGuiRender()

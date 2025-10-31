@@ -153,7 +153,7 @@ void SceneLightCasters::OnUpdate(double delta_time)
     glm::vec3 cam_pos = cam.GetPosition();
 
     glm::mat4 projection, model, ModelView, MVP;
-    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
 
     // geometry update
     ////////////////////////////////////////////////////////////////////////////
@@ -170,20 +170,20 @@ void SceneLightCasters::OnUpdate(double delta_time)
         ModelView = cam->GetViewMatrix() * model;
         MVP = projection * ModelView;
 
-        object_materials[i]->SetUniformMat4("model", model);
-        object_materials[i]->SetUniformMat4("mvp", MVP);
+        object_materials[i]->SetUniform("model", model);
+        object_materials[i]->SetUniform("mvp", MVP);
 
-        object_materials[i]->SetUniformFloat("material.shininess", 32.f);
+        object_materials[i]->SetUniform("material.shininess", 32.f);
 
-        object_materials[i]->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-        object_materials[i]->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
-        object_materials[i]->SetUniformVec3("light.direction", glm::vec3(-light_position[0], -light_position[1], -light_position[2])); // Directon is need to be flipped to get the direction from the fragment to the light
-        object_materials[i]->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-        object_materials[i]->SetUniformVec3("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
-        object_materials[i]->SetUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-        object_materials[i]->SetUniformFloat("light.constant", 1.0f);
-        object_materials[i]->SetUniformFloat("light.linear", 0.09f);
-        object_materials[i]->SetUniformFloat("light.quadratic", 0.032f);
+        object_materials[i]->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        object_materials[i]->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
+        object_materials[i]->SetUniform("light.direction", glm::vec3(-light_position[0], -light_position[1], -light_position[2])); // Directon is need to be flipped to get the direction from the fragment to the light
+        object_materials[i]->SetUniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+        object_materials[i]->SetUniform("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
+        object_materials[i]->SetUniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        object_materials[i]->SetUniform("light.constant", 1.0f);
+        object_materials[i]->SetUniform("light.linear", 0.09f);
+        object_materials[i]->SetUniform("light.quadratic", 0.032f);
 
     }
     */
@@ -202,20 +202,20 @@ void SceneLightCasters::OnUpdate(double delta_time)
         ModelView = cam->GetViewMatrix() * model;
         MVP = projection * ModelView;
 
-        object_materials[i]->SetUniformMat4("model", model);
-        object_materials[i]->SetUniformMat4("mvp", MVP);
+        object_materials[i]->SetUniform("model", model);
+        object_materials[i]->SetUniform("mvp", MVP);
 
-        object_materials[i]->SetUniformFloat("material.shininess", 32.f);
+        object_materials[i]->SetUniform("material.shininess", 32.f);
 
-        object_materials[i]->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-        object_materials[i]->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
-        object_materials[i]->SetUniformVec3("light.position", glm::vec3(light_position[0], light_position[1], light_position[2]));
-        object_materials[i]->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-        object_materials[i]->SetUniformVec3("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
-        object_materials[i]->SetUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-        object_materials[i]->SetUniformFloat("light.constant", 1.0f);
-        object_materials[i]->SetUniformFloat("light.linear", 0.09f);
-        object_materials[i]->SetUniformFloat("light.quadratic", 0.032f);
+        object_materials[i]->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        object_materials[i]->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
+        object_materials[i]->SetUniform("light.position", glm::vec3(light_position[0], light_position[1], light_position[2]));
+        object_materials[i]->SetUniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+        object_materials[i]->SetUniform("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
+        object_materials[i]->SetUniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        object_materials[i]->SetUniform("light.constant", 1.0f);
+        object_materials[i]->SetUniform("light.linear", 0.09f);
+        object_materials[i]->SetUniform("light.quadratic", 0.032f);
 
     }
     */
@@ -233,25 +233,25 @@ void SceneLightCasters::OnUpdate(double delta_time)
         ModelView = cam.GetViewMatrix() * model;
         MVP = projection * ModelView;
 
-        object_materials[i]->SetUniformMat4("model", model);
-        object_materials[i]->SetUniformMat4("mvp", MVP);
+        object_materials[i]->SetUniform("model", model);
+        object_materials[i]->SetUniform("mvp", MVP);
 
-        object_materials[i]->SetUniformFloat("material.shininess", 32.f);
+        object_materials[i]->SetUniform("material.shininess", 32.f);
 
-        object_materials[i]->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-        object_materials[i]->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
+        object_materials[i]->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+        object_materials[i]->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
 
-        object_materials[i]->SetUniformVec3("light.position", cam_pos);
-        object_materials[i]->SetUniformVec3("light.direction", cam.GetDirection());
-        object_materials[i]->SetUniformFloat("light.cut_off", glm::cos(glm::radians(12.5f))); // sending cosine for perf reasons | cos(light_angle) == dot(light_dir, spot_dir)
-        object_materials[i]->SetUniformFloat("light.outer_cut_off", glm::cos(glm::radians(17.5f))); // sending cosine for perf reasons | cos(light_angle) == dot(light_dir, spot_dir)
+        object_materials[i]->SetUniform("light.position", cam_pos);
+        object_materials[i]->SetUniform("light.direction", cam.GetDirection());
+        object_materials[i]->SetUniform("light.cut_off", glm::cos(glm::radians(12.5f))); // sending cosine for perf reasons | cos(light_angle) == dot(light_dir, spot_dir)
+        object_materials[i]->SetUniform("light.outer_cut_off", glm::cos(glm::radians(17.5f))); // sending cosine for perf reasons | cos(light_angle) == dot(light_dir, spot_dir)
 
-        object_materials[i]->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-        object_materials[i]->SetUniformVec3("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
-        object_materials[i]->SetUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
-        object_materials[i]->SetUniformFloat("light.constant", 1.0f);
-        object_materials[i]->SetUniformFloat("light.linear", 0.09f);
-        object_materials[i]->SetUniformFloat("light.quadratic", 0.032f);
+        object_materials[i]->SetUniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+        object_materials[i]->SetUniform("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
+        object_materials[i]->SetUniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+        object_materials[i]->SetUniform("light.constant", 1.0f);
+        object_materials[i]->SetUniform("light.linear", 0.09f);
+        object_materials[i]->SetUniform("light.quadratic", 0.032f);
 
     }
 
@@ -265,9 +265,9 @@ void SceneLightCasters::OnUpdate(double delta_time)
     ModelView = cam.GetViewMatrix() * model;
     MVP = projection * ModelView;
     
-    light_material->SetUniformMat4("mvp", MVP);
+    light_material->SetUniform("mvp", MVP);
 
-    light_material->SetUniformVec3("u_lightColor", glm::vec3(light_color[0], light_color[1], light_color[2]));
+    light_material->SetUniform("u_lightColor", glm::vec3(light_color[0], light_color[1], light_color[2]));
 }
 
 void SceneLightCasters::OnRender()

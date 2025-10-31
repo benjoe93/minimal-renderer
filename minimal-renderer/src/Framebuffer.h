@@ -51,7 +51,7 @@ class Framebuffer
 {
 private:
     unsigned int m_renderer_id;
-    std::unordered_map<unsigned int, std::shared_ptr<RenderTarget>> render_targets;
+    std::unordered_map<AttachmentTarget, std::shared_ptr<RenderTarget>> render_targets;
 
     void Validate() const;
 

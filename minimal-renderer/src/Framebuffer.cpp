@@ -27,7 +27,7 @@ void Framebuffer::Unbind() const
 void Framebuffer::AttachRenderTarget(AttachmentTarget target, std::shared_ptr<RenderTarget> render_target)
 {
     GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, static_cast<unsigned int>(target), GL_TEXTURE_2D, render_target->GetId(), 0));
-    render_targets[static_cast<unsigned int>(target)] = render_target;
+    render_targets[target] = render_target;
     Validate();
 }
 
@@ -39,7 +39,7 @@ void Framebuffer::AttachRenderBuffer(AttachmentTarget target, std::shared_ptr<Re
 
 std::shared_ptr<RenderTarget> Framebuffer::GetRenderTarget(AttachmentTarget target) const
 {
-    auto it = render_targets.find(static_cast<unsigned int>(target));
+    auto it = render_targets.find(target);
     if (it != render_targets.end())
         return it->second;
     return nullptr;

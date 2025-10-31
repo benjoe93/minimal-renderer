@@ -27,8 +27,6 @@ public:
     void AddRoll(const float new_roll);
     void SetFov(const float new_fov) { m_fov = new_fov; }
 
-
-
     unsigned int GetId() const { return m_renderer_id; }
     glm::vec3 GetPosition() const { return m_cam_position; }
     glm::vec3 GetDirection() const { return m_cam_direction; }
@@ -40,7 +38,6 @@ public:
     float GetRoll() const { return m_roll; }
 
     float GetFov() const { return m_fov; }
-
 
     void MoveFwd(const double delta_time);
     void MoveBwd(const double delta_time);

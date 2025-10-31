@@ -32,9 +32,9 @@ public:
     glm::vec3 GetDiffuse() const { return m_diffuse; };
     glm::vec3 GetSpecular() const { return m_specular; };
 
-    VertexArray* GetVertArray() const { return m_va.get(); }
-    IndexBuffer* GetIndexBuffer() const { return m_ib.get(); }
-    Material* GetMaterial() const { return m_material.get(); }
+    VertexArray& GetVertArray() const { return *m_va.get(); }
+    IndexBuffer& GetIndexBuffer() const { return *m_ib.get(); }
+    Material& GetMaterial() const { return *m_material.get(); }
 
     void SetPosition(glm::vec3 new_position) { m_position = new_position; };
     void SetAmbient(glm::vec3 new_ambient) { m_ambient = new_ambient; };

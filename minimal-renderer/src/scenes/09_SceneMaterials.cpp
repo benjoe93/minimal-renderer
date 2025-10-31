@@ -137,27 +137,24 @@ void SceneMaterials::OnRender()
     ////////////////////////////////////////////////////////////////////////////
     //                          geometery rendering                           //
     ////////////////////////////////////////////////////////////////////////////
-    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
     glm::mat4 model = glm::mat4(1.0f);
     //model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
     glm::mat4 mvp_matrix = projection * cam.GetViewMatrix() * model;
 
     object_shader->Bind();
-    object_shader->SetMat4("model", model);
-    object_shader->SetMat4("view", cam.GetViewMatrix());
-    object_shader->SetMat4("projection", projection);
-
-    object_shader->SetVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-    object_shader->SetVec3("material.diffuse", object_color[0], object_color[1], object_color[2]);
-    object_shader->SetVec3("material.specular", 0.5f, 0.5f, 0.5f);
-    object_shader->SetFloat("material.shininess", 32.f);
-
-    object_shader->SetVec3("u_viewPos", cam_pos[0], cam_pos[1], cam_pos[2]);
-
-    object_shader->SetVec3("light.position", light_position[0], light_position[1], light_position[2]);
-    object_shader->SetVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-    object_shader->SetVec3("light.diffuse", light_color[0], light_color[1], light_color[2]);
-    object_shader->SetVec3("light.specular", 1.0f, 1.0f, 1.0f);
+    object_shader->SetUniform("model", model);
+    object_shader->SetUniform("view", cam.GetViewMatrix());
+    object_shader->SetUniform("projection", projection);
+    object_shader->SetUniform("material.ambient", 1.0f, 0.5f, 0.31f);
+    object_shader->SetUniform("material.diffuse", object_color[0], object_color[1], object_color[2]);
+    object_shader->SetUniform("material.specular", 0.5f, 0.5f, 0.5f);
+    object_shader->SetUniform("material.shininess", 32.f);
+    object_shader->SetUniform("u_viewPos", cam_pos[0], cam_pos[1], cam_pos[2]);
+    object_shader->SetUniform("light.position", light_position[0], light_position[1], light_position[2]);
+    object_shader->SetUniform("light.ambient", 0.2f, 0.2f, 0.2f);
+    object_shader->SetUniform("light.diffuse", light_color[0], light_color[1], light_color[2]);
+    object_shader->SetUniform("light.specular", 1.0f, 1.0f, 1.0f);
 
     m_renderer.Draw(*object_va, *object_ib, *object_shader);
 
@@ -167,11 +164,10 @@ void SceneMaterials::OnRender()
     light_shader->Bind();
     glm::mat4 light_transform = glm::mat4(1.0f);
     light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
-    light_shader->SetMat4("model", light_transform);
-    light_shader->SetMat4("view", cam.GetViewMatrix());
-    light_shader->SetMat4("projection", projection);
-
-    light_shader->SetVec3("u_lightColor", light_color[0], light_color[1], light_color[2]);
+    light_shader->SetUniform("model", light_transform);
+    light_shader->SetUniform("view", cam.GetViewMatrix());
+    light_shader->SetUniform("projection", projection);
+    light_shader->SetUniform("u_lightColor", light_color[0], light_color[1], light_color[2]);
 
     m_renderer.Draw(*light_va, *light_ib, *light_shader);
 }

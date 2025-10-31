@@ -134,25 +134,25 @@ void SceneSurfMaps::OnUpdate(double delta_time)
 {
     Camera& cam = m_renderer.GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
-    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
 
     ////////////////////////////////////////////////////////////////////////////
     //                           geometery update                             //
     ////////////////////////////////////////////////////////////////////////////
     glm::mat4 model = glm::mat4(1.0f);
 
-    object_material->SetUniformMat4("model", model);
-    object_material->SetUniformMat4("view", cam.GetViewMatrix());
-    object_material->SetUniformMat4("projection", projection);
+    object_material->SetUniform("model", model);
+    object_material->SetUniform("view", cam.GetViewMatrix());
+    object_material->SetUniform("projection", projection);
 
-    object_material->SetUniformFloat("material.shininess", 32.f);
+    object_material->SetUniform("material.shininess", 32.f);
 
-    object_material->SetUniformVec3("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-    object_material->SetUniformVec3("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
-    object_material->SetUniformVec3("light.position", glm::vec3(light_position[0], light_position[1], light_position[2]));
-    object_material->SetUniformVec3("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
-    object_material->SetUniformVec3("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
-    object_material->SetUniformVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    object_material->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
+    object_material->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
+    object_material->SetUniform("light.position", glm::vec3(light_position[0], light_position[1], light_position[2]));
+    object_material->SetUniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+    object_material->SetUniform("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
+    object_material->SetUniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
     ////////////////////////////////////////////////////////////////////////////
     //                             light update                               //
@@ -161,11 +161,11 @@ void SceneSurfMaps::OnUpdate(double delta_time)
     light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
     light_transform = glm::scale(light_transform, glm::vec3(0.1f, 0.1f, 0.1f));
     
-    light_material->SetUniformMat4("model", light_transform);
-    light_material->SetUniformMat4("view", cam.GetViewMatrix());
-    light_material->SetUniformMat4("projection", projection);
+    light_material->SetUniform("model", light_transform);
+    light_material->SetUniform("view", cam.GetViewMatrix());
+    light_material->SetUniform("projection", projection);
 
-    light_material->SetUniformVec3("u_lightColor", glm::vec3(light_color[0], light_color[1], light_color[2]));
+    light_material->SetUniform("u_lightColor", glm::vec3(light_color[0], light_color[1], light_color[2]));
 }
 
 void SceneSurfMaps::OnRender()

@@ -108,8 +108,8 @@ scene::SceneCubeMultiple::SceneCubeMultiple(Renderer& in_renderer)
     default_shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/default.vert", "resources/shaders/00_GettingStarted/default.frag");
 
     default_shader->Bind();
-    default_shader->SetInt("texture_1", 0);
-    default_shader->SetInt("texture_2", 1);
+    default_shader->SetUniform("texture_1", 0);
+    default_shader->SetUniform("texture_2", 1);
 
     ////////////////////////////////////////////////////////////////////////////
     //                            geometery setup                             //
@@ -133,7 +133,7 @@ scene::SceneCubeMultiple::SceneCubeMultiple(Renderer& in_renderer)
 void scene::SceneCubeMultiple::OnRender()
 {
     // Projection matrix
-    glm::mat4 projection = glm::perspective(glm::radians(m_renderer.GetActiveCamera().GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(m_renderer.GetActiveCamera().GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
 
     // Model matrix
     for (unsigned char i = 0; i < 10; i++)
@@ -144,9 +144,9 @@ void scene::SceneCubeMultiple::OnRender()
         float rotation = i * 20.0f;
         model = glm::rotate(model, glm::radians(rotation), glm::vec3(1.0f, 0.3f, 0.5f));
 
-        default_shader->SetMat4("model", model);
-        default_shader->SetMat4("view", m_renderer.GetActiveCamera().GetViewMatrix());
-        default_shader->SetMat4("projection", projection);
+        default_shader->SetUniform("model", model);
+        default_shader->SetUniform("view", m_renderer.GetActiveCamera().GetViewMatrix());
+        default_shader->SetUniform("projection", projection);
 
         // draw first triangle
         m_renderer.Draw(*va, *ib , *default_shader);

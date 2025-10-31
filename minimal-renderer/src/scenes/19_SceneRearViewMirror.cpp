@@ -42,11 +42,11 @@ SceneRearViewMirror::SceneRearViewMirror(Renderer& in_renderer)
     framebuffer = std::make_unique<Framebuffer>();
 
     // create a color attachment texture
-    render_target = std::make_shared<RenderTarget>(m_renderer.state->scr_width, m_renderer.state->scr_height, 3, "screenTexture");
+    render_target = std::make_shared<RenderTarget>(m_renderer.state.scr_width, m_renderer.state.scr_height, 3, "screenTexture");
     framebuffer->AttachRenderTarget(AttachmentTarget::COLOR0, render_target);
 
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    render_buffer = std::make_shared<RenderBuffer>(m_renderer.state->scr_width, m_renderer.state->scr_height);
+    render_buffer = std::make_shared<RenderBuffer>(m_renderer.state.scr_width, m_renderer.state.scr_height);
     framebuffer->AttachRenderBuffer(AttachmentTarget::DEPTH_STENCIL, render_buffer);
     
     // unbind to prevent accidental renders
@@ -77,7 +77,7 @@ void SceneRearViewMirror::OnRender()
     Camera& cam = m_renderer.GetActiveCamera();
 
     glm::mat4 projection, ModelView, MVP;
-    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), m_renderer.state->near_plane, m_renderer.state->far_plane);
+    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), m_renderer.state.near_plane, m_renderer.state.far_plane);
 
     // first pass
 
@@ -92,7 +92,7 @@ void SceneRearViewMirror::OnRender()
         MVP = projection * ModelView;
 
         for (auto& mesh : obj->GetMeshes())
-            mesh->GetMaterial().SetUniformMat4("mvp", MVP);
+            mesh->GetMaterial().SetUniform("mvp", MVP);
 
         m_renderer.Draw(*obj);
     }
@@ -108,7 +108,7 @@ void SceneRearViewMirror::OnRender()
         MVP = projection * ModelView;
 
         for (auto& mesh : obj->GetMeshes())
-            mesh->GetMaterial().SetUniformMat4("mvp", MVP);
+            mesh->GetMaterial().SetUniform("mvp", MVP);
         m_renderer.Draw(*obj);
     }
 

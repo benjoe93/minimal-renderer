@@ -14,8 +14,8 @@ protected:
     GLenum GetFormat() const;
 
 public:
-    Texture(unsigned int width, unsigned int height, unsigned int nr_channels, std::string sampler_name);
-    ~Texture();
+    Texture(unsigned int width, unsigned int height, unsigned int nr_channels, std::string& sampler_name);
+    virtual ~Texture();
 
     // move 
     Texture(Texture&& other) noexcept;

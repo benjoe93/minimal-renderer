@@ -1,6 +1,6 @@
 #include "Material.h"
 
-Material::Material(const char* vertex_path, const char* fragment_path)
+Material::Material(std::string vertex_path, std::string fragment_path)
     : m_vertex_path(vertex_path), m_fragment_path(fragment_path)
 {
 	m_shader = std::make_unique<Shader>(vertex_path, fragment_path);
@@ -29,17 +29,17 @@ void Material::AddTexture2D(std::string path, std::string sampler_name, bool is_
     });
 }
 
-void Material::SetUniformFloat(std::string type, float value)
+void Material::SetUniform(const std::string type, float value)
 {
 	u_floats[type] = value;
 }
 
-void Material::SetUniformVec3(const std::string type, const glm::vec3& value)
+void Material::SetUniform(const std::string type, const glm::vec3& value)
 {
 	u_vec3[type] = value;
 }
 
-void Material::SetUniformMat4(const std::string type, const glm::mat4& value)
+void Material::SetUniform(const std::string type, const glm::mat4& value)
 {
 	u_mat4[type] = value;
 }
@@ -52,21 +52,21 @@ void Material::Bind()
 	// Bind uniforms
 	for (const auto& [name, value] : u_floats)
 	{
-		m_shader->SetFloat(name, value);
+		m_shader->SetUniform(name, value);
 	}
 	for (const auto& [name, value] : u_vec3)
 	{
-		m_shader->SetVec3(name, value[0], value[1], value[2]);
+		m_shader->SetUniform(name, value[0], value[1], value[2]);
 	}
 	for (const auto& [name, value] : u_mat4) {
-		m_shader->SetMat4(name, value);
+		m_shader->SetUniform(name, value);
 	}
 
 	// Bind textures
 	for (int i = 0; i < m_textures.size(); i++)
 	{
 		m_textures[i].second->Bind(i);
-		m_shader->SetInt(m_textures[i].first, i);
+		m_shader->SetUniform(m_textures[i].first, i);
 	}
 }
 

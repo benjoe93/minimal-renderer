@@ -53,8 +53,8 @@ namespace scene {
         
         shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/default.vert", "resources/shaders/00_GettingStarted/default.frag");
         shader->Bind();
-        shader->SetInt("texture1", 0);
-        shader->SetInt("texture2", 1);
+        shader->SetUniform("texture1", 0);
+        shader->SetUniform("texture2", 1);
 
         ////////////////////////////////////////////////////////////////////////////
         //                            geometery setup                             //
@@ -89,8 +89,8 @@ namespace scene {
         m_renderer.Clear(GL_COLOR_BUFFER_BIT);
         
         // Projection matrix
-        float aspect = static_cast<float>(m_renderer.state->scr_width) / m_renderer.state->scr_height;
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspect, m_renderer.state->near_plane, m_renderer.state->far_plane);
+        float aspect = static_cast<float>(m_renderer.state.scr_width) / m_renderer.state.scr_height;
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspect, m_renderer.state.near_plane, m_renderer.state.far_plane);
 
         // View matrix
         glm::mat4 view = glm::mat4(1.0f);
@@ -103,9 +103,9 @@ namespace scene {
         model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
         model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
         
-        shader->SetMat4("model", model);
-        shader->SetMat4("view", view);
-        shader->SetMat4("projection", projection);
+        shader->SetUniform("model", model);
+        shader->SetUniform("view", view);
+        shader->SetUniform("projection", projection);
         m_renderer.Draw(*vao, *ebo, *shader);
     }
 

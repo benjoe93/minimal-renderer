@@ -4,9 +4,6 @@
 
 class RenderTarget : public Texture
 {
-private:
-
 public:
-    RenderTarget(int width, int height, int nr_channels, std::string sampler_name);
-    ~RenderTarget();
+    RenderTarget(unsigned int width, unsigned int height, unsigned int nr_channels, std::string sampler_name);
 };

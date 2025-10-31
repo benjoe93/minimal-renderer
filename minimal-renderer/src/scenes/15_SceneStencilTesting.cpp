@@ -60,7 +60,7 @@ namespace scene {
         glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
 
         // objects
         // plane
@@ -73,8 +73,8 @@ namespace scene {
             MVP = projection * ModelView;
 
             auto& material = m->GetMaterial();
-            material.SetUniformMat4("model", model);
-            material.SetUniformMat4("mvp", MVP);
+            material.SetUniform("model", model);
+            material.SetUniform("mvp", MVP);
         }
 
         // boxes for rendering
@@ -87,8 +87,8 @@ namespace scene {
             MVP = projection * ModelView;
 
             auto& material = m->GetMaterial();
-            material.SetUniformMat4("model", model);
-            material.SetUniformMat4("mvp", MVP);
+            material.SetUniform("model", model);
+            material.SetUniform("mvp", MVP);
         }
         for (auto& m : objects[2]->GetMeshes())
         {
@@ -99,8 +99,8 @@ namespace scene {
             MVP = projection * ModelView;
 
             auto& material = m->GetMaterial();
-            material.SetUniformMat4("model", model);
-            material.SetUniformMat4("mvp", MVP);
+            material.SetUniform("model", model);
+            material.SetUniform("mvp", MVP);
         }
 
         // boxes for outline
@@ -114,8 +114,8 @@ namespace scene {
             MVP = projection * ModelView;
 
             auto& material = m->GetMaterial();
-            material.SetUniformMat4("model", model);
-            material.SetUniformMat4("mvp", MVP);
+            material.SetUniform("model", model);
+            material.SetUniform("mvp", MVP);
         }
         for (auto& m : outline_objects[1]->GetMeshes())
         {
@@ -127,8 +127,8 @@ namespace scene {
             MVP = projection * ModelView;
 
             auto& material = m->GetMaterial();
-            material.SetUniformMat4("model", model);
-            material.SetUniformMat4("mvp", MVP);
+            material.SetUniform("model", model);
+            material.SetUniform("mvp", MVP);
         }
     }
 

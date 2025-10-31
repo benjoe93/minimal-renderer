@@ -11,7 +11,7 @@ private:
 
 public:
     // connstuctor to read and build the texture
-    Texture2D(const std::string& filepath, std::string sampler_name, bool vertical_flip = true);
+    Texture2D(const std::string filepath, std::string sampler_name, bool vertical_flip = true);
     ~Texture2D();
 
     // Prevent copying (textures own GPU resources)

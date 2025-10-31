@@ -44,6 +44,6 @@ void SpotLight::Update(glm::mat4 projection, glm::mat4 camera_view)
     glm::mat4 ModelView = camera_view * model;
     glm::mat4 MVP = projection * ModelView;
 
-    m_material->SetUniformMat4("mvp", MVP);
-    m_material->SetUniformVec3("u_lightColor", m_diffuse);
+    m_material->SetUniform("mvp", MVP);
+    m_material->SetUniform("u_lightColor", m_diffuse);
 }

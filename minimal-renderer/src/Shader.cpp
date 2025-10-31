@@ -4,7 +4,7 @@
 
 #include "Shader.h"
 
-Shader::Shader(const char* vertex_path, const char* fragment_path)
+Shader::Shader(std::string vertex_path, std::string fragment_path)
     : m_vertex_path(vertex_path), m_fragment_path(fragment_path)
 {
     // retrive the vertex/fragment source code from file path
@@ -109,7 +109,7 @@ bool Shader::GetUniformLocation(const std::string& name, int& location) const
     return true;
 }
 
-void Shader::SetBool(const std::string& name, bool value)
+void Shader::SetUniform(const std::string& name, bool value)
 {
     int location;
     if (GetUniformLocation(name, location))
@@ -118,7 +118,7 @@ void Shader::SetBool(const std::string& name, bool value)
     }
 }
 
-void Shader::SetInt(const std::string& name, int value)
+void Shader::SetUniform(const std::string& name, int value)
 {
     int location;
     if (GetUniformLocation(name, location))
@@ -127,7 +127,7 @@ void Shader::SetInt(const std::string& name, int value)
     }
 }
 
-void Shader::SetFloat(const std::string& name, float value)
+void Shader::SetUniform(const std::string& name, float value)
 {
     int location;
     if (GetUniformLocation(name, location))
@@ -136,7 +136,7 @@ void Shader::SetFloat(const std::string& name, float value)
     }
 }
 
-void Shader::SetVec3(const std::string& name, const float x, const float y, const float z)
+void Shader::SetUniform(const std::string& name, const float x, const float y, const float z)
 {
     int location;
     if (GetUniformLocation(name, location))
@@ -145,7 +145,7 @@ void Shader::SetVec3(const std::string& name, const float x, const float y, cons
     }
 }
 
-void Shader::SetVec4(const std::string& name, const float x, const float y, const float z, const float w)
+void Shader::SetUniform(const std::string& name, const float x, const float y, const float z, const float w)
 {
     int location;
     if (GetUniformLocation(name, location))
@@ -154,7 +154,7 @@ void Shader::SetVec4(const std::string& name, const float x, const float y, cons
     }
 }
 
-void Shader::SetMat4(const std::string& name, glm::mat4 value)
+void Shader::SetUniform(const std::string& name, glm::mat4 value)
 {
     int location;
     if (GetUniformLocation(name, location))

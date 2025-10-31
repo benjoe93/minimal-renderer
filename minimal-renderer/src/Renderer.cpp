@@ -28,8 +28,6 @@ Renderer::Renderer()
     std::cout << "OpenGL Driver Vendor: \t" << glGetString(GL_VENDOR) << std::endl;
     std::cout << "OpenGL Renderer: \t" << glGetString(GL_RENDERER) << std::endl;
     std::cout << "Max vertex attribs: \t" << GetMaxVertexAttribs() << std::endl << std::endl;
-
-    state = std::make_unique<AppState>();
 }
 
 Renderer::~Renderer() {}
@@ -183,6 +181,5 @@ int Renderer::GetMaxVertexAttribs() const
 
 Camera& Renderer::GetActiveCamera() const
 {
-    std::shared_ptr<Camera> camera = state->cameras[state->active_camera];
-    return *camera;
+    return *state.cameras.at(state.active_camera);
 }

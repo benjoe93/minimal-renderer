@@ -83,7 +83,7 @@ namespace scene {
         Camera& cam = m_renderer.GetActiveCamera();
 
         glm::mat4 projection, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state->scr_width) / static_cast<float>(m_renderer.state->scr_height), m_renderer.state->near_plane, m_renderer.state->far_plane);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), m_renderer.state.near_plane, m_renderer.state.far_plane);
 
         // objects
         for (auto& obj : objects)
@@ -92,7 +92,7 @@ namespace scene {
             MVP = projection * ModelView;
 
             for (auto& mesh : obj->GetMeshes())
-                mesh->GetMaterial().SetUniformMat4("mvp", MVP);
+                mesh->GetMaterial().SetUniform("mvp", MVP);
         }
     }
 

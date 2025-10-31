@@ -96,9 +96,10 @@ int main(void)
     ImGui_ImplGlfw_InitForOpenGL(window, true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init("#version 330");
 
+    Camera cam(0, glm::vec3(0.0f, 0.0f, 3.0f));
     Renderer renderer;
-    renderer.state->cameras[0] = std::make_shared<Camera>(0, glm::vec3(0.0f, 0.0f, 3.0f));
-    renderer.state->active_camera = 0;
+    renderer.state.cameras[cam.GetId()] = &cam;
+    renderer.state.active_camera = cam.GetId();
     glfwSetWindowUserPointer(window, &renderer);
 
     scene::SceneRearViewMirror scene(renderer);
@@ -154,8 +155,8 @@ void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     auto renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
     glViewport(0, 0, width, height);
-    renderer->state->scr_width = width;
-    renderer->state->scr_height = height;
+    renderer->state.scr_width = width;
+    renderer->state.scr_height = height;
 }
 
 void ProcessInput(GLFWwindow* window)
@@ -163,15 +164,15 @@ void ProcessInput(GLFWwindow* window)
     Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
     Camera& cam = renderer->GetActiveCamera();
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && renderer->state->cursor_disabled == false)
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && renderer->state.cursor_disabled == false)
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        renderer->state->cursor_disabled = true;
+        renderer->state.cursor_disabled = true;
     }
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE && renderer->state->cursor_disabled)
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE && renderer->state.cursor_disabled)
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        renderer->state->cursor_disabled = false;
+        renderer->state.cursor_disabled = false;
     }
 
     // Exit
@@ -181,32 +182,32 @@ void ProcessInput(GLFWwindow* window)
     }
 
     // Move forward
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && renderer->state->cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && renderer->state.cursor_disabled)
     {
         cam.MoveFwd(renderer->GetDeltaTime());
     }
     // Move backward
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && renderer->state->cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && renderer->state.cursor_disabled)
     {
         cam.MoveBwd(renderer->GetDeltaTime());
     }
     // Move left
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && renderer->state->cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && renderer->state.cursor_disabled)
     {
         cam.MoveLeft(renderer->GetDeltaTime());
     }
     // Move right
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && renderer->state->cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && renderer->state.cursor_disabled)
     {
         cam.MoveRight(renderer->GetDeltaTime());
     }
     // Move down
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && renderer->state->cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && renderer->state.cursor_disabled)
     {
         cam.MoveDown(renderer->GetDeltaTime());
     }
     // Move up
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && renderer->state->cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && renderer->state.cursor_disabled)
     {
         cam.MoveUp(renderer->GetDeltaTime());
     }
@@ -217,16 +218,16 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos)
     Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
     Camera& cam = renderer->GetActiveCamera();
 
-    if (!renderer->state->cursor_disabled)
+    if (!renderer->state.cursor_disabled)
     {       
-        renderer->state->last_x = static_cast<float>(xpos);
-        renderer->state->last_y = static_cast<float>(ypos);
+        renderer->state.last_x = static_cast<float>(xpos);
+        renderer->state.last_y = static_cast<float>(ypos);
     }
 
-    float xoffset = static_cast<float>(xpos) - renderer->state->last_x;
-    float yoffset = static_cast<float>(ypos) - renderer->state->last_y;
-    renderer->state->last_x = static_cast<float>(xpos);
-    renderer->state->last_y = static_cast<float>(ypos);
+    float xoffset = static_cast<float>(xpos) - renderer->state.last_x;
+    float yoffset = static_cast<float>(ypos) - renderer->state.last_y;
+    renderer->state.last_x = static_cast<float>(xpos);
+    renderer->state.last_y = static_cast<float>(ypos);
 
     const float sensitivity = 0.1f;
     xoffset *= sensitivity;
