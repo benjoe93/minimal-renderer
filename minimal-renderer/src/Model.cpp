@@ -174,6 +174,27 @@ glm::mat4 Model::GetModelMatrix()
     return m_model_matrix;
 }
 
+std::unordered_set<Material*> Model::GetMaterials()
+{
+    std::unordered_set<Material*> materials;
+
+    for (auto& m : m_meshes)
+    {
+        Material* material = &m->GetMaterial();
+        if (material)
+        {
+            materials.insert(material);
+        }
+    }
+
+    return materials;
+}
+
+void Model::SetMaterials()
+{
+    std::cout << "Set Materials Need to be fixed.";
+}
+
 void Model::UpdateModelMatrix()
 {
     m_model_matrix = glm::mat4(1.0);

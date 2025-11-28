@@ -1,8 +1,8 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
-#include <vector>
 
 #include <assimp/scene.h>
 
@@ -58,6 +58,10 @@ public:
     inline glm::vec3 GetLocation() const { return m_transform.Location; }
     inline glm::vec3 GetRotation() const { return m_transform.Rotation; }
     inline glm::vec3 GetScale() const { return m_transform.Scale; }
+
+    std::unordered_set<Material*> GetMaterials();
+    // TODO: finish implementation
+    void SetMaterials();
 
 private:
     void UpdateModelMatrix();
