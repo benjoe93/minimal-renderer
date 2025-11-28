@@ -186,6 +186,7 @@
     <ClCompile Include="src\scenes\17_SceneFaceCulling.cpp" />
     <ClCompile Include="src\scenes\18_SceneFrameBuffers.cpp" />
     <ClCompile Include="src\scenes\19_SceneRearViewMirror.cpp" />
+    <ClCompile Include="src\scenes\20_SceneCubeMap.cpp" />
     <ClCompile Include="src\Texture.cpp" />
     <ClCompile Include="src\Texture2D.cpp" />
     <ClCompile Include="src\Application.cpp" />
@@ -236,11 +237,13 @@
     <ClInclude Include="src\scenes\17_SceneFaceCulling.h" />
     <ClInclude Include="src\scenes\18_SceneFrameBuffers.h" />
     <ClInclude Include="src\scenes\19_SceneRearViewMirror.h" />
+    <ClInclude Include="src\scenes\20_SceneCubeMap.h" />
     <ClInclude Include="src\scenes\Scene.h" />
     <ClInclude Include="src\ShapeLib.h" />
     <ClInclude Include="src\Texture.h" />
     <ClInclude Include="src\Texture2D.h" />
     <ClInclude Include="src\Shader.h" />
+    <ClInclude Include="src\TextureCubeMap.h" />
     <ClInclude Include="src\vendor\imgui\imconfig.h" />
     <ClInclude Include="src\vendor\imgui\imgui.h" />
     <ClInclude Include="src\vendor\imgui\imgui_impl_glfw.h" />

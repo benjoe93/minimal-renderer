@@ -4,7 +4,6 @@
 #include <assimp/postprocess.h>
 
 #include "Material.h"
-#include "Texture.h"
 
 #include "Model.h"
 
@@ -154,7 +153,9 @@ Model::Model(const std::string& path, const std::string& vertex_shader, const st
 }
 
 Model::Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader, Transform transform)
-    : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader), m_transform(transform)
+    :m_transform(transform),
+    m_vertex_shader_path(vertex_shader),
+    m_fragment_shader_path(fragment_shader)
 {
     LoadModel(path);
 }

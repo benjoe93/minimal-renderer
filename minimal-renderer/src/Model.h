@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <vector>
 #include <unordered_map>
 #include <memory>
@@ -8,12 +7,11 @@
 #include <assimp/scene.h>
 
 #include "Mesh.h"
+#include "Texture.h"
 
 class Mesh;
 class Material;
 class Texture2D;
-
-enum TextureType;
 
 struct Transform
 {

@@ -1,9 +1,5 @@
 #include <iostream>
 
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "Material.h"
 #include "LightDirectional.h"
 
 DirectionalLight::DirectionalLight(glm::vec3 position, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular)

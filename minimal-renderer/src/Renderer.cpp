@@ -1,3 +1,5 @@
+#include <cstddef>
+
 #include "IndexBuffer.h"
 #include "Shader.h"
 #include "VertexArray.h"
@@ -9,7 +11,7 @@
 
 
 Renderer::Renderer()
-{   
+{
     SetBlending(m_blending);
     SetBlendFunction(BlendFunc::SRC_ALPHA, BlendFunc::ONE_MINUS_SRC_ALPHA);
     SetBlendEquation(BlendEquation::ADD); // this is the default 
@@ -38,11 +40,25 @@ void Renderer::Clear(GLbitfield bits) const
     GLCall(glClear(bits));
 }
 
+void Renderer::Tick(double current_time)
+{
+    m_delta_time = current_time - m_last_frame;
+    m_last_frame = current_time;
+}
+
+#pragma region DrawFunctions
 void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
 {
     shader.Bind();
     va.Bind();
     GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount() , GL_UNSIGNED_INT, nullptr));
+}
+
+void Renderer::Draw(const VertexArray& va, int count, Material& material) const
+{
+    material.Bind();
+    va.Bind();
+    GLCall(glDrawArrays(GL_TRIANGLES, 0, count));
 }
 
 void Renderer::Draw(Model& obj)
@@ -53,19 +69,14 @@ void Renderer::Draw(Model& obj)
         auto& material = mesh->GetMaterial();
 
         material.Bind();
-        material.GetShader().Bind();
         mesh->GetVertexArray()->Bind();
         GLCall(glDrawElements(GL_TRIANGLES, ib->GetCount(), GL_UNSIGNED_INT, nullptr));
         material.Unbind();
     }
 }
+#pragma endregion
 
-void Renderer::Tick(double current_time)
-{
-    m_delta_time = current_time - m_last_frame;
-    m_last_frame = current_time;
-}
-
+#pragma region RenderSettings
 void Renderer::SetBlending(bool enabled)
 {
     m_blending = enabled;
@@ -171,6 +182,7 @@ void Renderer::SetFrontFace(FrontFace mode)
 {
     GLCall(glFrontFace(static_cast<unsigned int>(mode)));
 }
+#pragma endregion
 
 int Renderer::GetMaxVertexAttribs() const
 {

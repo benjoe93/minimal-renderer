@@ -53,7 +53,7 @@ Shader::Shader(std::string vertex_path, std::string fragment_path)
         GLCall(glGetShaderInfoLog(vertex, 512, nullptr, info_log));
         std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << info_log << std::endl;
     };
-    
+
     // fragment shader
     GLCall(fragment = glCreateShader(GL_FRAGMENT_SHADER));
     GLCall(glShaderSource(fragment, 1, &f_shader_code, nullptr));

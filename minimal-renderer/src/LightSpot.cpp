@@ -1,8 +1,5 @@
 #include <iostream>
 
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
 #include "Material.h"
 #include "LightSpot.h"
 

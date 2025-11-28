@@ -1,12 +1,13 @@
 #include <glad/glad.h>
 
 #include "Material.h"
-#include "Texture.h"
 
 #include "Mesh.h"
 
 Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::unique_ptr<Material> material)
-    : m_vertices(std::move(vertices)), m_indices(std::move(indices)), m_material(std::move(material))
+    :m_material(std::move(material)),
+    m_vertices(std::move(vertices)),
+    m_indices(std::move(indices))
 {
     m_va = std::make_unique<VertexArray>();
     m_va->Bind();

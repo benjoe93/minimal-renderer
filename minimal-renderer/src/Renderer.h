@@ -1,8 +1,6 @@
 #pragma once
 
 #include <iostream>
-#include <memory>
-#include <vector>
 #include <unordered_map>
 
 #include <glad/glad.h>
@@ -15,85 +13,90 @@ class Shader;
 class IndexBuffer;
 class VertexArray;
 class Model;
+class Material;
 
-#define ASSERT(x) if (!(x)) __debugbreak();
-#define GLCall(x) GLClearError();\
-    x;\
-    ASSERT(GLLogCall(#x, __FILE__, __LINE__))
+#pragma region OpenGLErrorHandling
+    #define ASSERT(x) if (!(x)) __debugbreak();
+    #define GLCall(x) GLClearError();\
+        x;\
+        ASSERT(GLLogCall(#x, __FILE__, __LINE__))
 
-static void GLClearError()
-{
-    while (glGetError() != GL_NO_ERROR);
-}
-
-static bool GLLogCall(const char* function, const char* file, int line)
-{
-    while (GLenum error = glGetError())
+    static void GLClearError()
     {
-        std::cout << "[OpenGL Error] (" << error << "): " << function << " " << file << ":" << line << std::endl;
-        return false;
+        while (glGetError() != GL_NO_ERROR);
     }
-    return true;
-}
 
-enum class TestingFunc
-{
-    ALWAYS      = GL_ALWAYS,    // The depth test always passes.
-    NEVER       = GL_NEVER,     // The depth test never passes.
-    LESS        = GL_LESS,      // Passes if the fragment's depth value is less than the stored depth value.
-    EQUAL       = GL_EQUAL,     // Passes if the fragment's depth value is equal to the stored depth value.
-    LEQUAL      = GL_LEQUAL,    // Passes if the fragment's depth value is less than or equal to the stored depth value.
-    GREATER     = GL_GREATER,   // Passes if the fragment's depth value is greater than the stored depth value.
-    NOTEQUAL    = GL_NOTEQUAL,  // Passes if the fragment's depth value is not equal to the stored depth value.
-    GEQUAL      = GL_GEQUAL     // Passes if the fragment's depth value is greater than or equal to the stored depth value.
-};
-enum class StencilOp
-{
-    KEEP        = GL_KEEP,      // The currently stored stencil value is kept.
-    ZERO        = GL_ZERO,      // The stencil value is set to 0.
-    REPLACE     = GL_REPLACE,   // The stencil value is replaced with the reference value set with glStencilFunc.
-    INCR        = GL_INCR,      // The stencil value is increased by 1 if it is lower than the maximum value.
-    INCR_WRAP   = GL_INCR_WRAP, // Same as GL_INCR, but wraps it back to 0 as soon as the maximum value is exceeded.
-    DECR        = GL_DECR,      // The stencil value is decreased by 1 if it is higher than the minimum value.
-    DECR_WRAP   = GL_DECR_WRAP, // Same as GL_DECR, but wraps it to the maximum value if it ends up lower than 0.
-    INVE        = GL_INVERT     // Bitwise inverts the current stencil buffer value.
-};
-enum class BlendFunc
-{
-    ZERO                       = GL_ZERO,                       // Factor is equal to 0
-    ONE                        = GL_ONE,                        // Factor is equal to 1
-    SRC_COLOR                  = GL_SRC_COLOR,                  // Factor is equal to the SOURCE color vector
-    ONE_MINUS_SRC_COLOR        = GL_ONE_MINUS_SRC_COLOR,        // Factor is eqaul to 1 - SOURCE color vector
-    DST_COLOR                  = GL_DST_COLOR,                  // Factor is equal to the DESTINATION color vector
-    ONE_MINUS_DST_COLOR        = GL_ONE_MINUS_DST_COLOR,        // Factor is equal to 1 - DESTINATION color vector
-    SRC_ALPHA                  = GL_SRC_ALPHA,                  // Factor is eqaul to the ALPHA component of the SOURCE color vector
-    ONE_MINUS_SRC_ALPHA        = GL_ONE_MINUS_SRC_ALPHA,        // Factor is equal to 1 - ALPHA component of the SOURCE color vector
-    DST_ALPHA                  = GL_DST_ALPHA,                  // Factor is eqaul to the ALPHA component of the DESTINATION color vector
-    ONE_MINUS_DST_ALPHA        = GL_ONE_MINUS_DST_ALPHA,        // Factor is equal to 1 - ALPHA component of the DESTINATION color vector
-    CONSTANT_COLOR             = GL_CONSTANT_COLOR,             // Factor is equal to the CONSTANT color vector
-    ONE_MINUS_CONSTANT_COLOR   = GL_ONE_MINUS_CONSTANT_COLOR,   // Factor is equal to 1 - CONSTANT color vector
-    CONSTANT_ALPHA             = GL_CONSTANT_ALPHA,             // Factor is eqaul to the ALPHA component of the CONSTANT color vector
-    ONE_MINUS_CONSTANT_ALPHA   = GL_ONE_MINUS_CONSTANT_ALPHA    // Factor is equal to 1 - ALPHA component of the CONSTANT color vector
-};
-enum class BlendEquation
-{
-    ADD                 = GL_FUNC_ADD,              // result = SRC + DST
-    SUBTRACT            = GL_FUNC_SUBTRACT,         // result = SRC - DST
-    REVERSE_SUBTRACT    = GL_FUNC_REVERSE_SUBTRACT, // result = DST - SRC
-    MIN                 = GL_MIN,                   // result = min(DST, SRC)
-    MAX                 = GL_MAX                    // result = max(DST, SRC)
-};
-enum class FaceCullMode
-{
-    BACK            = GL_BACK,          // Culls only back face
-    FRONT           = GL_FRONT,         // Culls only front face
-    FRONT_AND_BACK  = GL_FRONT_AND_BACK // Culls both the front and back faces
-};
-enum class FrontFace
-{
-    CCW = GL_CCW,   // Counter-clock wise
-    CW  = GL_CW     // Clock wise
-};
+    static bool GLLogCall(const char* function, const char* file, int line)
+    {
+        while (GLenum error = glGetError())
+        {
+            std::cout << "[OpenGL Error] (" << error << "): " << function << " " << file << ":" << line << std::endl;
+            return false;
+        }
+        return true;
+    }
+#pragma endregion
+
+#pragma region Enums
+    enum class TestingFunc
+    {
+        ALWAYS      = GL_ALWAYS,    // The depth test always passes.
+        NEVER       = GL_NEVER,     // The depth test never passes.
+        LESS        = GL_LESS,      // Passes if the fragment's depth value is less than the stored depth value.
+        EQUAL       = GL_EQUAL,     // Passes if the fragment's depth value is equal to the stored depth value.
+        LEQUAL      = GL_LEQUAL,    // Passes if the fragment's depth value is less than or equal to the stored depth value.
+        GREATER     = GL_GREATER,   // Passes if the fragment's depth value is greater than the stored depth value.
+        NOTEQUAL    = GL_NOTEQUAL,  // Passes if the fragment's depth value is not equal to the stored depth value.
+        GEQUAL      = GL_GEQUAL     // Passes if the fragment's depth value is greater than or equal to the stored depth value.
+    };
+    enum class StencilOp
+    {
+        KEEP        = GL_KEEP,      // The currently stored stencil value is kept.
+        ZERO        = GL_ZERO,      // The stencil value is set to 0.
+        REPLACE     = GL_REPLACE,   // The stencil value is replaced with the reference value set with glStencilFunc.
+        INCR        = GL_INCR,      // The stencil value is increased by 1 if it is lower than the maximum value.
+        INCR_WRAP   = GL_INCR_WRAP, // Same as GL_INCR, but wraps it back to 0 as soon as the maximum value is exceeded.
+        DECR        = GL_DECR,      // The stencil value is decreased by 1 if it is higher than the minimum value.
+        DECR_WRAP   = GL_DECR_WRAP, // Same as GL_DECR, but wraps it to the maximum value if it ends up lower than 0.
+        INVE        = GL_INVERT     // Bitwise inverts the current stencil buffer value.
+    };
+    enum class BlendFunc
+    {
+        ZERO                       = GL_ZERO,                       // Factor is equal to 0
+        ONE                        = GL_ONE,                        // Factor is equal to 1
+        SRC_COLOR                  = GL_SRC_COLOR,                  // Factor is equal to the SOURCE color vector
+        ONE_MINUS_SRC_COLOR        = GL_ONE_MINUS_SRC_COLOR,        // Factor is eqaul to 1 - SOURCE color vector
+        DST_COLOR                  = GL_DST_COLOR,                  // Factor is equal to the DESTINATION color vector
+        ONE_MINUS_DST_COLOR        = GL_ONE_MINUS_DST_COLOR,        // Factor is equal to 1 - DESTINATION color vector
+        SRC_ALPHA                  = GL_SRC_ALPHA,                  // Factor is eqaul to the ALPHA component of the SOURCE color vector
+        ONE_MINUS_SRC_ALPHA        = GL_ONE_MINUS_SRC_ALPHA,        // Factor is equal to 1 - ALPHA component of the SOURCE color vector
+        DST_ALPHA                  = GL_DST_ALPHA,                  // Factor is eqaul to the ALPHA component of the DESTINATION color vector
+        ONE_MINUS_DST_ALPHA        = GL_ONE_MINUS_DST_ALPHA,        // Factor is equal to 1 - ALPHA component of the DESTINATION color vector
+        CONSTANT_COLOR             = GL_CONSTANT_COLOR,             // Factor is equal to the CONSTANT color vector
+        ONE_MINUS_CONSTANT_COLOR   = GL_ONE_MINUS_CONSTANT_COLOR,   // Factor is equal to 1 - CONSTANT color vector
+        CONSTANT_ALPHA             = GL_CONSTANT_ALPHA,             // Factor is eqaul to the ALPHA component of the CONSTANT color vector
+        ONE_MINUS_CONSTANT_ALPHA   = GL_ONE_MINUS_CONSTANT_ALPHA    // Factor is equal to 1 - ALPHA component of the CONSTANT color vector
+    };
+    enum class BlendEquation
+    {
+        ADD                 = GL_FUNC_ADD,              // result = SRC + DST
+        SUBTRACT            = GL_FUNC_SUBTRACT,         // result = SRC - DST
+        REVERSE_SUBTRACT    = GL_FUNC_REVERSE_SUBTRACT, // result = DST - SRC
+        MIN                 = GL_MIN,                   // result = min(DST, SRC)
+        MAX                 = GL_MAX                    // result = max(DST, SRC)
+    };
+    enum class FaceCullMode
+    {
+        BACK            = GL_BACK,          // Culls only back face
+        FRONT           = GL_FRONT,         // Culls only front face
+        FRONT_AND_BACK  = GL_FRONT_AND_BACK // Culls both the front and back faces
+    };
+    enum class FrontFace
+    {
+        CCW = GL_CCW,   // Counter-clock wise
+        CW  = GL_CW     // Clock wise
+    };
+#pragma endregion
 
 struct AppState
 {
@@ -133,12 +136,28 @@ class Renderer
         Renderer();
         ~Renderer();
 
+        /*Clear specified Render Targets
+        Flags:
+            - GL_COLOR_BUFFER_BIT
+            - GL_DEPTH_BUFFER_BIT
+            - GL_STENCIL_BUFFER_BIT
+        */
         void Clear(GLbitfield bits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT) const;
-        void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
-        void Draw(Model& obj);
-
         void Tick(double current_time);
 
+        /* Set RenderTarget background color */
+        void SetBackgroundColor(glm::vec4 new_color) { m_background_color = new_color; }
+
+        #pragma region DrawFunctions
+        /* Draw mesh using Vertex Array and Index Buffer class. Use when verts are shared using an Index buffer. */
+        void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
+        /* Draw mesh using Vertex Array class. Use when only have access to a list of vert data. */
+        void Draw(const VertexArray& va, int count, Material& material) const;
+        /* Draw mesh using Model class*/
+        void Draw(Model& obj);
+        #pragma endregion
+
+        #pragma region RenderSettings
         void SetBlending(bool enabled);
         void SetDepthTest(bool enabled);
         void SetFaceCulling(bool enabled);
@@ -169,8 +188,7 @@ class Renderer
 
         void SetFaceCullingMode(FaceCullMode mode);
         void SetFrontFace(FrontFace mode);
-
-        void SetBackgroundColor(glm::vec4 new_color) { m_background_color = new_color; }
+        #pragma endregion
 
     public:
         Camera& GetActiveCamera() const;
@@ -179,9 +197,9 @@ class Renderer
         inline double GetDeltaTime() const { return m_delta_time; }
         inline float GetDeltaTimeFloat() const { return static_cast<float>(m_delta_time); }
 
-        inline bool BlendingState() const { return m_blending; }
-        inline bool DepthTestState() const { return m_depth_buffer; }
-        inline bool StencilTestState() const { return m_stencil_buffer; }
-        inline bool WireframeState() const { return m_wireframe; }
-        inline bool FaceCullingState() const { return m_face_culling; }
+        inline bool IsBlending() const { return m_blending; }
+        inline bool IsDepthTest() const { return m_depth_buffer; }
+        inline bool IsStencilTest() const { return m_stencil_buffer; }
+        inline bool IsWireframe() const { return m_wireframe; }
+        inline bool IsFaceCulling() const { return m_face_culling; }
 };

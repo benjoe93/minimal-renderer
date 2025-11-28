@@ -24,5 +24,6 @@ namespace scene {
         void OnUpdate(double delta_time) override;
         void OnRender() override;
         void OnImGuiRender() override;
+        void ConstructScene();
     };
 }

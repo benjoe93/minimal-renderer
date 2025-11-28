@@ -7,7 +7,6 @@ class Renderer;
 class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
-//class Material;
 
 namespace scene {
 class SceneSurfMaps: public Scene

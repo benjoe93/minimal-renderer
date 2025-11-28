@@ -6,11 +6,6 @@
 #include "vendor/imgui/imgui_impl_glfw.h"
 #include "vendor/imgui/imgui_impl_opengl3.h"
 
-#include "Shader.h"
-#include "Texture2D.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
 #include "Renderer.h"
 #include "Camera.h"
 
@@ -34,6 +29,7 @@
 #include "scenes/17_SceneFaceCulling.h"
 #include "scenes/18_SceneFrameBuffers.h"
 #include "scenes/19_SceneRearViewMirror.h"
+#include "scenes/20_SceneCubemap.h"
 
 
 #define WINDOW_TITLE "LearnOpenGL"
@@ -102,7 +98,7 @@ int main(void)
     renderer.state.active_camera = cam.GetId();
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneRearViewMirror scene(renderer);
+    scene::SceneCubemap scene(renderer);
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))
