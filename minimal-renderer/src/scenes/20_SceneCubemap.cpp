@@ -90,6 +90,7 @@ namespace scene {
 
         ConstructScene();
         ConstructReflectionScene(cubemap);
+        ConstructRefractionScene(cubemap);
     }
 
     void SceneCubemap::OnUpdate(double delta_time)
@@ -101,9 +102,20 @@ namespace scene {
         glm::mat4 projection, ModelView, MVP;
         projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), m_renderer.state.near_plane, m_renderer.state.far_plane);
 
-        if (m_use_reflections)
+        switch (m_active_mode)
         {
-            for (auto& obj : ref_objects)
+        case 0:
+            for (auto& obj : objects)
+            {
+                ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
+                MVP = projection * ModelView;
+
+                for (auto& mat : obj->GetMaterials())
+                    mat->SetUniform("mvp", MVP);
+            }
+            break;
+        case 1:
+            for (auto& obj : reflection_objects)
             {
                 ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
                 MVP = projection * ModelView;
@@ -115,10 +127,9 @@ namespace scene {
                     mat->SetUniform("camera_position", cam.GetPosition());
                 }
             }
-        }
-        else
-        {
-            for (auto& obj : objects)
+            break;
+        case 2:
+            for (auto& obj : refraction_objects)
             {
                 ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
                 MVP = projection * ModelView;
@@ -126,8 +137,11 @@ namespace scene {
                 for (auto& mat : obj->GetMaterials())
                 {
                     mat->SetUniform("mvp", MVP);
+                    mat->SetUniform("model", obj->GetModelMatrix());
+                    mat->SetUniform("camera_position", cam.GetPosition());
                 }
             }
+            break;
         }
 
         // skybox
@@ -138,15 +152,20 @@ namespace scene {
 
     void SceneCubemap::OnRender()
     {
-        if (m_use_reflections)
+        switch (m_active_mode)
         {
-            for (auto& obj : ref_objects)
-                m_renderer.Draw(*obj);
-        }
-        else
-        {
+        case 0:
             for (auto& obj : objects)
                 m_renderer.Draw(*obj);
+            break;
+        case 1:
+            for (auto& obj : reflection_objects)
+                m_renderer.Draw(*obj);
+            break;
+        case 2:
+            for (auto& obj : refraction_objects)
+                m_renderer.Draw(*obj);
+            break;
         }
 
         // Optimization: Rendering skybox after the scene is done so fragments covered by the scene doesn't need to be re-rendered.
@@ -158,7 +177,9 @@ namespace scene {
     void SceneCubemap::OnImGuiRender()
     {
         ImGui::Begin(m_name.c_str());
-        ImGui::Checkbox("Show reflections", &m_use_reflections);
+
+        ImGui::Combo("View Mode", &m_active_mode, m_view_modes, 3);
+
         ImGui::End();
     }
 
@@ -228,7 +249,7 @@ namespace scene {
 
         for (auto& mat : floor->GetMaterials())
             mat->AddTexture(in_skybox);
-        ref_objects.push_back(std::move(floor));
+        reflection_objects.push_back(std::move(floor));
 
         // Box 1
         std::unique_ptr<Model> box1 = std::make_unique<Model>(
@@ -244,7 +265,7 @@ namespace scene {
 
         for (auto& mat : box1->GetMaterials())
             mat->AddTexture(in_skybox);
-        ref_objects.push_back(std::move(box1));
+        reflection_objects.push_back(std::move(box1));
 
         // Box 2
         std::unique_ptr<Model> box2 = std::make_unique<Model>(
@@ -260,6 +281,59 @@ namespace scene {
 
         for (auto& mat : box2->GetMaterials())
             mat->AddTexture(in_skybox);
-        ref_objects.push_back(std::move(box2));
+        reflection_objects.push_back(std::move(box2));
+    }
+
+    void SceneCubemap::ConstructRefractionScene(std::shared_ptr<Texture> in_skybox)
+    {
+        std::string vertex_shader = "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert";
+        std::string fragment_shader = "resources/shaders/03_AdvancedOpenGL/05_Cubemap/refraction.frag";
+
+        std::unique_ptr<Model> floor = std::make_unique<Model>(
+            "resources/models/plane.fbx",
+            vertex_shader,
+            fragment_shader,
+            Transform(
+                glm::vec3(0.0f, -0.5f, 0.0f),
+                glm::vec3(-90.0f, 0.0f, 0.0f),
+                glm::vec3(1.0f)
+            )
+        );
+
+        for (auto& mat : floor->GetMaterials())
+            mat->AddTexture(in_skybox);
+        refraction_objects.push_back(std::move(floor));
+
+        // Box 1
+        std::unique_ptr<Model> box1 = std::make_unique<Model>(
+            "resources/models/box.fbx",
+            vertex_shader,
+            fragment_shader,
+            Transform(
+                glm::vec3(-1.5f, 0.0f, -1.0f),
+                glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(1.0f)
+            )
+        );
+
+        for (auto& mat : box1->GetMaterials())
+            mat->AddTexture(in_skybox);
+        refraction_objects.push_back(std::move(box1));
+
+        // Box 2
+        std::unique_ptr<Model> box2 = std::make_unique<Model>(
+            "resources/models/box.fbx",
+            vertex_shader,
+            fragment_shader,
+            Transform(
+                glm::vec3(1.5f, 0.0f, 0.0f),
+                glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(1.0f)
+            )
+        );
+
+        for (auto& mat : box2->GetMaterials())
+            mat->AddTexture(in_skybox);
+        refraction_objects.push_back(std::move(box2));
     }
 }

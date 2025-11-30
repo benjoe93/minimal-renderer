@@ -16,14 +16,16 @@ namespace scene {
     private:
         // not the most optimal way but it will work for now
         std::vector<std::unique_ptr<Model>> objects;
-        std::vector<std::unique_ptr<Model>> ref_objects;
-        
+        std::vector<std::unique_ptr<Model>> reflection_objects;
+        std::vector<std::unique_ptr<Model>> refraction_objects;
+
         std::shared_ptr<TextureCubemap> cubemap;
         std::unique_ptr<VertexArray>    skybox_va;
         std::unique_ptr<VertexBuffer>   skybox_vb;
         std::unique_ptr<Material>       skybox_material;
 
-        bool m_use_reflections = false;
+        int m_active_mode = 0;
+        const char* m_view_modes[3] = { "Normal", "Reflection", "Refraction" };
 
     public:
         SceneCubemap(Renderer& in_renderer);
@@ -33,6 +35,7 @@ namespace scene {
         void OnImGuiRender() override;
         void ConstructScene();
         void ConstructReflectionScene(std::shared_ptr<Texture> in_skybox);
+        void ConstructRefractionScene(std::shared_ptr<Texture> in_skybox);
 
     };
 }
