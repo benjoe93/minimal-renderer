@@ -3,13 +3,13 @@
 #include "00_SceneClearColor.h"
 
 namespace scene {
-scene::SceneClearColor::SceneClearColor(Renderer& in_renderer)
-    : Scene(in_renderer, "ClearColor")
+scene::SceneClearColor::SceneClearColor()
+    : Scene("ClearColor")
 {}
 
 void scene::SceneClearColor::OnRender()
 {
-    m_renderer.SetBackgroundColor({ m_clear_color[0], m_clear_color[1], m_clear_color[2], m_clear_color[3] });
+    Renderer::Get().SetBackgroundColor({ m_clear_color[0], m_clear_color[1], m_clear_color[2], m_clear_color[3] });
 }
 
 void scene::SceneClearColor::OnImGuiRender()

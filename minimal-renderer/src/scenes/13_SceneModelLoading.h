@@ -29,7 +29,7 @@ namespace scene {
         std::unique_ptr<Model> object;
 
     public:
-        SceneModelLoading(Renderer& in_renderer);
+        SceneModelLoading();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

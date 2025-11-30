@@ -88,17 +88,18 @@ int main(void)
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;         // Enable Docking
     ImGui::StyleColorsDark();
+
     // Setup Platform/Renderer backends
     ImGui_ImplGlfw_InitForOpenGL(window, true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init("#version 330");
 
     Camera cam(0, glm::vec3(0.0f, 0.0f, 3.0f));
-    Renderer renderer;
+    Renderer& renderer = Renderer::Get();
     renderer.state.cameras[cam.GetId()] = &cam;
     renderer.state.active_camera = cam.GetId();
     glfwSetWindowUserPointer(window, &renderer);
 
-    scene::SceneCubemap scene(renderer);
+    auto scene = scene::SceneCubemap();
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))
@@ -120,7 +121,6 @@ int main(void)
         scene.OnUpdate(renderer.GetDeltaTime());
         scene.OnRender();
         scene.OnImGuiRender();
-
  
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

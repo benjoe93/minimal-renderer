@@ -26,8 +26,8 @@ private:
     float rotation[3] = { 0.0f, 0.0f, 0.0f };
 
 public:
-    SceneCube(Renderer& in_renderer);
-    
+    SceneCube();
+
     void OnRender() override;
     void OnImGuiRender() override;
 };

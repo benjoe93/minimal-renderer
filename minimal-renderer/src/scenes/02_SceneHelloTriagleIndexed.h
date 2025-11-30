@@ -18,7 +18,7 @@ namespace scene {
         unsigned int EBO;
 
     public:
-        SceneHelloTriagleIdx(Renderer& in_renderer);
+        SceneHelloTriagleIdx();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

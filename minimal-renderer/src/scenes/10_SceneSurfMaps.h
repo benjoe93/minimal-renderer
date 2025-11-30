@@ -28,7 +28,7 @@ private:
     float light_position[3] = { 1.2f, 1.0f, 2.0f };
 
 public:
-    SceneSurfMaps(Renderer& in_renderer);
+    SceneSurfMaps();
 
     void OnUpdate(double delta_time) override;
     void OnRender() override;

@@ -39,7 +39,7 @@ namespace scene {
         std::vector<LightData> ptl_data;
     
     public:
-        SceneMultipleLights(Renderer& in_renderer);
+        SceneMultipleLights();
     
         void OnUpdate(double delta_time) override;
         void OnRender() override;

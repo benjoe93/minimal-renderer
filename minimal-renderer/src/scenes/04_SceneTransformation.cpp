@@ -35,8 +35,8 @@ static unsigned int indices[] = {
 };
 
 namespace scene {
-    SceneTransfrom::SceneTransfrom(Renderer& in_renderer)
-        :Scene(in_renderer, "Model transformation")
+    SceneTransfrom::SceneTransfrom()
+        :Scene("Model transformation")
     {
         ////////////////////////////////////////////////////////////////////////////
         //                              load texture                              //
@@ -83,8 +83,8 @@ namespace scene {
     void SceneTransfrom::OnRender()
     {
         // clean new frame
-        m_renderer.SetBackgroundColor(glm::vec4(0.2f, 0.3f, 0.3f, 1.0f));
-        m_renderer.Clear(GL_COLOR_BUFFER_BIT);
+        Renderer::Get().SetBackgroundColor(glm::vec4(0.2f, 0.3f, 0.3f, 1.0f));
+        Renderer::Get().Clear(GL_COLOR_BUFFER_BIT);
         
         // tranform
         glm::mat4 trans = glm::mat4(1.0f);
@@ -93,7 +93,7 @@ namespace scene {
         
         // draw
         shader->SetUniform("transform", trans);
-        m_renderer.Draw(*vao, *ebo, *shader);
+        Renderer::Get().Draw(*vao, *ebo, *shader);
     }
 
     void SceneTransfrom::OnImGuiRender()

@@ -23,8 +23,8 @@ private:
     std::unique_ptr<Shader> default_shader;
 
 public:
-    SceneCubeMultiple(Renderer& in_renderer);
-    
+    SceneCubeMultiple();
+
     void OnRender() override;
 };
 }

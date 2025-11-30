@@ -35,8 +35,8 @@ static unsigned int indices[] = {  // note that we start from 0!
 };
 
 namespace scene {
-    SceneTextures::SceneTextures(Renderer& in_renderer)
-        :Scene(in_renderer, "Texture Loading")
+    SceneTextures::SceneTextures()
+        :Scene("Texture Loading")
     {
         ////////////////////////////////////////////////////////////////////////////
         //                              load texture                              //

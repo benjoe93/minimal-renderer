@@ -96,8 +96,8 @@ static glm::vec3 cube_positions[] = {
 };
 
 namespace scene {
-SceneLightCasters::SceneLightCasters(Renderer& in_renderer)
-    :Scene(in_renderer, "Light Casters")
+SceneLightCasters::SceneLightCasters()
+    :Scene("Light Casters")
 {
     ////////////////////////////////////////////////////////////////////////////
     //                            geometery setup                             //
@@ -149,11 +149,11 @@ SceneLightCasters::SceneLightCasters(Renderer& in_renderer)
 void SceneLightCasters::OnUpdate(double delta_time)
 {
 
-    Camera& cam = m_renderer.GetActiveCamera();
+    Camera& cam = Renderer::Get().GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
 
     glm::mat4 projection, model, ModelView, MVP;
-    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
 
     // geometry update
     ////////////////////////////////////////////////////////////////////////////
@@ -279,7 +279,7 @@ void SceneLightCasters::OnRender()
     for (int i = 0; i < 10; i++)
     {
         object_materials[i]->Bind();
-        m_renderer.Draw(*object_va, *object_ib, object_materials[i]->GetShader());
+        Renderer::Get().Draw(*object_va, *object_ib, object_materials[i]->GetShader());
         object_materials[i]->Unbind();
     }
 
@@ -287,7 +287,7 @@ void SceneLightCasters::OnRender()
     //                            light rendering                             //
     ////////////////////////////////////////////////////////////////////////////
     light_material->Bind();
-    m_renderer.Draw(*light_va, *light_ib, light_material->GetShader());
+    Renderer::Get().Draw(*light_va, *light_ib, light_material->GetShader());
     light_material->Unbind();
 }
 

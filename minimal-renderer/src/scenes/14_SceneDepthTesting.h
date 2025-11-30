@@ -16,7 +16,7 @@ namespace scene {
         std::vector<std::unique_ptr<Model>> objects;
 
     public:
-        SceneDepthTesting(Renderer& in_renderer);
+        SceneDepthTesting();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

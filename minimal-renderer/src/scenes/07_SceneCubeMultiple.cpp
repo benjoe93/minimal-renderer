@@ -87,11 +87,11 @@ static glm::vec3 cube_positions[] = {
 };
 
 namespace scene {
-scene::SceneCubeMultiple::SceneCubeMultiple(Renderer& in_renderer)
-    :Scene(in_renderer, "Multiple Cubes")
+scene::SceneCubeMultiple::SceneCubeMultiple()
+    :Scene("Multiple Cubes")
 {
     // Set scene background color
-    m_renderer.SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
+    Renderer::Get().SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
 
     ////////////////////////////////////////////////////////////////////////////
     //                              load texture                              //
@@ -133,7 +133,7 @@ scene::SceneCubeMultiple::SceneCubeMultiple(Renderer& in_renderer)
 void scene::SceneCubeMultiple::OnRender()
 {
     // Projection matrix
-    glm::mat4 projection = glm::perspective(glm::radians(m_renderer.GetActiveCamera().GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(Renderer::Get().GetActiveCamera().GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
 
     // Model matrix
     for (unsigned char i = 0; i < 10; i++)
@@ -145,11 +145,11 @@ void scene::SceneCubeMultiple::OnRender()
         model = glm::rotate(model, glm::radians(rotation), glm::vec3(1.0f, 0.3f, 0.5f));
 
         default_shader->SetUniform("model", model);
-        default_shader->SetUniform("view", m_renderer.GetActiveCamera().GetViewMatrix());
+        default_shader->SetUniform("view", Renderer::Get().GetActiveCamera().GetViewMatrix());
         default_shader->SetUniform("projection", projection);
 
         // draw first triangle
-        m_renderer.Draw(*va, *ib , *default_shader);
+        Renderer::Get().Draw(*va, *ib , *default_shader);
     }
 }
 }

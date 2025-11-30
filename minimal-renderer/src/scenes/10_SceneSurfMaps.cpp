@@ -83,8 +83,8 @@ static size_t element_size = 36;
 static size_t buffer_size = element_size * 8 * sizeof(float);
 
 namespace scene {
-SceneSurfMaps::SceneSurfMaps(Renderer& in_renderer)
-    :Scene(in_renderer, "Surface Maps")
+SceneSurfMaps::SceneSurfMaps()
+    :Scene("Surface Maps")
 {
     ////////////////////////////////////////////////////////////////////////////
     //                            geometery setup                             //
@@ -132,9 +132,9 @@ SceneSurfMaps::SceneSurfMaps(Renderer& in_renderer)
 
 void SceneSurfMaps::OnUpdate(double delta_time)
 {
-    Camera& cam = m_renderer.GetActiveCamera();
+    Camera& cam = Renderer::Get().GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
-    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
 
     ////////////////////////////////////////////////////////////////////////////
     //                           geometery update                             //
@@ -174,14 +174,14 @@ void SceneSurfMaps::OnRender()
     //                          geometery rendering                           //
     ////////////////////////////////////////////////////////////////////////////
     object_material->Bind();
-    m_renderer.Draw(*object_va, *object_ib, object_material->GetShader());
+    Renderer::Get().Draw(*object_va, *object_ib, object_material->GetShader());
     object_material->Unbind();
 
     ////////////////////////////////////////////////////////////////////////////
     //                            light rendering                             //
     ////////////////////////////////////////////////////////////////////////////
     light_material->Bind();
-    m_renderer.Draw(*light_va, *light_ib, light_material->GetShader());
+    Renderer::Get().Draw(*light_va, *light_ib, light_material->GetShader());
     light_material->Unbind();
 }
 

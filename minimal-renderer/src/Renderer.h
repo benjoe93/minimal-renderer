@@ -132,9 +132,13 @@ class Renderer
     public:
         AppState state = AppState();
 
-    public:
+    private:
         Renderer();
         ~Renderer();
+
+    public:
+        Renderer(const Renderer&) = delete; // delete copy constructor
+        static Renderer& Get();
 
         /*Clear specified Render Targets
         Flags:
@@ -190,7 +194,6 @@ class Renderer
         void SetFrontFace(FrontFace mode);
         #pragma endregion
 
-    public:
         Camera& GetActiveCamera() const;
         int GetMaxVertexAttribs() const;
 

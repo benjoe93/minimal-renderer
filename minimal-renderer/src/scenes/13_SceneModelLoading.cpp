@@ -24,12 +24,12 @@
 
 namespace scene {
 
-    SceneModelLoading::SceneModelLoading(Renderer& in_renderer)
-        :Scene(in_renderer, "Model Loading")
+    SceneModelLoading::SceneModelLoading()
+        :Scene("Model Loading")
     {
-        m_renderer.SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
+        Renderer::Get().SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
 
-        Camera& camera = m_renderer.GetActiveCamera();
+        Camera& camera = Renderer::Get().GetActiveCamera();
 
         ////////////////////////////////////////////////////////////////////////////
         //                           directional light                            //
@@ -50,11 +50,11 @@ namespace scene {
 
     void SceneModelLoading::OnUpdate(double delta_time)
     {
-        Camera& cam = m_renderer.GetActiveCamera();
+        Camera& cam = Renderer::Get().GetActiveCamera();
         glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
 
         directional_light->Update(projection, cam.GetViewMatrix());
 
@@ -83,20 +83,20 @@ namespace scene {
 
     void SceneModelLoading::OnRender()
     {
-        m_renderer.SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
+        Renderer::Get().SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
 
         ////////////////////////////////////////////////////////////////////////////
         //                            light rendering                             //
         ////////////////////////////////////////////////////////////////////////////
         directional_light->GetMaterial().Bind();
-        m_renderer.Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), directional_light->GetMaterial().GetShader());
+        Renderer::Get().Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), directional_light->GetMaterial().GetShader());
         directional_light->GetMaterial().Unbind();
 
 
         ////////////////////////////////////////////////////////////////////////////
         //                          geometery rendering                           //
         ////////////////////////////////////////////////////////////////////////////
-        m_renderer.Draw(*object);
+        Renderer::Get().Draw(*object);
     }
 
     void SceneModelLoading::OnImGuiRender()

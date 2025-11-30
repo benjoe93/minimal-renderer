@@ -21,7 +21,7 @@ namespace scene {
         std::unique_ptr<Model> quad;
 
     public:
-        SceneRearViewMirror(Renderer& in_renderer);
+        SceneRearViewMirror();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

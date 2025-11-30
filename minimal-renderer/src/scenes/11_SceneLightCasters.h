@@ -30,7 +30,7 @@ private:
     float light_position[3] = { 1.2f, 1.0f, 2.0f };
 
 public:
-    SceneLightCasters(Renderer& in_renderer);
+    SceneLightCasters();
 
     void OnUpdate(double delta_time) override;
     void OnRender() override;

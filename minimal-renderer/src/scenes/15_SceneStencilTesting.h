@@ -16,9 +16,8 @@ namespace scene {
         std::vector<std::unique_ptr<Model>> objects;
         std::vector<std::unique_ptr<Model>> outline_objects;
 
-
     public:
-        SceneStencilTesting(Renderer& in_renderer);
+        SceneStencilTesting();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

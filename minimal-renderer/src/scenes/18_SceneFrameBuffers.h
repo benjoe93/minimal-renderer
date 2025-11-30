@@ -26,7 +26,7 @@ namespace scene {
         std::unique_ptr<Model> quad_edge;
 
     public:
-        SceneFramebuffer(Renderer& in_renderer);
+        SceneFramebuffer();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

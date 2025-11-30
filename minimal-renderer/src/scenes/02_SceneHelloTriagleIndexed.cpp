@@ -47,8 +47,8 @@ static const char* fragmentShaderSource = "#version 330 core\n"
 "}\n\0";
 
 namespace scene {
-    SceneHelloTriagleIdx::SceneHelloTriagleIdx(Renderer& in_renderer)
-        :Scene(in_renderer, "Hello Triagle")
+    SceneHelloTriagleIdx::SceneHelloTriagleIdx()
+        :Scene("Hello Triagle")
     {
         ////////////////////////////////////////////////////////////////////////////
         //                              shader setup                              //

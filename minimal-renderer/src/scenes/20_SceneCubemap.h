@@ -28,7 +28,7 @@ namespace scene {
         const char* m_view_modes[3] = { "Normal", "Reflection", "Refraction" };
 
     public:
-        SceneCubemap(Renderer& in_renderer);
+        SceneCubemap();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

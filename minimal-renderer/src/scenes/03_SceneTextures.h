@@ -19,9 +19,8 @@ namespace scene {
 
         unsigned int tex1, tex2;
 
-
     public:
-        SceneTextures(Renderer& in_renderer);
+        SceneTextures();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

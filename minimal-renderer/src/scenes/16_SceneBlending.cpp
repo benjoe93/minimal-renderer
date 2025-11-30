@@ -22,10 +22,10 @@
 
 namespace scene {
 
-    SceneBlending::SceneBlending(Renderer& in_renderer)
-        :Scene(in_renderer, "Blending")
+    SceneBlending::SceneBlending()
+        :Scene("Blending")
     {
-        m_renderer.SetFaceCulling(false);
+        Renderer::Get().SetFaceCulling(false);
         
         window_loc.push_back(glm::vec3(-1.5f, 0.0f, -0.48f));
         window_loc.push_back(glm::vec3( 1.5f, 0.0f,  0.51f));
@@ -141,12 +141,12 @@ namespace scene {
 
     void SceneBlending::OnUpdate(double delta_time)
     {
-        m_renderer.SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+        Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
-        Camera& cam = m_renderer.GetActiveCamera();
+        Camera& cam = Renderer::Get().GetActiveCamera();
 
         glm::mat4 projection, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), m_renderer.state.near_plane, m_renderer.state.far_plane);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
 
         ////////////////////////////////////////////////////////////////////////////
         //                           geometery update                             //
@@ -180,16 +180,16 @@ namespace scene {
         std::map<float, Model*> sorted;
         for (unsigned int i = 0; i < transparent_objects.size(); i++)
         {
-            float distance = glm::length(m_renderer.GetActiveCamera().GetPosition() - transparent_objects[i]->GetLocation());
+            float distance = glm::length(Renderer::Get().GetActiveCamera().GetPosition() - transparent_objects[i]->GetLocation());
             sorted[distance] = transparent_objects[i].get();
         }
 
         for (auto& obj : objects)
-            m_renderer.Draw(*obj);
+            Renderer::Get().Draw(*obj);
 
         // render object in reverse distance order
         for (std::map<float, Model*>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
-            m_renderer.Draw(*it->second);
+            Renderer::Get().Draw(*it->second);
     }
 
     void SceneBlending::OnImGuiRender()

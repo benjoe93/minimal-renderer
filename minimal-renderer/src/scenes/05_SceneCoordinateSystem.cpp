@@ -35,8 +35,8 @@ static unsigned int indices[] = {  // note that we start from 0!
 };
 
 namespace scene {
-    SceneCoordinateSystem::SceneCoordinateSystem(Renderer& in_renderer)
-        :Scene(in_renderer, "Coordinate system")
+    SceneCoordinateSystem::SceneCoordinateSystem()
+        :Scene("Coordinate system")
     {
         ////////////////////////////////////////////////////////////////////////////
         //                              load texture                              //
@@ -85,12 +85,12 @@ namespace scene {
 
     void SceneCoordinateSystem::OnRender()
     {
-        m_renderer.SetBackgroundColor(glm::vec4(0.2f, 0.3f, 0.3f, 1.0f));
-        m_renderer.Clear(GL_COLOR_BUFFER_BIT);
+        Renderer::Get().SetBackgroundColor(glm::vec4(0.2f, 0.3f, 0.3f, 1.0f));
+        Renderer::Get().Clear(GL_COLOR_BUFFER_BIT);
         
         // Projection matrix
-        float aspect = static_cast<float>(m_renderer.state.scr_width) / m_renderer.state.scr_height;
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspect, m_renderer.state.near_plane, m_renderer.state.far_plane);
+        float aspect = static_cast<float>(Renderer::Get().state.scr_width) / Renderer::Get().state.scr_height;
+        glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspect, Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
 
         // View matrix
         glm::mat4 view = glm::mat4(1.0f);
@@ -106,7 +106,7 @@ namespace scene {
         shader->SetUniform("model", model);
         shader->SetUniform("view", view);
         shader->SetUniform("projection", projection);
-        m_renderer.Draw(*vao, *ebo, *shader);
+        Renderer::Get().Draw(*vao, *ebo, *shader);
     }
 
     void SceneCoordinateSystem::OnImGuiRender()

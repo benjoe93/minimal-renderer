@@ -28,7 +28,7 @@ namespace scene {
         float rotation[3] = {0.0f, 0.0f, 0.0f};
 
     public:
-        SceneCoordinateSystem(Renderer& in_renderer);
+        SceneCoordinateSystem();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

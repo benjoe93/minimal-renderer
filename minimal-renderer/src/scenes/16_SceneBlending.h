@@ -18,10 +18,8 @@ namespace scene {
         std::vector<glm::vec3> window_loc;
         std::vector<glm::vec3> vegetation_loc;
 
-
-
     public:
-        SceneBlending(Renderer& in_renderer);
+        SceneBlending();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

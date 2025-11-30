@@ -29,7 +29,7 @@ private:
     float light_position[3] = { 1.2f, 1.0f, 2.0f };
 
 public:
-    ScenePhongLight(Renderer& in_renderer);
+    ScenePhongLight();
 
     void OnRender() override;
     void OnImGuiRender() override;

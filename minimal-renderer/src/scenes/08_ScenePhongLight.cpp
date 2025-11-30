@@ -85,8 +85,8 @@ static size_t buffer_size = element_size * 6 * sizeof(float);
 
 
 namespace scene {
-ScenePhongLight::ScenePhongLight(Renderer& in_renderer)
-    :Scene(in_renderer, "Phong Lighting")
+ScenePhongLight::ScenePhongLight()
+    :Scene("Phong Lighting")
 {
     ////////////////////////////////////////////////////////////////////////////
     //                            geometery setup                             //
@@ -133,13 +133,13 @@ ScenePhongLight::ScenePhongLight(Renderer& in_renderer)
 
 void ScenePhongLight::OnRender()
 {
-    Camera& cam = m_renderer.GetActiveCamera();
+    Camera& cam = Renderer::Get().GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
 
     ////////////////////////////////////////////////////////////////////////////
     //                          geometery rendering                           //
     ////////////////////////////////////////////////////////////////////////////
-    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 mvp_matrix = projection * cam.GetViewMatrix() * model;
 
@@ -154,7 +154,7 @@ void ScenePhongLight::OnRender()
     object_shader->SetUniform("u_lightColor", light_color[0], light_color[1], light_color[2]);
     object_shader->SetUniform("u_lightPos", light_position[0], light_position[1], light_position[2]);
 
-    m_renderer.Draw(*object_va, *object_ib, *object_shader);
+    Renderer::Get().Draw(*object_va, *object_ib, *object_shader);
 
     ////////////////////////////////////////////////////////////////////////////
     //                            light rendering                             //
@@ -169,7 +169,7 @@ void ScenePhongLight::OnRender()
 
     light_shader->SetUniform("u_lightColor", light_color[0], light_color[1], light_color[2]);
 
-    m_renderer.Draw(*light_va, *light_ib, *light_shader);
+    Renderer::Get().Draw(*light_va, *light_ib, *light_shader);
 }
 
 void ScenePhongLight::OnImGuiRender()

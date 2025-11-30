@@ -29,12 +29,12 @@ namespace scene {
 
     void SceneCubeMap::OnUpdate(double delta_time)
     {
-        m_renderer.SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+        Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
-        Camera& cam = m_renderer.GetActiveCamera();
+        Camera& cam = Renderer::Get().GetActiveCamera();
 
         glm::mat4 projection, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), m_renderer.state.near_plane, m_renderer.state.far_plane);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
 
         // objects
         for (auto& obj : objects)
@@ -52,7 +52,7 @@ namespace scene {
     void SceneCubeMap::OnRender()
     {
         for (auto& obj : objects)
-            m_renderer.Draw(*obj);
+            Renderer::Get().Draw(*obj);
     }
 
     void SceneCubeMap::OnImGuiRender()

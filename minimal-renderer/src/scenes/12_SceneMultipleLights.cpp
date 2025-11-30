@@ -111,10 +111,10 @@ static glm::vec3 point_light_col[] = {
 };
 
 namespace scene {
-    SceneMultipleLights::SceneMultipleLights(Renderer& in_renderer)
-        :Scene(in_renderer, "Multiple Lights")
+    SceneMultipleLights::SceneMultipleLights()
+        :Scene("Multiple Lights")
     {
-        Camera& camera = m_renderer.GetActiveCamera();
+        Camera& camera = Renderer::Get().GetActiveCamera();
 
         ////////////////////////////////////////////////////////////////////////////
         //                              light setup                               //
@@ -162,11 +162,11 @@ namespace scene {
 
     void SceneMultipleLights::OnUpdate(double delta_time)
     {
-        Camera& cam = m_renderer.GetActiveCamera();
+        Camera& cam = Renderer::Get().GetActiveCamera();
         glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
 
         ////////////////////////////////////////////////////////////////////////////
         //                           directional light                            //
@@ -247,24 +247,24 @@ namespace scene {
 
     void SceneMultipleLights::OnRender()
     {
-        m_renderer.SetBackgroundColor(glm::vec4(background_color[0], background_color[1], background_color[2], 1.0));
+        Renderer::Get().SetBackgroundColor(glm::vec4(background_color[0], background_color[1], background_color[2], 1.0));
 
         ////////////////////////////////////////////////////////////////////////////
         //                            light rendering                             //
         ////////////////////////////////////////////////////////////////////////////
         directional_light->GetMaterial().Bind();
-        m_renderer.Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), directional_light->GetMaterial().GetShader());
+        Renderer::Get().Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), directional_light->GetMaterial().GetShader());
         directional_light->GetMaterial().Unbind();
 
         for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
         {
             point_lights[ptl_id]->GetMaterial().Bind();
-            m_renderer.Draw(point_lights[ptl_id]->GetVertArray(), point_lights[ptl_id]->GetIndexBuffer(), point_lights[ptl_id]->GetMaterial().GetShader());
+            Renderer::Get().Draw(point_lights[ptl_id]->GetVertArray(), point_lights[ptl_id]->GetIndexBuffer(), point_lights[ptl_id]->GetMaterial().GetShader());
             point_lights[ptl_id]->GetMaterial().Unbind();
         }
 
         spot_light->GetMaterial().Bind();
-        m_renderer.Draw(spot_light->GetVertArray(), spot_light->GetIndexBuffer(), spot_light->GetMaterial().GetShader());
+        Renderer::Get().Draw(spot_light->GetVertArray(), spot_light->GetIndexBuffer(), spot_light->GetMaterial().GetShader());
         spot_light->GetMaterial().Unbind();
 
         ////////////////////////////////////////////////////////////////////////////
@@ -273,7 +273,7 @@ namespace scene {
         for (int obj_id = 0; obj_id < 10; obj_id++)
         {
             object_materials[obj_id]->Bind();
-            m_renderer.Draw(*object_va, *object_ib, object_materials[obj_id]->GetShader());
+            Renderer::Get().Draw(*object_va, *object_ib, object_materials[obj_id]->GetShader());
             object_materials[obj_id]->Unbind();
         }
     }

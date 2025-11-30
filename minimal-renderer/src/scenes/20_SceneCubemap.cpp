@@ -72,8 +72,8 @@ static std::vector<float> skybox_verts = {
 };
 
 namespace scene {
-    SceneCubemap::SceneCubemap(Renderer& in_renderer)
-        :Scene(in_renderer, "Cubemap")
+    SceneCubemap::SceneCubemap()
+        :Scene("Cubemap")
     {
         skybox_va = std::make_unique<VertexArray>();
         skybox_va->Bind();
@@ -95,12 +95,12 @@ namespace scene {
 
     void SceneCubemap::OnUpdate(double delta_time)
     {
-        m_renderer.SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+        Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
-        Camera& cam = m_renderer.GetActiveCamera();
+        Camera& cam = Renderer::Get().GetActiveCamera();
 
         glm::mat4 projection, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), m_renderer.state.near_plane, m_renderer.state.far_plane);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
 
         switch (m_active_mode)
         {
@@ -156,22 +156,22 @@ namespace scene {
         {
         case 0:
             for (auto& obj : objects)
-                m_renderer.Draw(*obj);
+                Renderer::Get().Draw(*obj);
             break;
         case 1:
             for (auto& obj : reflection_objects)
-                m_renderer.Draw(*obj);
+                Renderer::Get().Draw(*obj);
             break;
         case 2:
             for (auto& obj : refraction_objects)
-                m_renderer.Draw(*obj);
+                Renderer::Get().Draw(*obj);
             break;
         }
 
         // Optimization: Rendering skybox after the scene is done so fragments covered by the scene doesn't need to be re-rendered.
-        m_renderer.SetDepthFunction(TestingFunc::LEQUAL);
-        m_renderer.Draw(*skybox_va.get(), static_cast<int>(skybox_verts.size()), *skybox_material.get());
-        m_renderer.SetDepthFunction(TestingFunc::LESS);
+        Renderer::Get().SetDepthFunction(TestingFunc::LEQUAL);
+        Renderer::Get().Draw(*skybox_va.get(), static_cast<int>(skybox_verts.size()), *skybox_material.get());
+        Renderer::Get().SetDepthFunction(TestingFunc::LESS);
     }
 
     void SceneCubemap::OnImGuiRender()

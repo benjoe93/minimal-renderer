@@ -18,7 +18,7 @@ namespace scene {
 
 
     public:
-        SceneHelloTriagle(Renderer& in_renderer);
+        SceneHelloTriagle();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

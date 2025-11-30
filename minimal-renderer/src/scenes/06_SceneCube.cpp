@@ -54,11 +54,11 @@
     };
 
 namespace scene {
-scene::SceneCube::SceneCube(Renderer& in_renderer)
-    :Scene(in_renderer, "First Cube")
+scene::SceneCube::SceneCube()
+    :Scene("First Cube")
 {
     // Set scene background color
-    m_renderer.SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
+    Renderer::Get().SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
 
     ////////////////////////////////////////////////////////////////////////////
     //                              load texture                              //
@@ -101,7 +101,7 @@ scene::SceneCube::SceneCube(Renderer& in_renderer)
 void scene::SceneCube::OnRender()
 {
     // Projection matrix
-    glm::mat4 projection = glm::perspective(glm::radians(m_renderer.GetActiveCamera().GetFov()), static_cast<float>(m_renderer.state.scr_width) / static_cast<float>(m_renderer.state.scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(Renderer::Get().GetActiveCamera().GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
 
     // Model matrix
     glm::mat4 model = glm::mat4(1.0f);
@@ -112,11 +112,11 @@ void scene::SceneCube::OnRender()
     model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
     default_shader->SetUniform("model", model);
-    default_shader->SetUniform("view", m_renderer.GetActiveCamera().GetViewMatrix());
+    default_shader->SetUniform("view", Renderer::Get().GetActiveCamera().GetViewMatrix());
     default_shader->SetUniform("projection", projection);
 
     // draw first triangle
-    m_renderer.Draw(*va, *ib , *default_shader);
+    Renderer::Get().Draw(*va, *ib , *default_shader);
 }
 
 void scene::SceneCube::OnImGuiRender()

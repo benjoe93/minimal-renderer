@@ -34,6 +34,12 @@ Renderer::Renderer()
 
 Renderer::~Renderer() {}
 
+Renderer& Renderer::Get()
+{
+    static Renderer m_instance = Renderer();
+    return m_instance;
+}
+
 void Renderer::Clear(GLbitfield bits) const
 {
     GLCall(glClearColor(m_background_color.x, m_background_color.y, m_background_color.z, m_background_color.w));

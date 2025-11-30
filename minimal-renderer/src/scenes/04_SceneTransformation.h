@@ -29,7 +29,7 @@ namespace scene {
 
 
     public:
-        SceneTransfrom(Renderer& in_renderer);
+        SceneTransfrom();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;
