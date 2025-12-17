@@ -8,6 +8,7 @@
 
 #include "Renderer.h"
 #include "Camera.h"
+#include "ResourceManager.h"
 
 #include "scenes/00_SceneClearColor.h"
 #include "scenes/01_SceneHelloTriagle.h"
@@ -93,6 +94,8 @@ int main(void)
     ImGui_ImplGlfw_InitForOpenGL(window, true); // Second param install_callback=true will install GLFW callbacks and chain to existing ones.
     ImGui_ImplOpenGL3_Init("#version 330");
 
+    ResourceManager::Init();
+
     Camera cam(0, glm::vec3(0.0f, 0.0f, 3.0f));
     Renderer& renderer = Renderer::Get();
     renderer.state.cameras[cam.GetId()] = &cam;
@@ -133,6 +136,8 @@ int main(void)
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
+    ResourceManager::Shutdown();
 
     /* glfw: terminate, clearing all previously allocated GLFW resources */
     glfwTerminate();

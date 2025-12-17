@@ -3,8 +3,8 @@
 
 
 
-RenderTarget::RenderTarget(unsigned int width, unsigned int height, unsigned int nr_channels, std::string sampler_name)
-    : Texture(width, height, nr_channels, sampler_name)
+RenderTarget::RenderTarget(unsigned int width, unsigned int height, unsigned int nr_channels)
+    : Texture(width, height, nr_channels)
 {
     GLCall(glGenTextures(1, &m_renderer_id));
     GLCall(glBindTexture(GL_TEXTURE_2D, m_renderer_id));

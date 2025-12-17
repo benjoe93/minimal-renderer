@@ -9,12 +9,10 @@ class Texture
         unsigned int m_height;
         unsigned int m_nr_channels;
 
-        std::string m_sampler_name;
-
         GLenum GetFormat() const;
 
     public:
-        Texture(unsigned int width, unsigned int height, unsigned int nr_channels, const std::string& sampler_name);
+        Texture(unsigned int width, unsigned int height, unsigned int nr_channels);
         virtual ~Texture();
 
         // move 
@@ -32,7 +30,6 @@ class Texture
         unsigned int GetId() const { return m_renderer_id; }
         unsigned int GetWidht() const { return m_width; }
         unsigned int GetHeight() const { return m_height; }
-        std::string GetSamplerName() const { return m_sampler_name; }
 
         void SetWrappingHorizontal(const GLint new_wrapping);
         void SetWrappingVertical(const GLint new_wrapping);

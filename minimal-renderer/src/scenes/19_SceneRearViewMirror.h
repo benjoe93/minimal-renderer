@@ -14,14 +14,15 @@ namespace scene {
     {
     private:
         std::unique_ptr<Framebuffer> framebuffer;
-        std::shared_ptr<RenderBuffer> render_buffer;
-        std::shared_ptr<RenderTarget> render_target;
+        RenderBuffer* render_buffer;
+        RenderTarget* render_target;
 
         std::vector<std::unique_ptr<Model>> objects;
         std::unique_ptr<Model> quad;
 
     public:
         SceneRearViewMirror();
+        ~SceneRearViewMirror();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

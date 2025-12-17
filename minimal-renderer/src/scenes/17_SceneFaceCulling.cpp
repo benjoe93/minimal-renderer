@@ -17,6 +17,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "ResourceManager.h"
 
 #include "17_SceneFaceCulling.h"
 
@@ -25,10 +26,15 @@ namespace scene {
     SceneFaceCulling::SceneFaceCulling()
         :Scene("Face Culling")
     {
+        Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
+        Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg", true);
+        std::string vertex_path = "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert";
+        std::string fragment_path = "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag";
+
         std::unique_ptr<Model> floor = std::make_unique<Model>(
             "resources/models/plane.fbx",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
+            vertex_path,
+            fragment_path,
             Transform(
                 glm::vec3(0.0f, -0.5f, 0.0f),
                 glm::vec3(-90.0f, 0.0f, 0.0f),
@@ -37,16 +43,14 @@ namespace scene {
         );
 
         for (auto& mesh : floor->GetMeshes())
-            mesh->GetMaterial().AddTexture2D("resources/textures/metal.png", "material.diffuse", true);
+            mesh->GetMaterial().AddTexture("material.diffuse", metal_tex);
         objects.push_back(std::move(floor));
-
-        std::shared_ptr<Texture2D> marble_tex = std::make_shared<Texture2D>("resources/textures/marble.jpg", "material.diffuse", true);
 
         // Box 1
         std::unique_ptr<Model> box1 = std::make_unique<Model>(
             "resources/models/box.fbx",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
+            vertex_path,
+            fragment_path,
             Transform(
                 glm::vec3(-1.5f, 0.0f, -1.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f),
@@ -55,14 +59,14 @@ namespace scene {
         );
 
         for (auto& mesh : box1->GetMeshes())
-            mesh->GetMaterial().AddTexture(marble_tex);
+            mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
         objects.push_back(std::move(box1));
 
         // Box 2
         std::unique_ptr<Model> box2 = std::make_unique<Model>(
             "resources/models/box.fbx",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
+            vertex_path,
+            fragment_path,
             Transform(
                 glm::vec3(1.5f, 0.0f, 0.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f),
@@ -71,7 +75,7 @@ namespace scene {
         );
 
         for (auto& mesh : box2->GetMeshes())
-            mesh->GetMaterial().AddTexture(marble_tex);
+            mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
         objects.push_back(std::move(box2));
        
     }

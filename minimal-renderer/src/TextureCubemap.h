@@ -31,9 +31,8 @@ class TextureCubemap : public Texture
         void LoadTextureForSide(CubeSide side, CubePosition position);
 
     public:
-        TextureCubemap(unsigned int width, unsigned int height, unsigned int nr_channels, std::string sampler_name, std::unordered_map<CubeSide, std::string> side_source = {});
+        TextureCubemap(std::unordered_map<CubeSide, std::string> side_source = {});
 
         void Bind(unsigned int slot = 0) const override;
         void Unbind() const override;
-
 };

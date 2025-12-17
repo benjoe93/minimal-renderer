@@ -4,6 +4,7 @@
 #include <assimp/postprocess.h>
 
 #include "Material.h"
+#include "ResourceManager.h"
 
 #include "Model.h"
 
@@ -134,14 +135,14 @@ void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, ai
         if (it == m_texture_cache.end())
         {
             // new texture - load it and cache the path
-            std::shared_ptr<Texture2D> new_texture = std::make_shared<Texture2D>(full_path, type_name, true);
+            Texture2D* new_texture = ResourceManager::Get().GetTexture2D(full_path);
             m_texture_cache[texture_path] = new_texture;
-            material->AddTexture(new_texture);
+            material->AddTexture(type_name, new_texture);
         }
         else
         {
             // texture already exists - reuse it]
-            material->AddTexture(it->second);
+            material->AddTexture(type_name, it->second);
         }
     }
 }

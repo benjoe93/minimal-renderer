@@ -51,7 +51,7 @@ class Framebuffer
 {
 private:
     unsigned int m_renderer_id;
-    std::unordered_map<AttachmentTarget, std::shared_ptr<RenderTarget>> render_targets;
+    std::unordered_map<AttachmentTarget, RenderTarget*> render_targets;
 
     void Validate() const;
 
@@ -62,8 +62,8 @@ public:
     void Bind() const;
     void Unbind() const;
 
-    void AttachRenderTarget(AttachmentTarget target, std::shared_ptr<RenderTarget> render_target);
-    void AttachRenderBuffer(AttachmentTarget target, std::shared_ptr<RenderBuffer> render_buffer);
+    void AttachRenderTarget(AttachmentTarget target, RenderTarget* render_target);
+    void AttachRenderBuffer(AttachmentTarget target, RenderBuffer* render_buffer);
 
-    std::shared_ptr<RenderTarget> GetRenderTarget(AttachmentTarget target) const;
+    RenderTarget* GetRenderTarget(AttachmentTarget target) const;
 };

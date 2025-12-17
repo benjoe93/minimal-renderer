@@ -1,4 +1,5 @@
 #include "Material.h"
+#include "ResourceManager.h"
 
 Material::Material(std::string vertex_path, std::string fragment_path)
     : m_vertex_path(vertex_path), m_fragment_path(fragment_path)
@@ -10,12 +11,12 @@ Material::~Material()
 {
 }
 
-void Material::AddTexture(std::shared_ptr<Texture> texture)
+void Material::AddTexture(std::string sampler_name, Texture* texture)
 {
     if (texture)
     {
         m_textures.push_back({
-            texture->GetSamplerName(),
+            sampler_name,
             texture
         });
     }
@@ -25,7 +26,7 @@ void Material::AddTexture2D(std::string path, std::string sampler_name, bool is_
 {
     m_textures.push_back({
         sampler_name,
-        std::make_shared<Texture2D>(path, sampler_name, is_flipped)
+        ResourceManager::Get().GetTexture2D(path, is_flipped)
     });
 }
 

@@ -42,8 +42,8 @@ void Texture2D::LoadTexture(bool vertical_flip)
     stbi_image_free(data);
 }
 
-Texture2D::Texture2D(const std::string filepath, std::string sampler_name, bool vertical_flip)
-    : Texture(0, 0, 0, sampler_name),
+Texture2D::Texture2D(const std::string filepath, bool vertical_flip)
+    : Texture(0, 0, 0),
     m_filepath(filepath)
 {
    LoadTexture(vertical_flip);

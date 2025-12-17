@@ -16,7 +16,7 @@
 
 
 static float vertices[] = {
-    // positions            // uvs        // colors           
+    // positions            // uvs        // colors
     -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
      0.5f, -0.5f, -0.5f,    1.0f, 0.0f,   1.0f, 0.0f, 0.0f,
      0.5f,  0.5f, -0.5f,    1.0f, 1.0f,   1.0f, 0.0f, 0.0f,
@@ -96,8 +96,8 @@ scene::SceneCubeMultiple::SceneCubeMultiple()
     ////////////////////////////////////////////////////////////////////////////
     //                              load texture                              //
     ////////////////////////////////////////////////////////////////////////////
-    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", "texture_1", true);
-    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", "texture_2", true);
+    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", true);
+    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", true);
 
     texture_1->Bind();
     texture_2->Bind(1);

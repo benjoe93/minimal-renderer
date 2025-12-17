@@ -63,8 +63,8 @@ scene::SceneCube::SceneCube()
     ////////////////////////////////////////////////////////////////////////////
     //                              load texture                              //
     ////////////////////////////////////////////////////////////////////////////
-    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", "texture_1", true);
-    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", "texture_2", true);
+    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", true);
+    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", true);
 
     texture_1->Bind();
     texture_2->Bind(1);

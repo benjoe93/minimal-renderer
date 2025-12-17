@@ -19,7 +19,6 @@ namespace scene {
         std::vector<std::unique_ptr<Model>> reflection_objects;
         std::vector<std::unique_ptr<Model>> refraction_objects;
 
-        std::shared_ptr<TextureCubemap> cubemap;
         std::unique_ptr<VertexArray>    skybox_va;
         std::unique_ptr<VertexBuffer>   skybox_vb;
         std::unique_ptr<Material>       skybox_material;
@@ -34,8 +33,8 @@ namespace scene {
         void OnRender() override;
         void OnImGuiRender() override;
         void ConstructScene();
-        void ConstructReflectionScene(std::shared_ptr<Texture> in_skybox);
-        void ConstructRefractionScene(std::shared_ptr<Texture> in_skybox);
+        void ConstructReflectionScene(TextureCubemap* in_skybox);
+        void ConstructRefractionScene(TextureCubemap* in_skybox);
 
     };
 }

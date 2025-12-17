@@ -6,8 +6,8 @@
 #include "TextureCubeMap.h"
 #include "Renderer.h"
 
-TextureCubemap::TextureCubemap(unsigned int width, unsigned int height, unsigned int nr_channels, std::string sampler_name, std::unordered_map<CubeSide, std::string> side_source)
-    :Texture(width, height, nr_channels, sampler_name), m_textures_paths(side_source)
+TextureCubemap::TextureCubemap(std::unordered_map<CubeSide, std::string> side_source)
+    :Texture(0, 0, 0), m_textures_paths(side_source)
 {
     glGenTextures(1, &m_renderer_id);
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_renderer_id);
@@ -38,7 +38,6 @@ void TextureCubemap::Unbind() const
 {
     GLCall(glBindTexture(GL_TEXTURE_CUBE_MAP, 0));
 }
-
 
 void TextureCubemap::LoadTextureForSide(CubeSide side, CubePosition position)
 {

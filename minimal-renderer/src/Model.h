@@ -28,7 +28,7 @@ private:
     std::string m_vertex_shader_path;
     std::string m_fragment_shader_path;
     std::vector<std::unique_ptr<Mesh>> m_meshes;
-    std::unordered_map<std::string, std::shared_ptr<Texture2D>> m_texture_cache; // tracks loaded paths
+    std::unordered_map<std::string, Texture2D*> m_texture_cache; // tracks loaded paths
 
     glm::mat4 m_model_matrix = glm::mat4(1.0);
 

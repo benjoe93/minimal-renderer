@@ -12,6 +12,7 @@
 #include "Model.h"
 #include "FrameBuffer.h"
 #include "RenderTarget.h"
+#include "ResourceManager.h"
 
 #include "19_SceneRearViewMirror.h"
 
@@ -42,11 +43,11 @@ SceneRearViewMirror::SceneRearViewMirror()
     framebuffer = std::make_unique<Framebuffer>();
 
     // create a color attachment texture
-    render_target = std::make_shared<RenderTarget>(Renderer::Get().state.scr_width, Renderer::Get().state.scr_height, 3, "screenTexture");
+    render_target = new RenderTarget(Renderer::Get().state.scr_width, Renderer::Get().state.scr_height, 3);
     framebuffer->AttachRenderTarget(AttachmentTarget::COLOR0, render_target);
 
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    render_buffer = std::make_shared<RenderBuffer>(Renderer::Get().state.scr_width, Renderer::Get().state.scr_height);
+    render_buffer = new RenderBuffer(Renderer::Get().state.scr_width, Renderer::Get().state.scr_height);
     framebuffer->AttachRenderBuffer(AttachmentTarget::DEPTH_STENCIL, render_buffer);
     
     // unbind to prevent accidental renders
@@ -62,9 +63,15 @@ SceneRearViewMirror::SceneRearViewMirror()
     );
 
     for (auto& m : quad->GetMeshes())
-        m->GetMaterial().AddTexture(render_target);
+        m->GetMaterial().AddTexture("screenTexture", render_target);
 
     ConstructScene();
+}
+
+SceneRearViewMirror::~SceneRearViewMirror()
+{
+    delete render_buffer;
+    delete render_target;
 }
 
 void SceneRearViewMirror::OnUpdate(double delta_time)
@@ -122,6 +129,9 @@ void SceneRearViewMirror::OnImGuiRender()
 
 void scene::SceneRearViewMirror::ConstructScene()
 {
+    Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
+    Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg", true);
+
     std::unique_ptr<Model> floor = std::make_unique<Model>(
         "resources/models/plane.fbx",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
@@ -134,9 +144,8 @@ void scene::SceneRearViewMirror::ConstructScene()
     );
 
     for (auto& mesh : floor->GetMeshes())
-        mesh->GetMaterial().AddTexture(std::make_shared<Texture2D>("resources/textures/metal.png", "material.diffuse", true));
+        mesh->GetMaterial().AddTexture("material.diffuse", metal_tex);
     objects.push_back(std::move(floor));
-    std::shared_ptr<Texture2D> marble_tex = std::make_shared<Texture2D>("resources/textures/container.jpg", "material.diffuse", true);
 
     // Box 1
     std::unique_ptr<Model> box1 = std::make_unique<Model>(
@@ -151,7 +160,7 @@ void scene::SceneRearViewMirror::ConstructScene()
     );
 
     for (auto& mesh : box1->GetMeshes())
-        mesh->GetMaterial().AddTexture(marble_tex);
+        mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
     objects.push_back(std::move(box1));
 
     // Box 2
@@ -167,7 +176,7 @@ void scene::SceneRearViewMirror::ConstructScene()
     );
 
     for (auto& mesh : box2->GetMeshes())
-        mesh->GetMaterial().AddTexture(marble_tex);
+        mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
     objects.push_back(std::move(box2));
 }
 }

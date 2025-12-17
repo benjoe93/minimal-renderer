@@ -15,6 +15,7 @@
 #include "Mesh.h"
 #include "Model.h"
 #include "TextureCubemap.h"
+#include "ResourceManager.h"
 
 #include "20_SceneCubemap.h"
 
@@ -83,10 +84,10 @@ namespace scene {
 
         skybox_va->SetLayout(*skybox_vb.get(), 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 
-        cubemap = std::make_shared<TextureCubemap>(2048, 2048, 3, "cubemap", textures_faces);
+        TextureCubemap* cubemap = ResourceManager::Get().GetCubemap(textures_faces);
 
         skybox_material = std::make_unique<Material>("resources/shaders/03_AdvancedOpenGL/05_Cubemap/cubemap.vert", "resources/shaders/03_AdvancedOpenGL/05_Cubemap/cubemap.frag");
-        skybox_material->AddTexture(cubemap);
+        skybox_material->AddTexture("cubemap", cubemap);
 
         ConstructScene();
         ConstructReflectionScene(cubemap);
@@ -185,6 +186,9 @@ namespace scene {
 
     void SceneCubemap::ConstructScene()
 {
+    Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
+    Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg", true);
+
     std::unique_ptr<Model> floor = std::make_unique<Model>(
         "resources/models/plane.fbx",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
@@ -197,9 +201,8 @@ namespace scene {
     );
 
     for (auto& mesh : floor->GetMeshes())
-        mesh->GetMaterial().AddTexture(std::make_shared<Texture2D>("resources/textures/metal.png", "material.diffuse", true));
+        mesh->GetMaterial().AddTexture("material.diffuse", metal_tex);
     objects.push_back(std::move(floor));
-    std::shared_ptr<Texture2D> marble_tex = std::make_shared<Texture2D>("resources/textures/container.jpg", "material.diffuse", true);
 
     // Box 1
     std::unique_ptr<Model> box1 = std::make_unique<Model>(
@@ -214,7 +217,7 @@ namespace scene {
     );
 
     for (auto& mesh : box1->GetMeshes())
-        mesh->GetMaterial().AddTexture(marble_tex);
+        mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
     objects.push_back(std::move(box1));
 
     // Box 2
@@ -230,11 +233,11 @@ namespace scene {
     );
 
     for (auto& mesh : box2->GetMeshes())
-        mesh->GetMaterial().AddTexture(marble_tex);
+        mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
     objects.push_back(std::move(box2));
 }
 
-    void SceneCubemap::ConstructReflectionScene(std::shared_ptr<Texture> in_skybox)
+    void SceneCubemap::ConstructReflectionScene(TextureCubemap* in_skybox)
     {
         std::unique_ptr<Model> floor = std::make_unique<Model>(
             "resources/models/plane.fbx",
@@ -248,7 +251,7 @@ namespace scene {
         );
 
         for (auto& mat : floor->GetMaterials())
-            mat->AddTexture(in_skybox);
+            mat->AddTexture("cubemap", in_skybox);
         reflection_objects.push_back(std::move(floor));
 
         // Box 1
@@ -264,7 +267,7 @@ namespace scene {
         );
 
         for (auto& mat : box1->GetMaterials())
-            mat->AddTexture(in_skybox);
+            mat->AddTexture("cubemap", in_skybox);
         reflection_objects.push_back(std::move(box1));
 
         // Box 2
@@ -280,11 +283,11 @@ namespace scene {
         );
 
         for (auto& mat : box2->GetMaterials())
-            mat->AddTexture(in_skybox);
+            mat->AddTexture("cubemap", in_skybox);
         reflection_objects.push_back(std::move(box2));
     }
 
-    void SceneCubemap::ConstructRefractionScene(std::shared_ptr<Texture> in_skybox)
+    void SceneCubemap::ConstructRefractionScene(TextureCubemap* in_skybox)
     {
         std::string vertex_shader = "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert";
         std::string fragment_shader = "resources/shaders/03_AdvancedOpenGL/05_Cubemap/refraction.frag";
@@ -301,7 +304,7 @@ namespace scene {
         );
 
         for (auto& mat : floor->GetMaterials())
-            mat->AddTexture(in_skybox);
+            mat->AddTexture("cubemap", in_skybox);
         refraction_objects.push_back(std::move(floor));
 
         // Box 1
@@ -317,7 +320,7 @@ namespace scene {
         );
 
         for (auto& mat : box1->GetMaterials())
-            mat->AddTexture(in_skybox);
+            mat->AddTexture("cubemap", in_skybox);
         refraction_objects.push_back(std::move(box1));
 
         // Box 2
@@ -333,7 +336,7 @@ namespace scene {
         );
 
         for (auto& mat : box2->GetMaterials())
-            mat->AddTexture(in_skybox);
+            mat->AddTexture("cubemap", in_skybox);
         refraction_objects.push_back(std::move(box2));
     }
 }
