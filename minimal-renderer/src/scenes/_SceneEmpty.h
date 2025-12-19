@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <vector>
 #include "LightDirectional.h"
 #include "LightPoint.h"
 #include "LightSpot.h"
@@ -13,13 +14,14 @@ class VertexBuffer;
 class IndexBuffer;
 
 namespace scene {
-    class SceneCubeMap : public Scene
+    class _SceneEmpty : public Scene
     {
     private:
-        std::vector<std::unique_ptr<Model>> objects;
+        std::vector<Model*> m_objects;
 
     public:
-        SceneCubeMap(Renderer& in_renderer);
+        _SceneEmpty();
+        ~_SceneEmpty();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

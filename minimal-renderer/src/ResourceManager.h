@@ -30,13 +30,13 @@ public:
     static void Shutdown();
     static ResourceManager& Get();
     
-    Texture2D* GetTexture2D(std::string file_path, bool is_flipped = true);
-    TextureCubemap* GetCubemap(std::unordered_map<CubeSide, std::string> side_source);
+    Texture2D* GetTexture2D(const std::string& file_path, bool is_flipped = true);
+    TextureCubemap* GetCubemap(const std::unordered_map<CubeSide, std::string>& side_source);
 
-    Material* GetMaterial(std::string vertex_path, std::string fragment_path);
+    Material* GetMaterial(const std::string& vertex_path, const std::string& fragment_path);
 
-    Shader* GetShader(std::string vertex_path, std::string fragment_path);
+    Shader* GetShader(const std::string& vertex_path, const std::string& fragment_path);
 
-    RenderTarget* GetRenderTarget(std::string name, unsigned int width, unsigned int height, unsigned int nr_channels);
-    RenderBuffer* GetRenderBuffer(std::string name, unsigned int width, unsigned int height);
+    RenderTarget* GetRenderTarget(const std::string& name, unsigned int width, unsigned int height, unsigned int nr_channels);
+    RenderBuffer* GetRenderBuffer(const std::string& name, unsigned int width, unsigned int height);
 };

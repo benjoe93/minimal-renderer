@@ -17,17 +17,26 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "ResourceManager.h"
 
-#include "20_SceneCubeMap.h"
+#include "_SceneEmpty.h"
 
 namespace scene {
-    SceneCubeMap::SceneCubeMap(Renderer& in_renderer)
-        :Scene(in_renderer, "Cube Map")
+    _SceneEmpty::_SceneEmpty()
+        :Scene("")
     {
         ConstructScene();
     }
 
-    void SceneCubeMap::OnUpdate(double delta_time)
+    _SceneEmpty::~_SceneEmpty()
+    {
+        for (Model* model : m_objects) {
+            delete model;
+        }
+        m_objects.clear(); // Optional, but good practice
+    }
+
+    void _SceneEmpty::OnUpdate(double delta_time)
     {
         Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
@@ -37,7 +46,7 @@ namespace scene {
         projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
 
         // objects
-        for (auto& obj : objects)
+        for (auto& obj : m_objects)
         {
             ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
             MVP = projection * ModelView;
@@ -49,20 +58,20 @@ namespace scene {
         }
     }
 
-    void SceneCubeMap::OnRender()
+    void _SceneEmpty::OnRender()
     {
-        for (auto& obj : objects)
+        for (auto& obj : m_objects)
             Renderer::Get().Draw(*obj);
     }
 
-    void SceneCubeMap::OnImGuiRender()
+    void _SceneEmpty::OnImGuiRender()
     {
 
     }
 
-    void scene::SceneCubeMap::ConstructScene()
+    void scene::_SceneEmpty::ConstructScene()
     {
-        std::unique_ptr<Model> floor = std::make_unique<Model>(
+        Model* floor = new Model(
             "resources/models/plane.fbx",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -73,13 +82,13 @@ namespace scene {
             )
         );
 
-        for (auto& mesh : floor->GetMeshes())
-            mesh->GetMaterial().AddTexture(std::make_shared<Texture2D>("resources/textures/metal.png", "material.diffuse", true));
-        objects.push_back(std::move(floor));
-        std::shared_ptr<Texture2D> marble_tex = std::make_shared<Texture2D>("resources/textures/container.jpg", "material.diffuse", true);
+        for (auto& mat : floor->GetMaterials())
+            mat->AddTexture("material.diffuse", ResourceManager::Get().GetTexture2D("resources/textures/metal.png"));
+        m_objects.push_back(std::move(floor));
+        Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg");
 
         // Box 1
-        std::unique_ptr<Model> box1 = std::make_unique<Model>(
+        Model* box1 = new Model(
             "resources/models/box.fbx",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -90,12 +99,12 @@ namespace scene {
             )
         );
 
-        for (auto& mesh : box1->GetMeshes())
-            mesh->GetMaterial().AddTexture(marble_tex);
-        objects.push_back(std::move(box1));
+        for (auto& mat : box1->GetMaterials())
+            mat->AddTexture("material.diffuse", marble_tex);
+        m_objects.push_back(std::move(box1));
 
         // Box 2
-        std::unique_ptr<Model> box2 = std::make_unique<Model>(
+        Model* box2 = new Model(
             "resources/models/box.fbx",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -106,8 +115,8 @@ namespace scene {
             )
         );
 
-        for (auto& mesh : box2->GetMeshes())
-            mesh->GetMaterial().AddTexture(marble_tex);
-        objects.push_back(std::move(box2));
+        for (auto& mat : box2->GetMaterials())
+            mat->AddTexture("material.diffuse", marble_tex);
+        m_objects.push_back(std::move(box2));
     }
 }
