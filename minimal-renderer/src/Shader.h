@@ -3,6 +3,7 @@
 
 #include "Renderer.h"
 #include "Texture.h"
+#include "UniformBufferObject.h"
 
 
 class Shader
@@ -11,6 +12,7 @@ private:
     unsigned int m_renderer_id;
     std::string& m_vertex_path;
     std::string& m_fragment_path;
+    std::vector<std::pair<std::string, UniformBufferObj*>> u_uniform_buffers;
 
 public:
     Shader(std::string vertex_path, std::string fragment_path);
@@ -30,4 +32,10 @@ public:
     void SetUniform(const std::string& name, glm::mat4 value);
 
     void PrintShaderFiles() const;
-};
+
+    const std::string& GetVertexPath() const { return m_vertex_path; }
+    const std::string& GetFragmentPath() const { return m_fragment_path; }
+
+    void BindUniformBuffer(const std::string& block_name, UniformBufferObj* buffer);
+    unsigned int GetUniformBlockIndex(const std::string& block_name) const;
+ };

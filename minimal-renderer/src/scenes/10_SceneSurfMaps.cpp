@@ -174,14 +174,14 @@ void SceneSurfMaps::OnRender()
     //                          geometery rendering                           //
     ////////////////////////////////////////////////////////////////////////////
     object_material->Bind();
-    Renderer::Get().Draw(*object_va, *object_ib, object_material->GetShader());
+    Renderer::Get().Draw(*object_va, *object_ib, *object_material->GetShader());
     object_material->Unbind();
 
     ////////////////////////////////////////////////////////////////////////////
     //                            light rendering                             //
     ////////////////////////////////////////////////////////////////////////////
     light_material->Bind();
-    Renderer::Get().Draw(*light_va, *light_ib, light_material->GetShader());
+    Renderer::Get().Draw(*light_va, *light_ib, *light_material->GetShader());
     light_material->Unbind();
 }
 

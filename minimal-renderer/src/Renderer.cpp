@@ -1,11 +1,12 @@
 #include <cstddef>
 
+#include "Camera.h"
+#include "Material.h"
+#include "Model.h"
+#include "ResourceManager.h"
+#include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
-#include "VertexArray.h"
-#include "Model.h"
-#include "Mesh.h"
-#include "Material.h"
 
 #include "Renderer.h"
 

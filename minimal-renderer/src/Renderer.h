@@ -9,11 +9,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 class Camera;
-class Shader;
-class IndexBuffer;
-class VertexArray;
-class Model;
 class Material;
+class Model;
+class VertexArray;
+class IndexBuffer;
+class Shader;
 
 #pragma region OpenGLErrorHandling
     #define ASSERT(x) if (!(x)) __debugbreak();

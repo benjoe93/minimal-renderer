@@ -253,18 +253,18 @@ namespace scene {
         //                            light rendering                             //
         ////////////////////////////////////////////////////////////////////////////
         directional_light->GetMaterial().Bind();
-        Renderer::Get().Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), directional_light->GetMaterial().GetShader());
+        Renderer::Get().Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), *directional_light->GetMaterial().GetShader());
         directional_light->GetMaterial().Unbind();
 
         for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
         {
             point_lights[ptl_id]->GetMaterial().Bind();
-            Renderer::Get().Draw(point_lights[ptl_id]->GetVertArray(), point_lights[ptl_id]->GetIndexBuffer(), point_lights[ptl_id]->GetMaterial().GetShader());
+            Renderer::Get().Draw(point_lights[ptl_id]->GetVertArray(), point_lights[ptl_id]->GetIndexBuffer(), *point_lights[ptl_id]->GetMaterial().GetShader());
             point_lights[ptl_id]->GetMaterial().Unbind();
         }
 
         spot_light->GetMaterial().Bind();
-        Renderer::Get().Draw(spot_light->GetVertArray(), spot_light->GetIndexBuffer(), spot_light->GetMaterial().GetShader());
+        Renderer::Get().Draw(spot_light->GetVertArray(), spot_light->GetIndexBuffer(), *spot_light->GetMaterial().GetShader());
         spot_light->GetMaterial().Unbind();
 
         ////////////////////////////////////////////////////////////////////////////
@@ -273,7 +273,7 @@ namespace scene {
         for (int obj_id = 0; obj_id < 10; obj_id++)
         {
             object_materials[obj_id]->Bind();
-            Renderer::Get().Draw(*object_va, *object_ib, object_materials[obj_id]->GetShader());
+            Renderer::Get().Draw(*object_va, *object_ib, *object_materials[obj_id]->GetShader());
             object_materials[obj_id]->Unbind();
         }
     }

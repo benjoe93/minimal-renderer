@@ -2,9 +2,8 @@
 #include "ResourceManager.h"
 
 Material::Material(std::string vertex_path, std::string fragment_path)
-    : m_vertex_path(vertex_path), m_fragment_path(fragment_path)
 {
-    m_shader = std::make_unique<Shader>(vertex_path, fragment_path);
+    m_shader = ResourceManager::Get().GetShader(vertex_path, fragment_path);
 }
 
 Material::~Material()
@@ -77,4 +76,9 @@ void Material::Unbind()
     {
         m_textures[i].second->Unbind();
     }
+}
+
+void Material::AddUniformBuffer(const std::string& block_name, UniformBufferObj* obj)
+{
+    m_shader->BindUniformBuffer(block_name, obj);
 }

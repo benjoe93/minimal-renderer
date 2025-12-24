@@ -89,7 +89,7 @@ namespace scene {
         //                            light rendering                             //
         ////////////////////////////////////////////////////////////////////////////
         directional_light->GetMaterial().Bind();
-        Renderer::Get().Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), directional_light->GetMaterial().GetShader());
+        Renderer::Get().Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), *directional_light->GetMaterial().GetShader());
         directional_light->GetMaterial().Unbind();
 
 

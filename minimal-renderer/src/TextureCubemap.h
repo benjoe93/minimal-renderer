@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 #include <unordered_map>
-#include "Renderer.h"
 #include "Texture.h"
 
 enum CubeSide

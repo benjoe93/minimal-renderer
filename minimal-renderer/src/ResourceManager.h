@@ -1,3 +1,4 @@
+#pragma once
 #include <unordered_map>
 
 #include "Material.h"
@@ -33,9 +34,9 @@ public:
     Texture2D* GetTexture2D(const std::string& file_path, bool is_flipped = true);
     TextureCubemap* GetCubemap(const std::unordered_map<CubeSide, std::string>& side_source);
 
-    Material* GetMaterial(const std::string& vertex_path, const std::string& fragment_path);
-
     Shader* GetShader(const std::string& vertex_path, const std::string& fragment_path);
+
+    Material* GetMaterial(const std::string& vertex_path, const std::string& fragment_path);
 
     RenderTarget* GetRenderTarget(const std::string& name, unsigned int width, unsigned int height, unsigned int nr_channels);
     RenderBuffer* GetRenderBuffer(const std::string& name, unsigned int width, unsigned int height);

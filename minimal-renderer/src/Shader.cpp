@@ -169,3 +169,19 @@ void Shader::PrintShaderFiles() const
     std::cout << "Vert: " << m_vertex_path << std::endl;
     std::cout << "Frag: " << m_fragment_path << std::endl << std::endl;
 }
+
+unsigned int Shader::GetUniformBlockIndex(const std::string& block_name) const
+{
+    GLCall(unsigned int idx = glGetUniformBlockIndex(m_renderer_id, block_name.c_str()));
+    return idx;
+}
+
+void Shader::BindUniformBuffer(const std::string& block_name, UniformBufferObj* buffer)
+{
+    unsigned int binding_point = static_cast<unsigned int>(u_uniform_buffers.size());
+    u_uniform_buffers.push_back({block_name, buffer});
+
+    unsigned int block_idx = GetUniformBlockIndex(block_name);
+    GLCall(glUniformBlockBinding(m_renderer_id, block_idx, 0));
+    //GLCall(glUniformBlockBinding(m_renderer_id, block_idx, binding_point));
+}

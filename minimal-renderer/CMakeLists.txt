@@ -34,6 +34,7 @@ set(SCENE_SOURCES
     "src/scenes/18_SceneFrameBuffers.cpp"
     "src/scenes/19_SceneRearViewMirror.cpp"
     "src/scenes/20_SceneCubemap.cpp"
+    "src/scenes/21_SceneAdvancedGLSL.cpp"
     # "src/scenes/_SceneEmpty.cpp"  # Template - not compiled
 )
 
@@ -70,6 +71,7 @@ set(SCENE_HEADERS
     "src/scenes/18_SceneFrameBuffers.h"
     "src/scenes/19_SceneRearViewMirror.h"
     "src/scenes/20_SceneCubemap.h"
+    "src/scenes/21_SceneAdvancedGLSL.h"
     # "src/scenes/_SceneEmpty.h"  # Template - not compiled
 )
 

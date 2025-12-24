@@ -31,6 +31,7 @@
 #include "scenes/18_SceneFrameBuffers.h"
 #include "scenes/19_SceneRearViewMirror.h"
 #include "scenes/20_SceneCubemap.h"
+#include "scenes/21_SceneAdvancedGLSL.h"
 
 
 #define WINDOW_TITLE "LearnOpenGL"
@@ -102,7 +103,7 @@ int main(void)
     renderer.state.active_camera = cam.GetId();
     glfwSetWindowUserPointer(window, &renderer);
 
-    auto scene = scene::SceneCubemap();
+    auto scene = scene::SceneAdvancedGLSL();
 
     /* RENDER LOOP */
     while (!glfwWindowShouldClose(window))

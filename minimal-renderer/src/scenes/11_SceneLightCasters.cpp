@@ -279,7 +279,7 @@ void SceneLightCasters::OnRender()
     for (int i = 0; i < 10; i++)
     {
         object_materials[i]->Bind();
-        Renderer::Get().Draw(*object_va, *object_ib, object_materials[i]->GetShader());
+        Renderer::Get().Draw(*object_va, *object_ib, *object_materials[i]->GetShader());
         object_materials[i]->Unbind();
     }
 
@@ -287,7 +287,7 @@ void SceneLightCasters::OnRender()
     //                            light rendering                             //
     ////////////////////////////////////////////////////////////////////////////
     light_material->Bind();
-    Renderer::Get().Draw(*light_va, *light_ib, light_material->GetShader());
+    Renderer::Get().Draw(*light_va, *light_ib, *light_material->GetShader());
     light_material->Unbind();
 }
 

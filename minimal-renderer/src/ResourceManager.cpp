@@ -89,20 +89,6 @@ TextureCubemap* ResourceManager::GetCubemap(const std::unordered_map<CubeSide, s
     return new_texture;
 }
 
-Material* ResourceManager::GetMaterial(const std::string& vertex_path, const std::string& fragment_path)
-{
-    std::string key = vertex_path + "|" + fragment_path;
-    // Get
-    auto it = m_materials.find(key);
-    if (it != m_materials.end())
-        return it->second;
-
-    // Create
-    Material* new_material = new Material(vertex_path, fragment_path);
-    m_materials[key] = new_material;
-    return new_material;
-}
-
 Shader* ResourceManager::GetShader(const std::string& vertex_path, const std::string& fragment_path)
 {
     std::string key = vertex_path + "|" + fragment_path;
@@ -115,6 +101,20 @@ Shader* ResourceManager::GetShader(const std::string& vertex_path, const std::st
     Shader* new_shader = new Shader(vertex_path, fragment_path);
     m_shaders[key] = new_shader;
     return new_shader;
+}
+
+Material* ResourceManager::GetMaterial(const std::string& vertex_path, const std::string& fragment_path)
+{
+    std::string key = vertex_path + "|" + fragment_path;
+    // Get
+    auto it = m_materials.find(key);
+    if (it != m_materials.end())
+        return it->second;
+
+    // Create
+    Material* new_material = new Material(vertex_path, fragment_path);
+    m_materials[key] = new_material;
+    return new_material;
 }
 
 RenderTarget* ResourceManager::GetRenderTarget(const std::string& name, unsigned int width, unsigned int height, unsigned int nr_channels)
