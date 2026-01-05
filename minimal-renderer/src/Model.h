@@ -7,7 +7,6 @@
 #include <assimp/scene.h>
 
 #include "Mesh.h"
-#include "Texture.h"
 
 class Mesh;
 class Material;
@@ -33,33 +32,33 @@ private:
     glm::mat4 m_model_matrix = glm::mat4(1.0);
 
     void LoadModel(const std::string& path);
-    void ProcessNode(aiNode* node, const aiScene* scene);
-    std::unique_ptr<Mesh> ProcessMesh(aiMesh* mesh, const aiScene* scene);
-    void LoadMaterialTextures(Material* material, aiMaterial* ai_material, aiTextureType type, std::string type_name);
+    void ProcessNode(const aiNode* node, const aiScene* scene);
+    std::unique_ptr<Mesh> ProcessMesh(const aiMesh* mesh, const aiScene* scene);
+    void LoadMaterialTextures(Material* material, const aiMaterial* ai_material, aiTextureType type, const std::string& type_name);
 
 public:
     Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader);
-    Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader, Transform transform);
-    Model(std::unique_ptr<Mesh> mesh, Transform transform);
+    Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader, const Transform& transform);
+    Model(std::unique_ptr<Mesh> mesh, const Transform& transform);
 
-    inline void SetTransform(Transform new_transform) { m_transform = new_transform; }
-    inline void SetLocation(glm::vec3 new_location) { m_transform.Location = new_location; }
-    inline void SetRotation(glm::vec3 new_rotation) { m_transform.Rotation = new_rotation; }
-    inline void SetScale(glm::vec3 new_scale) { m_transform.Scale = new_scale; }
+    void SetTransform(const Transform& new_transform) { m_transform = new_transform; }
+    void SetLocation(const glm::vec3& new_location) { m_transform.Location = new_location; }
+    void SetRotation(const glm::vec3& new_rotation) { m_transform.Rotation = new_rotation; }
+    void SetScale(const glm::vec3& new_scale) { m_transform.Scale = new_scale; }
 
-    inline void SetLocationOffset(glm::vec3 new_location) { m_transform.Location += new_location; }
-    inline void SetRotationOffset(glm::vec3 new_rotation) { m_transform.Rotation += new_rotation; }
+    void SetLocationOffset(const glm::vec3& new_location) { m_transform.Location += new_location; }
+    void SetRotationOffset(const glm::vec3& new_rotation) { m_transform.Rotation += new_rotation; }
 
     std::vector<std::unique_ptr<Mesh>>& GetMeshes() { return m_meshes; }
     const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return m_meshes; }
 
     glm::mat4 GetModelMatrix();
-    inline Transform GetTransform() const { return m_transform; }
-    inline glm::vec3 GetLocation() const { return m_transform.Location; }
-    inline glm::vec3 GetRotation() const { return m_transform.Rotation; }
-    inline glm::vec3 GetScale() const { return m_transform.Scale; }
+    const Transform& GetTransform() const { return m_transform; }
+    const glm::vec3& GetLocation() const { return m_transform.Location; }
+    const glm::vec3& GetRotation() const { return m_transform.Rotation; }
+    const glm::vec3& GetScale() const { return m_transform.Scale; }
 
-    std::unordered_set<Material*> GetMaterials();
+    std::unordered_set<Material*> GetMaterials() const;
     // TODO: finish implementation
     void SetMaterials();
 

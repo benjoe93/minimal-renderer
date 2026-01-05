@@ -7,7 +7,7 @@ class VertexBuffer;
 class IndexBuffer;
 
 namespace scene {
-    class SceneHelloTriagle : public Scene
+    class SceneHelloTriangle : public Scene
     {
     private:
         unsigned int vertex_shader = 0;
@@ -18,7 +18,7 @@ namespace scene {
 
 
     public:
-        SceneHelloTriagle();
+        SceneHelloTriangle();
 
         void OnUpdate(double delta_time) override;
         void OnRender() override;

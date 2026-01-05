@@ -3,14 +3,13 @@
 #include <vector>
 
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "Texture2D.h"
 
 class Material;
-class Texture2D;
 
 struct Vertex
 {
@@ -27,15 +26,23 @@ private:
     std::unique_ptr<IndexBuffer>  m_ib;
     std::unique_ptr<Material>     m_material;
 
+    std::vector<Vertex>     m_vertices;
+    std::vector<GLuint>     m_indices;
+
 public:
-    std::vector<Vertex>         m_vertices;
-    std::vector<unsigned int>   m_indices;
-    std::vector<Texture2D>      m_textures;
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::unique_ptr<Material> material);
+    ~Mesh() = default;
 
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::unique_ptr<Material> material);
+    Mesh(const Mesh&) = delete;
+    Mesh& operator=(const Mesh&) = delete;
+    Mesh(Mesh&&) = default;
+    Mesh& operator=(Mesh&&) = default;
 
-    VertexArray* GetVertexArray() { return m_va.get(); }
-    VertexBuffer* GetVertexBuffer() { return m_vb.get(); }
-    IndexBuffer* GetIndexBuffer() const { return m_ib.get(); }
-    Material& GetMaterial() const { return *m_material; };
+    VertexArray& GetVertexArray() const { return *m_va; }
+    VertexBuffer& GetVertexBuffer() const { return *m_vb; }
+    IndexBuffer& GetIndexBuffer() const { return *m_ib; }
+    Material& GetMaterial() const { return *m_material; }
+
+    const std::vector<Vertex>& GetVertices() const { return m_vertices; }
+    const std::vector<unsigned int>& GetIndices() const { return m_indices; }
 };

@@ -1,9 +1,9 @@
 #pragma once
-#include <iostream>
+#include <glad/glad.h>
 #include "Texture.h"
 
 class RenderTarget : public Texture
 {
 public:
-    RenderTarget(unsigned int width, unsigned int height, unsigned int nr_channels);
+    RenderTarget(GLuint width, GLuint height, GLuint nr_channels);
 };

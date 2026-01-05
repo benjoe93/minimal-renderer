@@ -1,12 +1,10 @@
 #pragma once
-#include <iostream>
 #include <string>
 #include <vector>
 #include <unordered_map>
 
 #include "Shader.h"
 #include "Texture.h"
-#include "Texture2D.h"
 #include "UniformBufferObject.h"
 
 class Material
@@ -20,15 +18,15 @@ private:
     std::unordered_map<std::string, glm::mat4> u_mat4;
 
 public:
-    Material(std::string vertex_path, std::string fragment_path);
-    ~Material();
+    Material(const std::string& vertex_path, const std::string& fragment_path);
+    ~Material() = default;
 
-    void AddTexture(std::string sampler_name, Texture* texture);
-    void AddTexture2D(std::string path, std::string sampler_name, bool is_flipped);
+    void AddTexture(const std::string& sampler_name, Texture* texture);
+    void AddTexture2D(const std::string& path, const std::string& sampler_name, bool is_flipped);
 
-    void SetUniform(const std::string type, float value);
-    void SetUniform(const std::string type, const glm::vec3& value);
-    void SetUniform(const std::string type, const glm::mat4& value);
+    void SetUniform(const std::string& name, float value);
+    void SetUniform(const std::string& name, const glm::vec3& value);
+    void SetUniform(const std::string& name, const glm::mat4& value);
 
     void Bind();
     void Unbind();

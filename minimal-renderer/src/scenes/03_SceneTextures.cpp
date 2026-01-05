@@ -1,25 +1,9 @@
-#include <map>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-#include "vendor/imgui/imgui.h"
+#include <iostream>
+#include <glad/glad.h>
 #include "vendor/stb_image/stb_image.h"
-
-#include "LightDirectional.h"
-#include "LightPoint.h"
-
-#include "Renderer.h"
-#include "Camera.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "Texture.h"
-#include "Material.h"
-#include "Mesh.h"
-#include "Model.h"
-
 #include "03_SceneTextures.h"
+
+#include "Shader.h"
 
 
 static float vertices[] = {
@@ -61,7 +45,7 @@ namespace scene {
         }
         else
         {
-            std::cout << "Faild to load texture" << std::endl;
+            std::cout << "Failed to load texture" << std::endl;
         }
         stbi_image_free(data);
         // texture2
@@ -101,7 +85,7 @@ namespace scene {
         shader->SetUniform("texture2", 1);
 
         ////////////////////////////////////////////////////////////////////////////
-        //                            geometery setup                             //
+        //                            geometry setup                              //
         ////////////////////////////////////////////////////////////////////////////
 
         // vertex array object
@@ -120,13 +104,11 @@ namespace scene {
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
         // linking vertex attribs
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);                   // vertex position
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);                                  // vertex position
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));    // uv coords
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(5 * sizeof(float)));    // vertex color
         glEnableVertexAttribArray(0);
-
-        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float))); // uv coords
         glEnableVertexAttribArray(1);
-
-        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float))); // vertex color
         glEnableVertexAttribArray(2);
 
         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
@@ -134,8 +116,7 @@ namespace scene {
         glBindVertexArray(0);
     }
 
-    void SceneTextures::OnUpdate(double delta_time)
-    {}
+    void SceneTextures::OnUpdate(double delta_time) { }
 
     void SceneTextures::OnRender()
     {
@@ -145,10 +126,8 @@ namespace scene {
         // draw first triangle
         shader->Bind();
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
     }
 
-    void SceneTextures::OnImGuiRender()
-    {
-    }
+    void SceneTextures::OnImGuiRender() { }
 }

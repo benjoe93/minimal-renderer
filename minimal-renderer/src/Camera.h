@@ -1,23 +1,28 @@
 #pragma once
 #include "Renderer.h"
 
+
+
 class Camera
 {
 private:
+    static constexpr float DEFAULT_SPEED = 2.5f;
+    static constexpr float DEFAULT_FOV = 45.0f;
+
     unsigned int m_renderer_id;
 
-    float m_cam_speed = 2.5f;
-    float m_fov = 45.0f;
-    float m_pitch, m_yaw, m_roll;
-    glm::vec3 m_cam_position, m_cam_direction, m_cam_up;
+    float m_cam_speed = DEFAULT_SPEED;
+    float m_fov = DEFAULT_FOV;
+    float m_pitch = 0.0f, m_yaw = -90.0f, m_roll = 0.0f;
+    glm::vec3 m_cam_position{}, m_cam_direction{}, m_cam_up{};
 
 public:
-    Camera(const unsigned int id, const glm::vec3 position, const glm::vec3 front = glm::vec3(0.0f, 0.0f, -1.0f), const glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f));
-    ~Camera();
+    Camera(const unsigned int id, const glm::vec3& position, const glm::vec3& front = glm::vec3(0.0f, 0.0f, -1.0f), const glm::vec3& up = glm::vec3(0.0f, 1.0f, 0.0f));
+    ~Camera() = default;
 
     glm::mat4 GetViewMatrix() const;
 
-    void SetPosition(glm::vec3 new_pos) { m_cam_position = new_pos; }
+    void SetPosition(const glm::vec3& new_pos) { m_cam_position = new_pos; }
     void SetSpeed(const float new_speed) { m_cam_speed = new_speed; }
     void SetPitch(const float new_pitch);
     void SetYaw(const float new_yaw);

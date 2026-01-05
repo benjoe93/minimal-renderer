@@ -11,8 +11,8 @@
 #include "ResourceManager.h"
 
 #include "scenes/00_SceneClearColor.h"
-#include "scenes/01_SceneHelloTriagle.h"
-#include "scenes/02_SceneHelloTriagleIndexed.h"
+#include "scenes/01_SceneHelloTriangle.h"
+#include "scenes/02_SceneHelloTriangleIndexed.h"
 #include "scenes/03_SceneTextures.h"
 #include "scenes/04_SceneTransformation.h"
 #include "scenes/05_SceneCoordinateSystem.h"
@@ -36,6 +36,9 @@
 
 #define WINDOW_TITLE "LearnOpenGL"
 
+constexpr float MOUSE_SENSITIVITY = 0.1f;
+constexpr float SCROLL_SPEED_FACTOR = 5.0f;
+
 /* glfw: whenever the window size changed(by OS or user resize) this callback function executes */
 void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -49,18 +52,18 @@ void MouseCallback(GLFWwindow* window, double xpos, double ypos);
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
 
 /* Update window title */
-void UpdateWindowTitle(GLFWwindow* window, std::string scene_name, double delat_time);
+void UpdateWindowTitle(GLFWwindow* window, const std::string &scene_name, double delta_time);
 
 int main(void)
 {
-    // GLWF: init& config
+    // GLFW: init& config
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
-    // GLWF: create a window and its OpenGL context 
+    // GLFW: create a window and its OpenGL context
     GLFWwindow* window = glfwCreateWindow(1280, 720, WINDOW_TITLE, nullptr, nullptr);
     if (!window)
     {
@@ -98,9 +101,9 @@ int main(void)
     ResourceManager::Init();
 
     Camera cam(0, glm::vec3(0.0f, 0.0f, 3.0f));
-    Renderer& renderer = Renderer::Get();
-    renderer.state.cameras[cam.GetId()] = &cam;
-    renderer.state.active_camera = cam.GetId();
+    auto& renderer = Renderer::Get();
+    renderer.GetState().cameras[cam.GetId()] = &cam;
+    renderer.GetState().active_camera = cam.GetId();
     glfwSetWindowUserPointer(window, &renderer);
 
     auto scene = scene::SceneAdvancedGLSL();
@@ -145,36 +148,36 @@ int main(void)
     return 0;
 }
 
-
-void UpdateWindowTitle(GLFWwindow* window, std::string scene_name, double delat_time)
+void UpdateWindowTitle(GLFWwindow* window, const std::string &scene_name, const double delta_time)
 {
     char title[200];
-    snprintf(title, sizeof(title), "%s / %s - FPS: %.1f | Frame: %.2fms", WINDOW_TITLE, scene_name.c_str(), 1 / delat_time, delat_time * 1000.f);
+    const double fps = 1.0 / delta_time;
+    const double frame_time = delta_time * 1000.0;
+    snprintf(title, sizeof(title), "%s / %s - FPS: %.1f | Frame: %.2fms", WINDOW_TITLE, scene_name.c_str(), fps, frame_time);
     glfwSetWindowTitle(window, title);
 }
 
-void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+void FramebufferSizeCallback(GLFWwindow* window, const int width, const int height)
 {
-    auto renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+    const auto renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
     glViewport(0, 0, width, height);
-    renderer->state.scr_width = width;
-    renderer->state.scr_height = height;
+    renderer->SetScreenSize(width, height);
 }
 
 void ProcessInput(GLFWwindow* window)
 {
-    Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+    const auto renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
     Camera& cam = renderer->GetActiveCamera();
 
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && renderer->state.cursor_disabled == false)
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS && renderer->GetState().cursor_disabled == false)
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        renderer->state.cursor_disabled = true;
+        renderer->GetState().cursor_disabled = true;
     }
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE && renderer->state.cursor_disabled)
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE && renderer->GetState().cursor_disabled)
     {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        renderer->state.cursor_disabled = false;
+        renderer->GetState().cursor_disabled = false;
     }
 
     // Exit
@@ -184,32 +187,32 @@ void ProcessInput(GLFWwindow* window)
     }
 
     // Move forward
-    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && renderer->state.cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && renderer->GetState().cursor_disabled)
     {
         cam.MoveFwd(renderer->GetDeltaTime());
     }
     // Move backward
-    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && renderer->state.cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && renderer->GetState().cursor_disabled)
     {
         cam.MoveBwd(renderer->GetDeltaTime());
     }
     // Move left
-    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && renderer->state.cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && renderer->GetState().cursor_disabled)
     {
         cam.MoveLeft(renderer->GetDeltaTime());
     }
     // Move right
-    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && renderer->state.cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && renderer->GetState().cursor_disabled)
     {
         cam.MoveRight(renderer->GetDeltaTime());
     }
     // Move down
-    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && renderer->state.cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS && renderer->GetState().cursor_disabled)
     {
         cam.MoveDown(renderer->GetDeltaTime());
     }
     // Move up
-    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && renderer->state.cursor_disabled)
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS && renderer->GetState().cursor_disabled)
     {
         cam.MoveUp(renderer->GetDeltaTime());
     }
@@ -217,49 +220,30 @@ void ProcessInput(GLFWwindow* window)
 
 void MouseCallback(GLFWwindow* window, double xpos, double ypos)
 {
-    Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+    const auto renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
     Camera& cam = renderer->GetActiveCamera();
 
-    if (!renderer->state.cursor_disabled)
+    if (!renderer->GetState().cursor_disabled)
     {       
-        renderer->state.last_x = static_cast<float>(xpos);
-        renderer->state.last_y = static_cast<float>(ypos);
+        renderer->GetState().last_x = static_cast<float>(xpos);
+        renderer->GetState().last_y = static_cast<float>(ypos);
     }
 
-    float xoffset = static_cast<float>(xpos) - renderer->state.last_x;
-    float yoffset = static_cast<float>(ypos) - renderer->state.last_y;
-    renderer->state.last_x = static_cast<float>(xpos);
-    renderer->state.last_y = static_cast<float>(ypos);
+    const float xoffset = (static_cast<float>(xpos) - renderer->GetState().last_x) * MOUSE_SENSITIVITY;
+    const float yoffset = (static_cast<float>(ypos) - renderer->GetState().last_y) * MOUSE_SENSITIVITY;
 
-    const float sensitivity = 0.1f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
+    renderer->GetState().last_x = static_cast<float>(xpos);
+    renderer->GetState().last_y = static_cast<float>(ypos);
 
     cam.SetYaw(cam.GetYaw() + xoffset);
-    float new_pitch = cam.GetPitch() + -1.0f * yoffset;
-
-    if (new_pitch > 89.0f)
-    {
-        new_pitch = 89.0f;
-    }
-    if (new_pitch < -89.0f)
-    {
-        new_pitch = -89.0f;
-    }
-    cam.SetPitch(new_pitch);
+    cam.SetPitch(std::clamp(cam.GetPitch() + -1.0f * yoffset, -89.0f, 89.0f));
     cam.UpdateRotation();
 }
 
 void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+    const auto renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
     Camera& cam = renderer->GetActiveCamera();
 
-    float speed = cam.GetSpeed();
-    speed += static_cast<float>(yoffset) / 5.0f;
-    if (speed < 0.1f)
-        speed = 0.1f;
-    if (speed > 10.0f)
-        speed = 10.0f;
-    cam.SetSpeed(speed);
+    cam.SetSpeed(std::clamp(cam.GetSpeed() + static_cast<float>(yoffset) / SCROLL_SPEED_FACTOR, 0.1f, 10.0f));
 }

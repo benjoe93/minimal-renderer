@@ -5,14 +5,8 @@
 
 #include "vendor/imgui/imgui.h"
 
-#include "LightDirectional.h"
-#include "LightPoint.h"
-
 #include "Renderer.h"
 #include "Camera.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
 #include "Texture.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -43,7 +37,11 @@ namespace scene {
         Camera& cam = Renderer::Get().GetActiveCamera();
 
         glm::mat4 projection, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
+        projection = glm::perspective(
+            glm::radians(cam.GetFov()),
+            static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+                Renderer::Get().GetState().near_plane,
+                Renderer::Get().GetState().far_plane);
 
         // objects
         for (auto& obj : m_objects)
@@ -64,14 +62,11 @@ namespace scene {
             Renderer::Get().Draw(*obj);
     }
 
-    void _SceneEmpty::OnImGuiRender()
-    {
-
-    }
+    void _SceneEmpty::OnImGuiRender() { }
 
     void scene::_SceneEmpty::ConstructScene()
     {
-        Model* floor = new Model(
+        auto floor = new Model(
             "resources/models/plane.fbx",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -88,7 +83,7 @@ namespace scene {
         Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg");
 
         // Box 1
-        Model* box1 = new Model(
+        auto box1 = new Model(
             "resources/models/box.fbx",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -104,7 +99,7 @@ namespace scene {
         m_objects.push_back(std::move(box1));
 
         // Box 2
-        Model* box2 = new Model(
+        auto box2 = new Model(
             "resources/models/box.fbx",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
             "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",

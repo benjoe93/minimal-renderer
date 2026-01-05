@@ -8,53 +8,54 @@
 
 void Texture2D::LoadTexture(bool vertical_flip)
 {
-    // sets the image import to be upside down
-    // this is necessary due to how stb and opengl handle coordinates
     stbi_set_flip_vertically_on_load(vertical_flip);
 
     GLCall(glGenTextures(1, &m_renderer_id));
 
-    // load and generate texture
     int width, height, nr_channels;
     unsigned char* data = stbi_load(m_filepath.c_str(), &width, &height, &nr_channels, 0);
-    if (data)
+
+    if (!data)
     {
-        m_width = width;
-        m_height = height;
-        m_nr_channels = nr_channels;
-
-        GLenum format = GetFormat();
-
-        GLCall(glBindTexture(GL_TEXTURE_2D, m_renderer_id));
-        GLCall(glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data));
-        GLCall(glGenerateMipmap(GL_TEXTURE_2D));
-
-        // set texture wrapping/filtering options
-        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
-        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
-        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
-        GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+        std::cerr << "Failed to load texture: " << m_filepath << '\n';
+        GLCall(glDeleteTextures(1, &m_renderer_id));
+        m_renderer_id = 0;  // Mark as invalid
+        return;
     }
-    else
+
+    // Validate dimensions
+    if (width <= 0 || height <= 0)
     {
-        std::cout << "Failed to load texture: " << m_filepath << std::endl;
+        std::cerr << "Invalid texture dimensions for: " << m_filepath << '\n';
+        stbi_image_free(data);
+        GLCall(glDeleteTextures(1, &m_renderer_id));
+        m_renderer_id = 0;
+        return;
     }
+
+    m_width = static_cast<GLuint>(width);
+    m_height = static_cast<GLuint>(height);
+    m_nr_channels = static_cast<GLuint>(nr_channels);
+
+    const GLenum format = GetFormat();
+
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_renderer_id));
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, format, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, data));
+    GLCall(glGenerateMipmap(GL_TEXTURE_2D));
+
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT));
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT));
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR));
+    GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+
     stbi_image_free(data);
 }
 
-Texture2D::Texture2D(const std::string filepath, bool vertical_flip)
+Texture2D::Texture2D(const std::string& filepath, bool vertical_flip)
     : Texture(0, 0, 0),
-    m_filepath(filepath)
+      m_filepath(filepath)
 {
-   LoadTexture(vertical_flip);
-}
-
-Texture2D::~Texture2D()
-{
-    if (m_renderer_id != 0)
-    {
-        GLCall(glDeleteTextures(1, &m_renderer_id));
-    }
+    LoadTexture(vertical_flip);
 }
 
 Texture2D::Texture2D(Texture2D&& other) noexcept

@@ -10,7 +10,7 @@ namespace scene {
         std::string m_name;
 
     public:
-        Scene(std::string scene_name) : m_name(scene_name) {}
+        Scene(const std::string &scene_name) : m_name(scene_name) {}
         virtual ~Scene(){}
 
         virtual void OnUpdate(double delta_time) {}

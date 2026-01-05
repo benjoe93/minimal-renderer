@@ -10,7 +10,8 @@ Framebuffer::Framebuffer()
 
 Framebuffer::~Framebuffer()
 {
-    GLCall(glDeleteFramebuffers(1, &m_renderer_id));
+    if (m_renderer_id != 0)
+        GLCall(glDeleteFramebuffers(1, &m_renderer_id));
 }
 
 
@@ -26,30 +27,27 @@ void Framebuffer::Unbind() const
 
 void Framebuffer::AttachRenderTarget(AttachmentTarget target, RenderTarget* render_target)
 {
-    GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, static_cast<unsigned int>(target), GL_TEXTURE_2D, render_target->GetId(), 0));
+    GLCall(glFramebufferTexture2D(GL_FRAMEBUFFER, static_cast<GLenum>(target), GL_TEXTURE_2D, render_target->GetId(), 0));
     render_targets[target] = render_target;
     Validate();
 }
 
-void Framebuffer::AttachRenderBuffer(AttachmentTarget target, RenderBuffer* render_buffer)
+void Framebuffer::AttachRenderBuffer(AttachmentTarget target, const RenderBuffer* render_buffer)
 {
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, static_cast<unsigned int>(target), GL_RENDERBUFFER, render_buffer->GetId());
+    GLCall(glFramebufferRenderbuffer(GL_FRAMEBUFFER, static_cast<GLenum>(target), GL_RENDERBUFFER, render_buffer->GetId()));
     Validate();
 }
 
-RenderTarget* Framebuffer::GetRenderTarget(AttachmentTarget target) const
+RenderTarget* Framebuffer::GetRenderTarget(const AttachmentTarget target) const
 {
-    auto it = render_targets.find(target);
-    if (it != render_targets.end())
+    if (auto it = render_targets.find(target); it != render_targets.end())
         return it->second;
     return nullptr;
 }
 
 void Framebuffer::Validate() const
 {
-    auto error = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
-    switch (error)
+    switch (const auto error = glCheckFramebufferStatus(GL_FRAMEBUFFER))
     {
     case GL_FRAMEBUFFER_COMPLETE:
         return;

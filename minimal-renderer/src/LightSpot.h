@@ -8,21 +8,25 @@ class Material;
 class SpotLight : public Light
 {
 private:
+    static constexpr float DEFAULT_CONSTANT = 1.0f;
+    static constexpr float DEFAULT_LINEAR = 0.09f;
+    static constexpr float DEFAULT_QUADRATIC = 0.032f;
+
     glm::vec3 m_direction;
 
     float m_inner_angle;
     float m_outer_angle;
 
-    float m_constant  = 1.0f;
-    float m_linear    = 0.09f;
-    float m_quadratic = 0.032f;
+    float m_constant  = DEFAULT_CONSTANT;
+    float m_linear    = DEFAULT_LINEAR;
+    float m_quadratic = DEFAULT_QUADRATIC;
 
 public:
-    SpotLight(glm::vec3 position, glm::vec3 direction, float inner_angle, float outer_angle, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+    SpotLight(const glm::vec3& position, const glm::vec3& direction, float inner_angle, float outer_angle, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
 
-    void Update(glm::mat4 projection, glm::mat4 camera_view) override;
+    void Update(const glm::mat4& projection, const glm::mat4& camera_view) override;
 
-    glm::vec3 GetDirection() const { return m_direction; };
+    const glm::vec3& GetDirection() const { return m_direction; }
     float GetInnerAngle() const { return m_inner_angle; };
     float GetOuterAngle() const { return m_outer_angle; };
     float GetConstant() const { return m_constant; };
@@ -30,7 +34,10 @@ public:
     float GetQuadratic() const { return m_quadratic; };
 
 
-    void SetDirection(glm::vec3 new_direction) { m_direction = new_direction; };
-    void SetInnerAngle(float new_angle) { m_inner_angle = new_angle; };
-    void SetOuterAngle(float new_angle) { m_outer_angle = new_angle; };
+    void SetDirection(const glm::vec3& new_direction) { m_direction = new_direction; }
+    void SetInnerAngle(const float new_angle) { m_inner_angle = new_angle; };
+    void SetOuterAngle(const float new_angle) { m_outer_angle = new_angle; };
+    void SetConstant(const float value) { m_constant = value; }
+    void SetLinear(const float value) { m_linear = value; }
+    void SetQuadratic(const float value) { m_quadratic = value; }
 };

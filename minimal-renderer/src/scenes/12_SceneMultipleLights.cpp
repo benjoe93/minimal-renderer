@@ -12,12 +12,11 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
 #include "Material.h"
 
 #include "12_SceneMultipleLights.h"
 
-static float vertices[] = {
+constexpr float vertices[] = {
     // Positions            // Normal               // uv
     // Front face (z = -0.5)
     -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
@@ -62,7 +61,7 @@ static float vertices[] = {
      -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 0.0f,
      -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 1.0f
 };
-static unsigned int indices[] = {
+constexpr unsigned int indices[] = {
     // Front face
      2,  1,  0,
      5,  4,  3,
@@ -82,10 +81,10 @@ static unsigned int indices[] = {
       32, 31, 30,
       35, 34, 33
 };
-static size_t element_size = 36;
-static size_t buffer_size = element_size * 8 * sizeof(float);
+constexpr size_t element_size = 36;
+constexpr size_t buffer_size = element_size * 8 * sizeof(float);
 
-static glm::vec3 cube_positions[] = {
+constexpr glm::vec3 cube_positions[] = {
     glm::vec3(0.0f,  0.0f,  0.0f),
     glm::vec3(2.0f,  5.0f, -15.0f),
     glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -97,13 +96,13 @@ static glm::vec3 cube_positions[] = {
     glm::vec3(1.5f,  0.2f, -1.5f),
     glm::vec3(-1.3f,  1.0f, -1.5f)
 };
-static glm::vec3 point_light_pos[] = {
+constexpr glm::vec3 point_light_pos[] = {
     glm::vec3(0.7f,  0.2f,  2.0f),
     glm::vec3(2.3f, -3.3f, -4.0f),
     glm::vec3(-4.0f,  2.0f, -12.0f),
     glm::vec3(0.0f,  0.0f, -3.0f)
 };
-static glm::vec3 point_light_col[] = {
+constexpr glm::vec3 point_light_col[] = {
     glm::vec3(1.0f, 0.0f, 0.0f),
     glm::vec3(0.0f, 1.0f, 0.0f),
     glm::vec3(0.0f, 0.0f, 1.0f),
@@ -133,7 +132,7 @@ namespace scene {
         spot_light = std::make_unique<SpotLight>(camera.GetPosition(), camera.GetDirection(), 25.0f, 30.0f, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
 
         ////////////////////////////////////////////////////////////////////////////
-        //                            geometery setup                             //
+        //                            geometry setup                              //
         ////////////////////////////////////////////////////////////////////////////
         object_va = std::make_unique<VertexArray>();
         object_va->Bind();
@@ -143,9 +142,9 @@ namespace scene {
         object_ib = std::make_unique<IndexBuffer>(indices, element_size);
         object_ib->Bind();
 
-        object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-        object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-        object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+        object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+        object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
+        object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(6 * sizeof(float)));
 
         for (int mat_id = 0; mat_id < 10; mat_id++)
         {
@@ -166,7 +165,7 @@ namespace scene {
         glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
 
         ////////////////////////////////////////////////////////////////////////////
         //                           directional light                            //
@@ -256,11 +255,11 @@ namespace scene {
         Renderer::Get().Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), *directional_light->GetMaterial().GetShader());
         directional_light->GetMaterial().Unbind();
 
-        for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
+        for (const auto & point_light : point_lights)
         {
-            point_lights[ptl_id]->GetMaterial().Bind();
-            Renderer::Get().Draw(point_lights[ptl_id]->GetVertArray(), point_lights[ptl_id]->GetIndexBuffer(), *point_lights[ptl_id]->GetMaterial().GetShader());
-            point_lights[ptl_id]->GetMaterial().Unbind();
+            point_light->GetMaterial().Bind();
+            Renderer::Get().Draw(point_light->GetVertArray(), point_light->GetIndexBuffer(), *point_light->GetMaterial().GetShader());
+            point_light->GetMaterial().Unbind();
         }
 
         spot_light->GetMaterial().Bind();
@@ -268,7 +267,7 @@ namespace scene {
         spot_light->GetMaterial().Unbind();
 
         ////////////////////////////////////////////////////////////////////////////
-        //                          geometery rendering                           //
+        //                          geometry rendering                            //
         ////////////////////////////////////////////////////////////////////////////
         for (int obj_id = 0; obj_id < 10; obj_id++)
         {

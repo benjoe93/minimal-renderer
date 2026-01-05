@@ -1,16 +1,10 @@
-#include <map>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "vendor/imgui/imgui.h"
-#include "vendor/stb_image/stb_image.h"
-
-#include "LightDirectional.h"
-#include "LightPoint.h"
 
 #include "Renderer.h"
-#include "Camera.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
@@ -20,7 +14,6 @@
 #include "Model.h"
 
 #include "04_SceneTransformation.h"
-
 
 static float vertices[] = {
     // positions          // uvs        // colors           
@@ -35,7 +28,7 @@ static unsigned int indices[] = {
 };
 
 namespace scene {
-    SceneTransfrom::SceneTransfrom()
+    SceneTransform::SceneTransform()
         :Scene("Model transformation")
     {
         ////////////////////////////////////////////////////////////////////////////
@@ -55,7 +48,7 @@ namespace scene {
         shader->SetUniform("texture2", 1);
 
         ////////////////////////////////////////////////////////////////////////////
-        //                            geometery setup                             //
+        //                            geometry setup                              //
         ////////////////////////////////////////////////////////////////////////////
         // vertex array object
         vao = std::make_unique<VertexArray>();
@@ -69,25 +62,25 @@ namespace scene {
         ebo = std::make_unique<IndexBuffer>(indices, 6);
         ebo->Bind();
 
-        vao->SetLayout(*vbo, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);                    // vertex position
-        vao->SetLayout(*vbo, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));  // uv coords
-        vao->SetLayout(*vbo, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));  // vertex color
+        vao->SetLayout(*vbo, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);                                 // vertex position
+        vao->SetLayout(*vbo, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));   // uv coords
+        vao->SetLayout(*vbo, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(5 * sizeof(float)));   // vertex color
         
         vbo->Unbind();
         vao->Unbind();
     }
 
-    void SceneTransfrom::OnUpdate(double delta_time)
+    void SceneTransform::OnUpdate(double delta_time)
     {}
 
-    void SceneTransfrom::OnRender()
+    void SceneTransform::OnRender()
     {
         // clean new frame
         Renderer::Get().SetBackgroundColor(glm::vec4(0.2f, 0.3f, 0.3f, 1.0f));
         Renderer::Get().Clear(GL_COLOR_BUFFER_BIT);
         
-        // tranform
-        glm::mat4 trans = glm::mat4(1.0f);
+        // transform
+        auto trans = glm::mat4(1.0f);
         trans = glm::translate(trans, glm::vec3(location[0], location[1], 0.0f));
         trans = glm::rotate(trans, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
         
@@ -96,7 +89,7 @@ namespace scene {
         Renderer::Get().Draw(*vao, *ebo, *shader);
     }
 
-    void SceneTransfrom::OnImGuiRender()
+    void SceneTransform::OnImGuiRender()
     {
         ImGui::Begin(m_name.c_str());
         ImGui::DragFloat2("Location", location, 0.01f, -1.0f, 1.0f, "%.2f");

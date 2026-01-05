@@ -1,18 +1,30 @@
 #pragma once
+#include <glad/glad.h>
 
 class VertexBuffer;
 
 class VertexArray
 {
 private:
-    unsigned int m_renderer_id;
+    GLuint m_renderer_id;
 
 public:
     VertexArray();
     ~VertexArray();
 
-    void SetLayout(const VertexBuffer& vbo, unsigned int layout, int size, unsigned int type, unsigned char normalize, int stride, const void* offset);
+    // Prevent copying
+    VertexArray(const VertexArray&) = delete;
+    VertexArray& operator=(const VertexArray&) = delete;
 
-    void Bind() const; 
+    // Allow moving
+    VertexArray(VertexArray&& other) noexcept;
+    VertexArray& operator=(VertexArray&& other) noexcept;
+
+    void SetLayout(const VertexBuffer& vbo, GLuint layout, GLint size, GLenum type,
+                   GLboolean normalize, GLsizei stride, const void* offset);
+
+    void Bind() const;
     void Unbind() const;
+
+    GLuint GetId() const { return m_renderer_id; }
 };

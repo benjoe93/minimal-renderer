@@ -9,12 +9,11 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
 #include "Material.h"
 
 #include "10_SceneSurfMaps.h"
 
-static float vertices[] = {
+constexpr float vertices[] = {
     // Positions            // Normal               // uv
     // Front face (z = -0.5)
     -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,    0.0f, 0.0f,
@@ -59,7 +58,7 @@ static float vertices[] = {
      -0.5f,  0.5f,  0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 0.0f,
      -0.5f,  0.5f, -0.5f,    0.0f,  1.0f,  0.0f,    0.0f, 1.0f
 };
-static unsigned int indices[] = {
+constexpr unsigned int indices[] = {
     // Front face
      2,  1,  0,
      5,  4,  3,
@@ -79,15 +78,15 @@ static unsigned int indices[] = {
       32, 31, 30,
       35, 34, 33
 };
-static size_t element_size = 36;
-static size_t buffer_size = element_size * 8 * sizeof(float);
+constexpr size_t element_size = 36;
+constexpr size_t buffer_size = element_size * 8 * sizeof(float);
 
 namespace scene {
 SceneSurfMaps::SceneSurfMaps()
     :Scene("Surface Maps")
 {
     ////////////////////////////////////////////////////////////////////////////
-    //                            geometery setup                             //
+    //                            geometry setup                              //
     ////////////////////////////////////////////////////////////////////////////
     object_va = std::make_unique<VertexArray>();
     object_va->Bind();
@@ -97,9 +96,9 @@ SceneSurfMaps::SceneSurfMaps()
     object_ib = std::make_unique<IndexBuffer>(indices, element_size);
     object_ib->Bind();
 
-    object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+    object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
+    object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(6 * sizeof(float)));
 
     object_material = std::make_unique<Material>("resources/shaders/01_Lighting/02_SurfaceMaps/object.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/object.frag");
 
@@ -121,7 +120,7 @@ SceneSurfMaps::SceneSurfMaps()
     light_ib = std::make_unique<IndexBuffer>(indices, element_size);
     light_ib->Bind();
 
-    light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
 
     light_material = std::make_unique<Material>("resources/shaders/01_Lighting/02_SurfaceMaps/light.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/light.frag");
 
@@ -134,12 +133,12 @@ void SceneSurfMaps::OnUpdate(double delta_time)
 {
     Camera& cam = Renderer::Get().GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
-    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
 
     ////////////////////////////////////////////////////////////////////////////
-    //                           geometery update                             //
+    //                           geometry update                              //
     ////////////////////////////////////////////////////////////////////////////
-    glm::mat4 model = glm::mat4(1.0f);
+    auto model = glm::mat4(1.0f);
 
     object_material->SetUniform("model", model);
     object_material->SetUniform("view", cam.GetViewMatrix());
@@ -157,7 +156,7 @@ void SceneSurfMaps::OnUpdate(double delta_time)
     ////////////////////////////////////////////////////////////////////////////
     //                             light update                               //
     ////////////////////////////////////////////////////////////////////////////
-    glm::mat4 light_transform = glm::mat4(1.0f);
+    auto light_transform = glm::mat4(1.0f);
     light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
     light_transform = glm::scale(light_transform, glm::vec3(0.1f, 0.1f, 0.1f));
     
@@ -171,7 +170,7 @@ void SceneSurfMaps::OnUpdate(double delta_time)
 void SceneSurfMaps::OnRender()
 {
     ////////////////////////////////////////////////////////////////////////////
-    //                          geometery rendering                           //
+    //                          geometry rendering                            //
     ////////////////////////////////////////////////////////////////////////////
     object_material->Bind();
     Renderer::Get().Draw(*object_va, *object_ib, *object_material->GetShader());

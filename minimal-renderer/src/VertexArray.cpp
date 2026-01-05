@@ -3,23 +3,49 @@
 #include "VertexArray.h"
 
 VertexArray::VertexArray()
+    : m_renderer_id(0)
 {
     GLCall(glGenVertexArrays(1, &m_renderer_id));
 }
 
 VertexArray::~VertexArray()
 {
-    GLCall(glDeleteVertexArrays(1, &m_renderer_id));
+    if (m_renderer_id != 0)
+    {
+        GLCall(glDeleteVertexArrays(1, &m_renderer_id));
+    }
 }
 
-void VertexArray::SetLayout(const VertexBuffer& vbo, unsigned int layout, int size, unsigned int type, unsigned char normalize, int stride, const void* offset)
+VertexArray::VertexArray(VertexArray&& other) noexcept
+    : m_renderer_id(other.m_renderer_id)
 {
+    other.m_renderer_id = 0;
+}
+
+VertexArray& VertexArray::operator=(VertexArray&& other) noexcept
+{
+    if (this != &other)
+    {
+        // Clean up existing resource
+        if (m_renderer_id != 0)
+        {
+            GLCall(glDeleteVertexArrays(1, &m_renderer_id));
+        }
+
+        // Move new resource
+        m_renderer_id = other.m_renderer_id;
+        other.m_renderer_id = 0;
+    }
+    return *this;
+}
+
+void VertexArray::SetLayout(const VertexBuffer& vbo, GLuint layout, GLint size, GLenum type, GLboolean normalize, GLsizei stride, const void* offset)
+{
+    Bind();
     vbo.Bind();
     GLCall(glVertexAttribPointer(layout, size, type, normalize, stride, offset));
     GLCall(glEnableVertexAttribArray(layout));
-    vbo.Unbind();
 }
-
 
 void VertexArray::Bind() const
 {

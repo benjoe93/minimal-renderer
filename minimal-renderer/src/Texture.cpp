@@ -1,19 +1,17 @@
 #include "Renderer.h"
 #include "Texture.h"
 
-
-Texture::Texture(unsigned int width, unsigned int height, unsigned int nr_channels)
+Texture::Texture(GLuint width, GLuint height, GLuint nr_channels)
     : m_width(width), m_height(height), m_nr_channels(nr_channels)
 {
 }
 
 Texture::~Texture()
 {
-    // check if valid id
     if (m_renderer_id != 0)
     {
-        glDeleteTextures(1, &m_renderer_id);
-        m_renderer_id = 0;  // reset to avoid double-deletion
+        GLCall(glDeleteTextures(1, &m_renderer_id));
+        m_renderer_id = 0;
     }
 }
 
@@ -30,17 +28,24 @@ Texture& Texture::operator=(Texture&& other) noexcept
 {
     if (this != &other)
     {
+        // Clean up existing resource
+        if (m_renderer_id != 0)
+        {
+            GLCall(glDeleteTextures(1, &m_renderer_id));
+        }
+
+        // Move the new resource
         m_renderer_id = other.m_renderer_id;
         m_width = other.m_width;
         m_height = other.m_height;
         m_nr_channels = other.m_nr_channels;
 
-        other.m_renderer_id = 0; // Prevent cleanup of moved resource
+        other.m_renderer_id = 0;
     }
     return *this;
 }
 
-void Texture::Bind(unsigned int slot) const
+void Texture::Bind(GLuint slot) const
 {
     GLCall(glActiveTexture(GL_TEXTURE0 + slot));
     GLCall(glBindTexture(GL_TEXTURE_2D, m_renderer_id));
@@ -62,12 +67,12 @@ GLenum Texture::GetFormat() const
     }
 }
 
-void Texture::SetWrappingHorizontal(const GLint new_wrapping)
+void Texture::SetWrappingHorizontal(GLint new_wrapping)
 {
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, new_wrapping));
 }
 
-void Texture::SetWrappingVertical(const GLint new_wrapping)
+void Texture::SetWrappingVertical(GLint new_wrapping)
 {
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, new_wrapping));
 }

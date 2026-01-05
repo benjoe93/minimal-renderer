@@ -1,10 +1,9 @@
 #pragma once
-#include <memory>
 #include <vector>
-
-#include "Renderer.h"
 #include "UniformBufferObject.h"
 #include "Scene.h"
+
+class Model;
 
 namespace scene {
     class SceneAdvancedGLSL : public Scene

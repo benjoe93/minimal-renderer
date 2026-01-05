@@ -2,8 +2,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "vendor/imgui/imgui.h"
-
 #include "Renderer.h"
 #include "Camera.h"
 #include "IndexBuffer.h"
@@ -15,7 +13,7 @@
 #include "07_SceneCubeMultiple.h"
 
 
-static float vertices[] = {
+constexpr float vertices[] = {
     // positions            // uvs        // colors
     -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
      0.5f, -0.5f, -0.5f,    1.0f, 0.0f,   1.0f, 0.0f, 0.0f,
@@ -59,7 +57,7 @@ static float vertices[] = {
     -0.5f,  0.5f,  0.5f,    0.0f, 0.0f,   1.0f, 0.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,   1.0f, 0.0f, 0.0f
 };
-static unsigned int indices[] = {
+constexpr unsigned int indices[] = {
      2,  1,  0, // back
      5,  4,  3,
      6,  7,  8, // front
@@ -73,7 +71,7 @@ static unsigned int indices[] = {
     32, 31, 30, // top
     35, 34, 33
 };
-static glm::vec3 cube_positions[] = {
+constexpr glm::vec3 cube_positions[] = {
     glm::vec3(0.0f,  0.0f,  0.0f),
     glm::vec3(2.0f,  5.0f, -15.0f),
     glm::vec3(-1.5f, -2.2f, -2.5f),
@@ -112,7 +110,7 @@ scene::SceneCubeMultiple::SceneCubeMultiple()
     default_shader->SetUniform("texture_2", 1);
 
     ////////////////////////////////////////////////////////////////////////////
-    //                            geometery setup                             //
+    //                            geometry setup                              //
     ////////////////////////////////////////////////////////////////////////////
     va = std::make_unique<VertexArray>();
     va->Bind();
@@ -122,9 +120,9 @@ scene::SceneCubeMultiple::SceneCubeMultiple()
     vb->Bind();
     ib = std::make_unique<IndexBuffer>(indices, 36);
 
-    va->SetLayout(*vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);                    // vertex position
-    va->SetLayout(*vb, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));  // uv coords
-    va->SetLayout(*vb, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));  // vertex color
+    va->SetLayout(*vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);                    // vertex position
+    va->SetLayout(*vb, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));  // uv coords
+    va->SetLayout(*vb, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(5 * sizeof(float)));  // vertex color
 
     vb->Unbind();
     va->Unbind();
@@ -133,15 +131,19 @@ scene::SceneCubeMultiple::SceneCubeMultiple()
 void scene::SceneCubeMultiple::OnRender()
 {
     // Projection matrix
-    glm::mat4 projection = glm::perspective(glm::radians(Renderer::Get().GetActiveCamera().GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
+    const glm::mat4 projection = glm::perspective(
+        glm::radians(Renderer::Get().GetActiveCamera().GetFov()),
+        static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+        0.1f,
+        100.0f);
 
     // Model matrix
     for (unsigned char i = 0; i < 10; i++)
     {
-        glm::mat4 model = glm::mat4(1.0f);
+        auto model = glm::mat4(1.0f);
         model = glm::translate(model, cube_positions[i]);
         // set rotation
-        float rotation = i * 20.0f;
+        const float rotation = i * 20.0f;
         model = glm::rotate(model, glm::radians(rotation), glm::vec3(1.0f, 0.3f, 0.5f));
 
         default_shader->SetUniform("model", model);

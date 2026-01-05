@@ -4,16 +4,23 @@
 class RenderBuffer
 {
 private:
-    unsigned int m_renderer_id;
-    unsigned int m_width;
-    unsigned int m_height;
+    GLuint m_renderer_id;
+    GLuint m_width;
+    GLuint m_height;
 
 public:
-    RenderBuffer(unsigned int width, unsigned int height);
+    RenderBuffer(GLuint width, GLuint height);
     ~RenderBuffer();
+
+    RenderBuffer(const RenderBuffer&) = delete;
+    RenderBuffer& operator=(const RenderBuffer&) = delete;
+    RenderBuffer(RenderBuffer&&) noexcept = default;
+    RenderBuffer& operator=(RenderBuffer&&) noexcept = default;
 
     void Bind() const;
     void Unbind() const;
 
-    unsigned int GetId() const { return m_renderer_id; }
+    GLuint GetId() const { return m_renderer_id; }
+    GLuint GetWidth() const { return m_width; }
+    GLuint GetHeight() const { return m_height; }
 };

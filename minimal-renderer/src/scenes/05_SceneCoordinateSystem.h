@@ -1,10 +1,6 @@
 #pragma once
 #include <memory>
-#include "LightDirectional.h"
-#include "LightPoint.h"
-#include "LightSpot.h"
 #include "Scene.h"
-#include "Model.h"
 
 class Renderer;
 class VertexArray;

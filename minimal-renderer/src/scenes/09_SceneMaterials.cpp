@@ -9,12 +9,11 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
 #include "Shader.h"
 
 #include "09_SceneMaterials.h"
 
-static float vertices[] = {
+constexpr float vertices[] = {
     // Positions            Normal
     // Front face (z = -0.5)
     -0.5f, -0.5f, -0.5f,     0.0f,  0.0f, -1.0f,
@@ -59,7 +58,7 @@ static float vertices[] = {
      -0.5f,  0.5f,  0.5f,     0.0f,  1.0f,  0.0f,
      -0.5f,  0.5f, -0.5f,     0.0f,  1.0f,  0.0f
 };
-static unsigned int indices[] = {
+constexpr unsigned int indices[] = {
     // Front face
      2,  1,  0,
      5,  4,  3,
@@ -79,15 +78,15 @@ static unsigned int indices[] = {
       32, 31, 30,
       35, 34, 33
 };
-static size_t element_size = 36;
-static size_t buffer_size = element_size * 6 * sizeof(float);
+constexpr size_t element_size = 36;
+constexpr size_t buffer_size = element_size * 6 * sizeof(float);
 
 namespace scene {
 SceneMaterials::SceneMaterials()
     :Scene("Materials")
 {
     ////////////////////////////////////////////////////////////////////////////
-    //                            geometery setup                             //
+    //                            geometry setup                              //
     ////////////////////////////////////////////////////////////////////////////
     object_va = std::make_unique<VertexArray>();
     object_va->Bind();
@@ -135,10 +134,10 @@ void SceneMaterials::OnRender()
     glm::vec3 cam_pos = cam.GetPosition();
 
     ////////////////////////////////////////////////////////////////////////////
-    //                          geometery rendering                           //
+    //                          geometry rendering                            //
     ////////////////////////////////////////////////////////////////////////////
-    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
-    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
+    auto model = glm::mat4(1.0f);
     //model = glm::translate(model, glm::vec3(-1.0f, 0.0f, 0.0f));
     glm::mat4 mvp_matrix = projection * cam.GetViewMatrix() * model;
 
@@ -162,7 +161,7 @@ void SceneMaterials::OnRender()
     //                            light rendering                             //
     ////////////////////////////////////////////////////////////////////////////
     light_shader->Bind();
-    glm::mat4 light_transform = glm::mat4(1.0f);
+    auto light_transform = glm::mat4(1.0f);
     light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
     light_shader->SetUniform("model", light_transform);
     light_shader->SetUniform("view", cam.GetViewMatrix());

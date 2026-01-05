@@ -1,18 +1,12 @@
 #include <map>
+#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "vendor/imgui/imgui.h"
-
-#include "LightDirectional.h"
-#include "LightPoint.h"
-
 #include "Renderer.h"
 #include "Camera.h"
 #include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
 #include "Texture2D.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -28,18 +22,18 @@ namespace scene {
     {
         Renderer::Get().SetFaceCulling(false);
         
-        window_loc.push_back(glm::vec3(-1.5f, 0.0f, -0.48f));
-        window_loc.push_back(glm::vec3( 1.5f, 0.0f,  0.51f));
-        window_loc.push_back(glm::vec3( 0.0f, 0.0f,  0.7f));
-        window_loc.push_back(glm::vec3(-0.3f, 0.0f, -2.3f));
-        window_loc.push_back(glm::vec3( 0.5f, 0.0f, -0.6f));
+        window_loc.emplace_back(-1.5f, 0.0f, -0.48f);
+        window_loc.emplace_back( 1.5f, 0.0f,  0.51f);
+        window_loc.emplace_back( 0.0f, 0.0f,  0.7f);
+        window_loc.emplace_back(-0.3f, 0.0f, -2.3f);
+        window_loc.emplace_back( 0.5f, 0.0f, -0.6f);
 
-        vegetation_loc.push_back(glm::vec3( 0.5f, -0.25f,  0.48f));
-        vegetation_loc.push_back(glm::vec3(-2.5f, -0.25f, -0.51f));
-        vegetation_loc.push_back(glm::vec3( 0.0f, -0.25f,  0.2f));
+        vegetation_loc.emplace_back( 0.5f, -0.25f,  0.48f);
+        vegetation_loc.emplace_back(-2.5f, -0.25f, -0.51f);
+        vegetation_loc.emplace_back( 0.0f, -0.25f,  0.2f);
 
         ////////////////////////////////////////////////////////////////////////////
-        //                            geometery setup                             //
+        //                            geometry setup                              //
         ////////////////////////////////////////////////////////////////////////////
         // floor
         Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
@@ -47,7 +41,7 @@ namespace scene {
         std::string vertex_path = "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert";
         std::string fragment_path = "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag";
 
-        std::unique_ptr<Model> floor = std::make_unique<Model>(
+        auto floor = std::make_unique<Model>(
             "resources/models/plane.fbx",
             vertex_path,
             fragment_path,
@@ -63,7 +57,7 @@ namespace scene {
             objects.push_back(std::move(floor));
         
         // Box 1
-        std::unique_ptr<Model> box1 = std::make_unique<Model>(
+        auto box1 = std::make_unique<Model>(
             "resources/models/box.fbx",
             vertex_path,
             fragment_path,
@@ -79,7 +73,7 @@ namespace scene {
         objects.push_back(std::move(box1));
 
         // Box 2
-        std::unique_ptr<Model> box2 = std::make_unique<Model>(
+        auto box2 = std::make_unique<Model>(
             "resources/models/box.fbx",
             vertex_path,
             fragment_path,
@@ -96,14 +90,14 @@ namespace scene {
 
         // windows
         Texture2D* window_tex = ResourceManager::Get().GetTexture2D("resources/textures/window.png", true);
-        for (unsigned int i = 0; i < window_loc.size(); i++)
+        for (auto location : window_loc)
         {
-            std::unique_ptr<Model> window = std::make_unique<Model>(
+            auto window = std::make_unique<Model>(
                 "resources/models/plane.fbx",
                 "resources/shaders/03_AdvancedOpenGL/03_Blending/window.vert",
                 "resources/shaders/03_AdvancedOpenGL/03_Blending/window.frag",
                 Transform(
-                    window_loc[i], 
+                    location,
                     glm::vec3(0.0f, 0.0f, 180.0f),
                     glm::vec3(0.1f)
                 )
@@ -118,14 +112,14 @@ namespace scene {
         Texture2D* grass_tex = ResourceManager::Get().GetTexture2D("resources/textures/grass.png", true);
         grass_tex->SetWrappingHorizontal(GL_CLAMP_TO_EDGE);
         grass_tex->SetWrappingVertical(GL_CLAMP_TO_EDGE);
-        for (unsigned int i = 0; i < vegetation_loc.size(); i++)
+        for (auto location : vegetation_loc)
         {
-            std::unique_ptr<Model> grass = std::make_unique<Model>(
+            auto grass = std::make_unique<Model>(
                 "resources/models/plane.fbx",
                 "resources/shaders/03_AdvancedOpenGL/03_Blending/grass.vert",
                 "resources/shaders/03_AdvancedOpenGL/03_Blending/grass.frag",
                 Transform(
-                    vegetation_loc[i],
+                    location,
                     glm::vec3(0.0f, 0.0f, 180.0f),
                     glm::vec3(0.05f)
                 )
@@ -144,10 +138,15 @@ namespace scene {
         Camera& cam = Renderer::Get().GetActiveCamera();
 
         glm::mat4 projection, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
+        projection = glm::perspective(
+            glm::radians(cam.GetFov()),
+            static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+            Renderer::Get().GetState().near_plane,
+            Renderer::Get().GetState().far_plane
+        );
 
         ////////////////////////////////////////////////////////////////////////////
-        //                           geometery update                             //
+        //                           geometry update                             //
         ////////////////////////////////////////////////////////////////////////////
         for (auto& obj : objects)
         {
@@ -176,21 +175,19 @@ namespace scene {
     {
         // sort transparent objects based on distance from camera
         std::map<float, Model*> sorted;
-        for (unsigned int i = 0; i < transparent_objects.size(); i++)
+        for (const auto & transparent_object : transparent_objects)
         {
-            float distance = glm::length(Renderer::Get().GetActiveCamera().GetPosition() - transparent_objects[i]->GetLocation());
-            sorted[distance] = transparent_objects[i].get();
+            float distance = glm::length(Renderer::Get().GetActiveCamera().GetPosition() - transparent_object->GetLocation());
+            sorted[distance] = transparent_object.get();
         }
 
         for (auto& obj : objects)
             Renderer::Get().Draw(*obj);
 
         // render object in reverse distance order
-        for (std::map<float, Model*>::reverse_iterator it = sorted.rbegin(); it != sorted.rend(); ++it)
+        for (auto it = sorted.rbegin(); it != sorted.rend(); ++it)
             Renderer::Get().Draw(*it->second);
     }
 
-    void SceneBlending::OnImGuiRender()
-    {
-    }
+    void SceneBlending::OnImGuiRender() { }
 }

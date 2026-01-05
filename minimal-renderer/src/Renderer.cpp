@@ -1,15 +1,10 @@
-#include <cstddef>
-
-#include "Camera.h"
 #include "Material.h"
 #include "Model.h"
-#include "ResourceManager.h"
 #include "VertexArray.h"
 #include "IndexBuffer.h"
 #include "Shader.h"
 
 #include "Renderer.h"
-
 
 Renderer::Renderer()
 {
@@ -26,30 +21,42 @@ Renderer::Renderer()
     SetFaceCullingMode(FaceCullMode::BACK);
 
     // Log OpenGL stats
+#ifndef NDEBUG
     std::cout << "OpenGL Version: \t" << glGetString(GL_VERSION) << std::endl;
     std::cout << "GLSL Version: \t\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     std::cout << "OpenGL Driver Vendor: \t" << glGetString(GL_VENDOR) << std::endl;
     std::cout << "OpenGL Renderer: \t" << glGetString(GL_RENDERER) << std::endl;
     std::cout << "Max vertex attribs: \t" << GetMaxVertexAttribs() << std::endl << std::endl;
+#endif
 }
-
-Renderer::~Renderer() {}
 
 Renderer& Renderer::Get()
 {
-    static Renderer m_instance = Renderer();
+    static auto m_instance = Renderer();
     return m_instance;
 }
 
 void Renderer::Clear(GLbitfield bits) const
 {
-    GLCall(glClearColor(m_background_color.x, m_background_color.y, m_background_color.z, m_background_color.w));
     GLCall(glClear(bits));
 }
 
 void Renderer::Tick(double current_time)
 {
-    m_delta_time = current_time - m_last_frame;
+    // If m_last_frame hasn't been set yet, initialize it
+    if (m_last_frame == 0.0) {
+        m_last_frame = current_time;
+    }
+
+    double frame_time = current_time - m_last_frame;
+
+    // Cap the delta time to 0.1s (10 FPS) to prevent
+    // physics "explosions" after a hang or pause.
+    if (frame_time > 0.1) {
+        frame_time = 0.1;
+    }
+
+    m_delta_time = frame_time;
     m_last_frame = current_time;
 }
 
@@ -58,7 +65,7 @@ void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& 
 {
     shader.Bind();
     va.Bind();
-    GLCall(glDrawElements(GL_TRIANGLES, ib.GetCount() , GL_UNSIGNED_INT, nullptr));
+    GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(ib.GetCount()), GL_UNSIGNED_INT, nullptr));
 }
 
 void Renderer::Draw(const VertexArray& va, int count, Material& material) const
@@ -72,11 +79,11 @@ void Renderer::Draw(Model& obj)
 {
     for (auto& mesh : obj.GetMeshes())
     {
-        IndexBuffer* ib = mesh->GetIndexBuffer();
+        IndexBuffer* ib = &mesh->GetIndexBuffer();
         auto& material = mesh->GetMaterial();
 
         material.Bind();
-        mesh->GetVertexArray()->Bind();
+        mesh->GetVertexArray().Bind();
         GLCall(glDrawElements(GL_TRIANGLES, ib->GetCount(), GL_UNSIGNED_INT, nullptr));
         material.Unbind();
     }
@@ -148,16 +155,20 @@ void Renderer::SetWireframeRender(bool enabled)
     {
         GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
     }
+    else
+    {
+        GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
+    }
 }
 
 void Renderer::SetDepthFunction(TestingFunc function)
 {
-    GLCall(glDepthFunc(static_cast<unsigned int>(function)));
+    GLCall(glDepthFunc(static_cast<GLenum>(function)));
 }
 
 void Renderer::SetStencilFunction(TestingFunc function, int reference_value, unsigned int bit_mask)
 {
-    GLCall(glStencilFunc(static_cast<unsigned int>(function), reference_value, bit_mask));
+    GLCall(glStencilFunc(static_cast<GLenum>(function), reference_value, bit_mask));
 }
 
 void Renderer::SetStencilMask(unsigned int bit_mask)
@@ -167,38 +178,55 @@ void Renderer::SetStencilMask(unsigned int bit_mask)
 
 void Renderer::SetStencilOperation(StencilOp stencil_fail, StencilOp depth_fail, StencilOp pass)
 {
-    GLCall(glStencilOp(static_cast<unsigned int>(stencil_fail), static_cast<unsigned int>(depth_fail), static_cast<unsigned int>(pass)));
+    GLCall(glStencilOp(static_cast<GLenum>(stencil_fail), static_cast<GLenum>(depth_fail), static_cast<GLenum>(pass)));
 }
 
 void Renderer::SetBlendFunction(BlendFunc src_factor, BlendFunc dst_factor)
 {
-    GLCall(glBlendFunc(static_cast<unsigned int>(src_factor), static_cast<unsigned int>(dst_factor)));
+    GLCall(glBlendFunc(static_cast<GLenum>(src_factor), static_cast<GLenum>(dst_factor)));
 }
 
 void Renderer::SetBlendEquation(BlendEquation eq)
 {
-    GLCall(glBlendEquation(static_cast<unsigned int>(eq)));
+    GLCall(glBlendEquation(static_cast<GLenum>(eq)));
 }
 
 void Renderer::SetFaceCullingMode(FaceCullMode mode)
 {
-    GLCall(glCullFace(static_cast<unsigned int>(mode)));
+    GLCall(glCullFace(static_cast<GLenum>(mode)));
 }
 
 void Renderer::SetFrontFace(FrontFace mode)
 {
-    GLCall(glFrontFace(static_cast<unsigned int>(mode)));
+    GLCall(glFrontFace(static_cast<GLenum>(mode)));
+}
+
+void Renderer::SetBackgroundColor(const glm::vec4 &new_color)
+{
+    m_background_color = new_color;
+    GLCall(glClearColor(new_color.r, new_color.g, new_color.b, new_color.a));
 }
 #pragma endregion
 
-int Renderer::GetMaxVertexAttribs() const
+GLint Renderer::GetMaxVertexAttribs() const
 {
-    int nrAttr;
+    GLint nrAttr;
     GLCall(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttr));
     return nrAttr;
 }
 
+void Renderer::SetScreenSize(GLuint width, GLuint height)
+{
+    m_state.scr_width = width;
+    m_state.scr_height = height;
+}
+
 Camera& Renderer::GetActiveCamera() const
 {
-    return *state.cameras.at(state.active_camera);
+    auto it = m_state.cameras.find(m_state.active_camera);
+    if (it == m_state.cameras.end())
+    {
+        throw std::runtime_error("Active camera not found!");
+    }
+    return *it->second;
 }

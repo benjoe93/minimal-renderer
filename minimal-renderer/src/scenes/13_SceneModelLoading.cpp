@@ -2,17 +2,11 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "vendor/imgui/imgui.h"
-
 #include "LightDirectional.h"
 #include "LightPoint.h"
 
 #include "Renderer.h"
 #include "Camera.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "Texture.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
@@ -54,7 +48,7 @@ namespace scene {
         glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
 
         directional_light->Update(projection, cam.GetViewMatrix());
 
@@ -94,12 +88,10 @@ namespace scene {
 
 
         ////////////////////////////////////////////////////////////////////////////
-        //                          geometery rendering                           //
+        //                          geometry rendering                            //
         ////////////////////////////////////////////////////////////////////////////
         Renderer::Get().Draw(*object);
     }
 
-    void SceneModelLoading::OnImGuiRender()
-    {
-    }
+    void SceneModelLoading::OnImGuiRender() { }
 }

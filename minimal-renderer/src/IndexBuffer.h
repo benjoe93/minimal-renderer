@@ -1,17 +1,24 @@
 #pragma once
+#include <glad/glad.h>
 
 class IndexBuffer
 {
 private:
-    unsigned int m_renderer_id;
-    unsigned int m_count;
+    GLuint m_renderer_id;
+    size_t m_count;
 
 public:
-    IndexBuffer(const unsigned int* data, size_t count);
+    IndexBuffer(const GLuint *data, size_t count);
     ~IndexBuffer();
+
+    IndexBuffer(const IndexBuffer&) = delete;
+    IndexBuffer& operator=(const IndexBuffer&) = delete;
+    IndexBuffer(IndexBuffer&&) noexcept = default;
+    IndexBuffer& operator=(IndexBuffer&&) noexcept = default;
 
     void Bind() const;
     void Unbind() const;
 
-    unsigned int GetCount() const { return m_count; }
+    GLuint GetId() const { return m_renderer_id; }
+    size_t GetCount() const { return m_count; }
 };

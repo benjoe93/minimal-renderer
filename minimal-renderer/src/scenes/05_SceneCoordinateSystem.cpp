@@ -1,16 +1,10 @@
-#include <map>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "vendor/imgui/imgui.h"
-#include "vendor/stb_image/stb_image.h"
-
-#include "LightDirectional.h"
-#include "LightPoint.h"
 
 #include "Renderer.h"
-#include "Camera.h"
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
@@ -57,7 +51,7 @@ namespace scene {
         shader->SetUniform("texture2", 1);
 
         ////////////////////////////////////////////////////////////////////////////
-        //                            geometery setup                             //
+        //                            geometry setup                              //
         ////////////////////////////////////////////////////////////////////////////
 
         // vertex array object
@@ -72,9 +66,9 @@ namespace scene {
         ebo = std::make_unique<IndexBuffer>(indices, 6);
         ebo->Bind();
 
-        vao->SetLayout(*vbo, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);                    // vertex position
-        vao->SetLayout(*vbo, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));  // uv coords
-        vao->SetLayout(*vbo, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));  // vertex color
+        vao->SetLayout(*vbo, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);                                // vertex position
+        vao->SetLayout(*vbo, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));  // uv coords
+        vao->SetLayout(*vbo, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(5 * sizeof(float)));  // vertex color
         
         vbo->Unbind();
         vao->Unbind();
@@ -89,15 +83,16 @@ namespace scene {
         Renderer::Get().Clear(GL_COLOR_BUFFER_BIT);
         
         // Projection matrix
-        float aspect = static_cast<float>(Renderer::Get().state.scr_width) / Renderer::Get().state.scr_height;
-        glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspect, Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
+        const auto& renderer = Renderer::Get();
+        const float aspect = static_cast<float>(renderer.GetScreenWidth()) / static_cast<float>(renderer.GetScreenHeight());
+        const glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspect, Renderer::Get().GetState().near_plane, Renderer::Get().GetState().far_plane);
 
         // View matrix
-        glm::mat4 view = glm::mat4(1.0f);
+        auto view = glm::mat4(1.0f);
         view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
         // Model matrix
-        glm::mat4 model = glm::mat4(1.0f);
+        auto model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(location[0], location[1], location[2]));
         model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));

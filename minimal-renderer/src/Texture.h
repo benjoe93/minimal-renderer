@@ -4,33 +4,32 @@
 class Texture
 {
     protected:
-        unsigned int m_renderer_id = 0;
-        unsigned int m_width;
-        unsigned int m_height;
-        unsigned int m_nr_channels;
+        GLuint m_renderer_id = 0;
+        GLuint m_width;
+        GLuint m_height;
+        GLuint m_nr_channels;
 
         GLenum GetFormat() const;
 
-    public:
-        Texture(unsigned int width, unsigned int height, unsigned int nr_channels);
-        virtual ~Texture();
+public:
+    Texture(GLuint width, GLuint height, GLuint nr_channels);
+    virtual ~Texture();
 
-        // move 
-        Texture(Texture&& other) noexcept;
-        Texture& operator=(Texture&& other) noexcept;
+    // Prevent copying
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
 
-        // prevent copying
-        Texture(const Texture&) = delete;
-        Texture& operator=(const Texture&) = delete;
+    // Move semantics
+    Texture(Texture&& other) noexcept;
+    Texture& operator=(Texture&& other) noexcept;
 
+    virtual void Bind(GLuint slot = 0) const;
+    virtual void Unbind() const;
 
-        virtual void Bind(unsigned int slot = 0) const;
-        virtual void Unbind() const;
+    GLuint GetId() const { return m_renderer_id; }
+    GLuint GetWidth() const { return m_width; }
+    GLuint GetHeight() const { return m_height; }
 
-        unsigned int GetId() const { return m_renderer_id; }
-        unsigned int GetWidht() const { return m_width; }
-        unsigned int GetHeight() const { return m_height; }
-
-        void SetWrappingHorizontal(const GLint new_wrapping);
-        void SetWrappingVertical(const GLint new_wrapping);
+    void SetWrappingHorizontal(GLint new_wrapping);
+    void SetWrappingVertical(GLint new_wrapping);
 };

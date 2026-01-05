@@ -24,7 +24,11 @@ namespace scene {
 
         // store the projection matrix (we only do this once now) (note: we're not using zoom anymore by changing the FoV)
         Camera& cam = Renderer::Get().GetActiveCamera();
-        glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
+        glm::mat4 projection = glm::perspective(
+            glm::radians(cam.GetFov()),
+            static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+            Renderer::Get().GetState().near_plane,
+            Renderer::Get().GetState().far_plane);
         m_uniform_buffer->Bind();
         m_uniform_buffer->StoreData(0, sizeof(glm::mat4), glm::value_ptr(projection));
         m_uniform_buffer->Unbind();
@@ -86,7 +90,11 @@ namespace scene {
         Camera& cam = Renderer::Get().GetActiveCamera();
 
         glm::mat4 projection, ModelView, MVP, view;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
+        projection = glm::perspective(
+            glm::radians(cam.GetFov()),
+            static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+            Renderer::Get().GetState().near_plane,
+            Renderer::Get().GetState().far_plane);
         view = cam.GetViewMatrix();
 
         // set the view matrix in the uniform block - we only have to do this once per loop iteration.
@@ -106,7 +114,6 @@ namespace scene {
                 //mat->SetUniform("projection", projection);
                 //mat->SetUniform("view", view);
             }
-
         }
     }
 

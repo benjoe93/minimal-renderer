@@ -1,5 +1,5 @@
 #pragma once
-#include <iostream>
+#include <string>
 #include "Texture.h"
 
 class Texture2D : public Texture
@@ -10,17 +10,16 @@ private:
     void LoadTexture(bool vertical_flip);
 
 public:
-    // connstuctor to read and build the texture
-    Texture2D(const std::string filepath, bool vertical_flip = true);
-    ~Texture2D();
+    Texture2D(const std::string& filepath, bool vertical_flip = true);
+    ~Texture2D() = default;
 
-    // Prevent copying (textures own GPU resources)
+    // Prevent copying
     Texture2D(const Texture2D&) = delete;
     Texture2D& operator=(const Texture2D&) = delete;
 
     // Allow moving
     Texture2D(Texture2D&& other) noexcept;
     Texture2D& operator=(Texture2D&& other) noexcept;
-    
-    std::string GetFilepath() const { return m_filepath; }
+
+    const std::string& GetFilepath() const { return m_filepath; }
 };

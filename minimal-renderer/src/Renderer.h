@@ -16,25 +16,32 @@ class IndexBuffer;
 class Shader;
 
 #pragma region OpenGLErrorHandling
-    #define ASSERT(x) if (!(x)) __debugbreak();
-    #define GLCall(x) GLClearError();\
-        x;\
-        ASSERT(GLLogCall(#x, __FILE__, __LINE__))
-
-    static void GLClearError()
+namespace GLDebug
     {
-        while (glGetError() != GL_NO_ERROR);
-    }
-
-    static bool GLLogCall(const char* function, const char* file, int line)
-    {
-        while (GLenum error = glGetError())
+        inline void ClearError()
         {
-            std::cout << "[OpenGL Error] (" << error << "): " << function << " " << file << ":" << line << std::endl;
-            return false;
+            while (glGetError() != GL_NO_ERROR);
         }
-        return true;
+
+        inline bool LogCall(const char* function, const char* file, int line)
+        {
+            bool success = true;
+            while (GLenum error = glGetError())
+            {
+                std::cerr << "[OpenGL Error] (0x" << std::hex << error << std::dec
+                          << "): " << function << " " << file << ":" << line << '\n';
+                success = false;
+            }
+            return success;
+        }
     }
+
+    #ifdef NDEBUG
+    #define GLCall(x) x
+    #else
+    #define ASSERT(x) if (!(x)) __debugbreak();
+    #define GLCall(x) GLDebug::ClearError(); x; ASSERT(GLDebug::LogCall(#x, __FILE__, __LINE__))
+    #endif
 #pragma endregion
 
 #pragma region Enums
@@ -100,19 +107,19 @@ class Shader;
 
 struct AppState
 {
-    unsigned int scr_width = 1280;
-    unsigned int scr_height = 720;
+GLuint scr_width = 1280;
+    GLuint scr_height = 720;
 
     float near_plane = 0.1f;
     float far_plane  = 100.0f;
 
     bool cursor_disabled = false;
 
-    float last_x = 640;
-    float last_y = 360;
+    float last_x = 640.0f;
+    float last_y = 360.0f;
 
-    unsigned int active_camera = 0;
-    std::unordered_map<unsigned int, Camera*> cameras;
+    GLuint active_camera = 0;
+    std::unordered_map<GLuint, Camera*> cameras;
 };
 
 class Renderer
@@ -129,15 +136,16 @@ class Renderer
         double m_delta_time = 0.0;
         double m_last_frame = 0.0;
 
-    public:
-        AppState state = AppState();
+        AppState m_state = AppState();
 
     private:
         Renderer();
-        ~Renderer();
+        ~Renderer() = default;
 
     public:
         Renderer(const Renderer&) = delete; // delete copy constructor
+        Renderer& operator=(const Renderer&) = delete;
+
         static Renderer& Get();
 
         /*Clear specified Render Targets
@@ -149,25 +157,24 @@ class Renderer
         void Clear(GLbitfield bits = GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT) const;
         void Tick(double current_time);
 
-        /* Set RenderTarget background color */
-        void SetBackgroundColor(glm::vec4 new_color) { m_background_color = new_color; }
-
-        #pragma region DrawFunctions
+    #pragma region DrawFunctions
         /* Draw mesh using Vertex Array and Index Buffer class. Use when verts are shared using an Index buffer. */
         void Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const;
         /* Draw mesh using Vertex Array class. Use when only have access to a list of vert data. */
-        void Draw(const VertexArray& va, int count, Material& material) const;
+        void Draw(const VertexArray& va, GLsizei count, Material& material) const;
         /* Draw mesh using Model class*/
         void Draw(Model& obj);
-        #pragma endregion
+    #pragma endregion
 
-        #pragma region RenderSettings
+    #pragma region RenderSettings
+        // Render state
         void SetBlending(bool enabled);
         void SetDepthTest(bool enabled);
         void SetFaceCulling(bool enabled);
         void SetStencilTest(bool enabled);
         void SetWireframeRender(bool enabled);
 
+        // Configuration
         /* Specifies the comparison function for depth testing. For more info: https://docs.gl/gl3/glDepthFunc */
         void SetDepthFunction(TestingFunc function);
 
@@ -192,17 +199,25 @@ class Renderer
 
         void SetFaceCullingMode(FaceCullMode mode);
         void SetFrontFace(FrontFace mode);
-        #pragma endregion
+        /* Set RenderTarget background color */
+        void SetBackgroundColor(const glm::vec4& new_color);
+        void SetScreenSize(GLuint width, GLuint height);
+    #pragma endregion
 
+        // Queries
         Camera& GetActiveCamera() const;
-        int GetMaxVertexAttribs() const;
+        GLint GetMaxVertexAttribs() const;
+        AppState& GetState() { return m_state; }
+        const AppState& GetState() const { return m_state; }
+        GLuint GetScreenWidth() const { return m_state.scr_width; }
+        GLuint GetScreenHeight() const { return m_state.scr_height; }
 
-        inline double GetDeltaTime() const { return m_delta_time; }
-        inline float GetDeltaTimeFloat() const { return static_cast<float>(m_delta_time); }
+        double GetDeltaTime() const { return m_delta_time; }
+        float GetDeltaTimeFloat() const { return static_cast<float>(m_delta_time); }
 
-        inline bool IsBlending() const { return m_blending; }
-        inline bool IsDepthTest() const { return m_depth_buffer; }
-        inline bool IsStencilTest() const { return m_stencil_buffer; }
-        inline bool IsWireframe() const { return m_wireframe; }
-        inline bool IsFaceCulling() const { return m_face_culling; }
+        bool IsBlending() const { return m_blending; }
+        bool IsDepthTest() const { return m_depth_buffer; }
+        bool IsStencilTest() const { return m_stencil_buffer; }
+        bool IsWireframe() const { return m_wireframe; }
+        bool IsFaceCulling() const { return m_face_culling; }
 };

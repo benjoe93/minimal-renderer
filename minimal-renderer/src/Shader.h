@@ -1,22 +1,27 @@
 #pragma once
 #include <string>
+#include <vector>
 
 #include "Renderer.h"
-#include "Texture.h"
 #include "UniformBufferObject.h"
-
 
 class Shader
 {
 private:
-    unsigned int m_renderer_id;
-    std::string& m_vertex_path;
-    std::string& m_fragment_path;
+    GLuint m_renderer_id;
+    std::string m_vertex_path;
+    std::string m_fragment_path;
     std::vector<std::pair<std::string, UniformBufferObj*>> u_uniform_buffers;
+    mutable std::unordered_map<std::string, GLint> m_uniform_cache;
 
 public:
-    Shader(std::string vertex_path, std::string fragment_path);
+    Shader(const std::string& vertex_path, const std::string& fragment_path);
     ~Shader();
+
+    Shader(const Shader&) = delete;
+    Shader& operator=(const Shader&) = delete;
+    Shader(Shader&&) noexcept = default;
+    Shader& operator=(Shader&&) noexcept = default;
 
     void Bind() const;
     void Unbind() const;
@@ -27,15 +32,16 @@ public:
     void SetUniform(const std::string& name, bool value);
     void SetUniform(const std::string& name, int value);
     void SetUniform(const std::string& name, float value);
-    void SetUniform(const std::string& name, const float x, const float y, const float z);
-    void SetUniform(const std::string& name, const float x, const float y, const float z, const float w);
-    void SetUniform(const std::string& name, glm::mat4 value);
+    void SetUniform(const std::string& name, float x, float y, float z);
+    void SetUniform(const std::string& name, float x, float y, float z, float w);
+    void SetUniform(const std::string& name, const glm::mat4& value);
 
     void PrintShaderFiles() const;
 
+    GLuint GetId() const { return m_renderer_id; }
     const std::string& GetVertexPath() const { return m_vertex_path; }
     const std::string& GetFragmentPath() const { return m_fragment_path; }
 
     void BindUniformBuffer(const std::string& block_name, UniformBufferObj* buffer);
-    unsigned int GetUniformBlockIndex(const std::string& block_name) const;
+    GLuint GetUniformBlockIndex(const std::string& block_name) const;
  };

@@ -80,7 +80,7 @@ scene::SceneCube::SceneCube()
     default_shader->SetUniform("texture_2", 1);
 
     ////////////////////////////////////////////////////////////////////////////
-    //                            geometery setup                             //
+    //                            geometry setup                              //
     ////////////////////////////////////////////////////////////////////////////
     va = std::make_unique<VertexArray>();
     va->Bind();
@@ -90,9 +90,9 @@ scene::SceneCube::SceneCube()
     vb->Bind();
     ib = std::make_unique<IndexBuffer>(indices, 36);
 
-    va->SetLayout(*vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);                    // vertex position
-    va->SetLayout(*vb, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));  // uv coords
-    va->SetLayout(*vb, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(5 * sizeof(float)));  // vertex color
+    va->SetLayout(*vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);                                // vertex position
+    va->SetLayout(*vb, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));  // uv coords
+    va->SetLayout(*vb, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(5 * sizeof(float)));  // vertex color
 
     vb->Unbind();
     va->Unbind();
@@ -101,10 +101,15 @@ scene::SceneCube::SceneCube()
 void scene::SceneCube::OnRender()
 {
     // Projection matrix
-    glm::mat4 projection = glm::perspective(glm::radians(Renderer::Get().GetActiveCamera().GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
+    const glm::mat4 projection = glm::perspective(
+        glm::radians(Renderer::Get().GetActiveCamera().GetFov()),
+        static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+        0.1f,
+        100.0f
+    );
 
     // Model matrix
-    glm::mat4 model = glm::mat4(1.0f);
+    auto model = glm::mat4(1.0f);
     // transform with user input
     model = glm::translate(model, glm::vec3(location[0], location[1], location[2]));
     model = glm::rotate(model, glm::radians(rotation[0]), glm::vec3(1.0f, 0.0f, 0.0f));

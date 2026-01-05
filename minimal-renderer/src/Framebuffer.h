@@ -1,9 +1,7 @@
 #pragma once
 #include <iostream>
 #include <unordered_map>
-#include <memory>
-
-#include "Renderer.h"
+#include <glad/glad.h>
 
 class RenderTarget;
 class RenderBuffer;
@@ -50,7 +48,7 @@ enum class AttachmentTarget
 class Framebuffer
 {
 private:
-    unsigned int m_renderer_id;
+    GLuint m_renderer_id;
     std::unordered_map<AttachmentTarget, RenderTarget*> render_targets;
 
     void Validate() const;
@@ -59,11 +57,18 @@ public:
     Framebuffer();
     ~Framebuffer();
 
+    Framebuffer(const Framebuffer&) = delete;
+    Framebuffer& operator=(const Framebuffer&) = delete;
+    Framebuffer(Framebuffer&&) = default;
+    Framebuffer& operator=(Framebuffer&&) = default;
+
     void Bind() const;
     void Unbind() const;
 
     void AttachRenderTarget(AttachmentTarget target, RenderTarget* render_target);
-    void AttachRenderBuffer(AttachmentTarget target, RenderBuffer* render_buffer);
+    void AttachRenderBuffer(AttachmentTarget target, const RenderBuffer* render_buffer);
+
+   GLuint GetId() const { return m_renderer_id; }
 
     RenderTarget* GetRenderTarget(AttachmentTarget target) const;
 };

@@ -1,14 +1,19 @@
 #include <iostream>
 
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/string_cast.hpp>
+
 #include "LightDirectional.h"
 
-DirectionalLight::DirectionalLight(glm::vec3 position, glm::vec3 direction, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular)
+DirectionalLight::DirectionalLight(const glm::vec3& position, const glm::vec3& direction, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular)
     : Light(position, ambient, diffuse, specular), m_direction(direction)
 {
+#ifndef NDEBUG
     std::cout << "Directional light {\n";
-    std::cout << "  " << "Direction: { " << m_direction.x << ", " << m_direction.y << ", " << m_direction.z << " }\n";
-    std::cout << "  " << "Ambient:   { " << m_ambient.x   << ", " << m_ambient.y   << ", " << m_ambient.z   << " }\n";
-    std::cout << "  " << "Diffuse:   { " << m_diffuse.x   << ", " << m_diffuse.y   << ", " << m_diffuse.z   << " }\n";
-    std::cout << "  " << "Specular:  { " << m_specular.x  << ", " << m_specular.y  << ", " << m_specular.z  << " }\n";
+    std::cout << "  Direction: " << glm::to_string(m_direction) << "\n";
+    std::cout << "  Ambient:   " << glm::to_string(m_ambient) << "\n";
+    std::cout << "  Diffuse:   " << glm::to_string(m_diffuse) << "\n";
+    std::cout << "  Specular:  " << glm::to_string(m_specular) << "\n";
     std::cout << "}\n\n";
+#endif
 }

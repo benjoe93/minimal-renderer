@@ -2,24 +2,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "vendor/imgui/imgui.h"
-
-#include "LightDirectional.h"
-#include "LightPoint.h"
-
 #include "Renderer.h"
 #include "Camera.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "Texture.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
 
 #include "14_SceneDepthTesting.h"
-
-
 
 namespace scene {
 
@@ -31,7 +20,7 @@ namespace scene {
         Camera& camera = Renderer::Get().GetActiveCamera();
 
         ////////////////////////////////////////////////////////////////////////////
-        //                            geometery setup                             //
+        //                            geometry setup                              //
         ////////////////////////////////////////////////////////////////////////////
         objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
         objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
@@ -50,10 +39,10 @@ namespace scene {
         glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
 
         ////////////////////////////////////////////////////////////////////////////
-        //                           geometery update                             //
+        //                           geometry update                              //
         ////////////////////////////////////////////////////////////////////////////
         // boxes
         for (auto& m : objects[0]->GetMeshes())
@@ -102,13 +91,11 @@ namespace scene {
         Renderer::Get().SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
 
         ////////////////////////////////////////////////////////////////////////////
-        //                          geometery rendering                           //
+        //                          geometry rendering                            //
         ////////////////////////////////////////////////////////////////////////////
         for (auto& obj : objects)
             Renderer::Get().Draw(*obj);
     }
 
-    void SceneDepthTesting::OnImGuiRender()
-    {
-    }
+    void SceneDepthTesting::OnImGuiRender() { }
 }

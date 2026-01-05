@@ -1,30 +1,54 @@
 #pragma once
 #include <glad/glad.h>
-#include <vector>
 
 class UniformBufferObj
 {
 private:
-    unsigned int m_renderer_id;
+    GLuint m_renderer_id;
+    GLsizeiptr m_size;
 
 public:
     UniformBufferObj(GLsizeiptr size);
     ~UniformBufferObj();
 
+    // Prevent copying
+    UniformBufferObj(const UniformBufferObj&) = delete;
+    UniformBufferObj& operator=(const UniformBufferObj&) = delete;
+
+    // Allow moving
+    UniformBufferObj(UniformBufferObj&& other) noexcept;
+    UniformBufferObj& operator=(UniformBufferObj&& other) noexcept;
+
     void Bind() const;
     void Unbind() const;
 
-    /*Bind a range within a buffer object to an indexed buffer target
-    * @param idx - Specify the index of the binding point within the array specified by target.
-    * @param offset - The starting offset in basic machine units into the buffer object buffer.
-    * @param size - The amount of data in machine units that can be read from the buffet object while used as an indexed target.
-    */
-    void SetRange(unsigned int idx, GLintptr offset, GLsizeiptr size);
+    /**
+     * Bind a range within a buffer object to an indexed buffer target
+     * @param idx - Index of the binding point within the array
+     * @param offset - Starting offset in bytes into the buffer object
+     * @param size - Amount of data in bytes that can be read from the buffer
+     */
+    void SetRange(GLuint idx, GLintptr offset, GLsizeiptr size) const;
 
-    /*Store data
-    @param offset - Specifies the offset into the buffer object's data store where data replacement will begin, measured in bytes.
-    @param size - Specifies the size in bytes of the data store region being replaced.
-    @param data - Specifies a pointer to the new data that will be copied into the data store.
-    */
-    void StoreData(GLintptr offset, GLsizeiptr size, const void* data);
+    /**
+     * Store data in the buffer
+     * @param offset - Offset into the buffer's data store in bytes
+     * @param size - Size in bytes of the data being stored
+     * @param data - Pointer to the new data
+     */
+    void StoreData(GLintptr offset, GLsizeiptr size, const void* data) const;
+
+    /**
+     * Convenience template for storing typed data
+     * @param data - Reference to the data to store
+     * @param offset - Offset into the buffer in bytes (default: 0)
+     */
+    template<typename T>
+    void Store(const T& data, GLintptr offset = 0) const
+    {
+        StoreData(offset, sizeof(T), &data);
+    }
+
+    GLuint GetID() const { return m_renderer_id; }
+    GLsizeiptr GetSize() const { return m_size; }
 };

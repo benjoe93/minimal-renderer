@@ -8,16 +8,22 @@ class Material;
 class PointLight : public Light
 {
 private:
-    float m_constant = 1.0f;
-    float m_linear = 0.09f;
-    float m_quadratic = 0.032f;
+    static constexpr float DEFAULT_CONSTANT = 1.0f;
+    static constexpr float DEFAULT_LINEAR = 0.09f;
+    static constexpr float DEFAULT_QUADRATIC = 0.032f;
+
+    float m_constant = DEFAULT_CONSTANT;
+    float m_linear = DEFAULT_LINEAR;
+    float m_quadratic = DEFAULT_QUADRATIC;
 
 public:
-    PointLight(glm::vec3 position, glm::vec3 ambient, glm::vec3 diffuse, glm::vec3 specular);
+    PointLight(const glm::vec3& position, const glm::vec3& ambient, const glm::vec3& diffuse, const glm::vec3& specular);
 
     float GetConstant() const { return m_constant; };
     float GetLinear() const { return m_linear; };
     float GetQuadratic() const { return m_quadratic; };
 
-    void SetPosition(glm::vec3 new_position) { m_position = new_position; };
+    void SetConstant(const float value) { m_constant = value; }
+    void SetLinear(const float value) { m_linear = value; }
+    void SetQuadratic(const float value) { m_quadratic = value; }
 };

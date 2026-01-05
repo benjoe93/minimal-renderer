@@ -16,13 +16,6 @@
 
 #include "19_SceneRearViewMirror.h"
 
-static std::vector<float> quad_verts = {
-    // positions   // texCoords
-    -1.0f,  1.0f,  0.0f, 1.0f, // top left
-    -1.0f, -1.0f,  0.0f, 0.0f, // bot left
-     1.0f, -1.0f,  1.0f, 0.0f, // bot right
-     1.0f,  1.0f,  1.0f, 1.0f  // top right
-};
 static std::vector<Vertex> verts = {
            // positions          // normals          // texCoords
     Vertex({-0.5f,  0.9f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f}), // top left
@@ -43,11 +36,11 @@ SceneRearViewMirror::SceneRearViewMirror()
     framebuffer = std::make_unique<Framebuffer>();
 
     // create a color attachment texture
-    render_target = new RenderTarget(Renderer::Get().state.scr_width, Renderer::Get().state.scr_height, 3);
+    render_target = new RenderTarget(Renderer::Get().GetScreenWidth(), Renderer::Get().GetScreenHeight(), 3);
     framebuffer->AttachRenderTarget(AttachmentTarget::COLOR0, render_target);
 
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    render_buffer = new RenderBuffer(Renderer::Get().state.scr_width, Renderer::Get().state.scr_height);
+    render_buffer = new RenderBuffer(Renderer::Get().GetScreenWidth(), Renderer::Get().GetScreenHeight());
     framebuffer->AttachRenderBuffer(AttachmentTarget::DEPTH_STENCIL, render_buffer);
     
     // unbind to prevent accidental renders
@@ -84,10 +77,13 @@ void SceneRearViewMirror::OnRender()
     Camera& cam = Renderer::Get().GetActiveCamera();
 
     glm::mat4 projection, ModelView, MVP;
-    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
+    projection = glm::perspective(
+        glm::radians(cam.GetFov()),
+        static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+        Renderer::Get().GetState().near_plane,
+        Renderer::Get().GetState().far_plane);
 
     // first pass
-
     framebuffer->Bind();
     Renderer::Get().Clear();
     Renderer::Get().SetDepthTest(true);
@@ -123,16 +119,14 @@ void SceneRearViewMirror::OnRender()
     Renderer::Get().Draw(*quad);
 }
 
-void SceneRearViewMirror::OnImGuiRender()
-{
-}
+void SceneRearViewMirror::OnImGuiRender() { }
 
 void scene::SceneRearViewMirror::ConstructScene()
 {
     Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
     Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg", true);
 
-    std::unique_ptr<Model> floor = std::make_unique<Model>(
+    auto floor = std::make_unique<Model>(
         "resources/models/plane.fbx",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -148,7 +142,7 @@ void scene::SceneRearViewMirror::ConstructScene()
     objects.push_back(std::move(floor));
 
     // Box 1
-    std::unique_ptr<Model> box1 = std::make_unique<Model>(
+    auto box1 = std::make_unique<Model>(
         "resources/models/box.fbx",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -164,7 +158,7 @@ void scene::SceneRearViewMirror::ConstructScene()
     objects.push_back(std::move(box1));
 
     // Box 2
-    std::unique_ptr<Model> box2 = std::make_unique<Model>(
+    auto box2 = std::make_unique<Model>(
         "resources/models/box.fbx",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",

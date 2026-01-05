@@ -1,13 +1,8 @@
-#include <map>
 #include <unordered_map>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <vendor/stb_image/stb_image.h>
 #include "vendor/imgui/imgui.h"
-
-#include "LightDirectional.h"
-#include "LightPoint.h"
 
 #include "Renderer.h"
 #include "Camera.h"
@@ -27,7 +22,6 @@ static std::unordered_map<CubeSide, std::string> textures_faces = {
     { CubeSide::LEFT,     "resources/textures/skybox/left.jpg", },
     { CubeSide::RIGHT,    "resources/textures/skybox/right.jpg" }
 };
-
 static std::vector<float> skybox_verts = {
     -1.0f,  1.0f, -1.0f,
     -1.0f, -1.0f, -1.0f,
@@ -82,7 +76,7 @@ namespace scene {
         skybox_vb = std::make_unique<VertexBuffer>(skybox_verts.data(), skybox_verts.size() * sizeof(float));
         skybox_vb->Bind();
 
-        skybox_va->SetLayout(*skybox_vb.get(), 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        skybox_va->SetLayout(*skybox_vb, 0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
 
         TextureCubemap* cubemap = ResourceManager::Get().GetCubemap(textures_faces);
 
@@ -101,7 +95,11 @@ namespace scene {
         Camera& cam = Renderer::Get().GetActiveCamera();
 
         glm::mat4 projection, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
+        projection = glm::perspective(
+            glm::radians(cam.GetFov()),
+            static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+            Renderer::Get().GetState().near_plane,
+            Renderer::Get().GetState().far_plane);
 
         switch (m_active_mode)
         {
@@ -171,7 +169,7 @@ namespace scene {
 
         // Optimization: Rendering skybox after the scene is done so fragments covered by the scene doesn't need to be re-rendered.
         Renderer::Get().SetDepthFunction(TestingFunc::LEQUAL);
-        Renderer::Get().Draw(*skybox_va.get(), static_cast<int>(skybox_verts.size()), *skybox_material.get());
+        Renderer::Get().Draw(*skybox_va, static_cast<int>(skybox_verts.size()), *skybox_material);
         Renderer::Get().SetDepthFunction(TestingFunc::LESS);
     }
 
@@ -189,7 +187,7 @@ namespace scene {
     Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
     Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg", true);
 
-    std::unique_ptr<Model> floor = std::make_unique<Model>(
+    auto floor = std::make_unique<Model>(
         "resources/models/plane.fbx",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -205,7 +203,7 @@ namespace scene {
     objects.push_back(std::move(floor));
 
     // Box 1
-    std::unique_ptr<Model> box1 = std::make_unique<Model>(
+    auto box1 = std::make_unique<Model>(
         "resources/models/box.fbx",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -221,7 +219,7 @@ namespace scene {
     objects.push_back(std::move(box1));
 
     // Box 2
-    std::unique_ptr<Model> box2 = std::make_unique<Model>(
+    auto box2 = std::make_unique<Model>(
         "resources/models/box.fbx",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
         "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
@@ -239,7 +237,7 @@ namespace scene {
 
     void SceneCubemap::ConstructReflectionScene(TextureCubemap* in_skybox)
     {
-        std::unique_ptr<Model> floor = std::make_unique<Model>(
+        auto floor = std::make_unique<Model>(
             "resources/models/plane.fbx",
             "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert",
             "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.frag",
@@ -255,7 +253,7 @@ namespace scene {
         reflection_objects.push_back(std::move(floor));
 
         // Box 1
-        std::unique_ptr<Model> box1 = std::make_unique<Model>(
+        auto box1 = std::make_unique<Model>(
             "resources/models/box.fbx",
             "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert",
             "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.frag",
@@ -271,7 +269,7 @@ namespace scene {
         reflection_objects.push_back(std::move(box1));
 
         // Box 2
-        std::unique_ptr<Model> box2 = std::make_unique<Model>(
+        auto box2 = std::make_unique<Model>(
             "resources/models/box.fbx",
             "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert",
             "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.frag",
@@ -292,7 +290,7 @@ namespace scene {
         std::string vertex_shader = "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert";
         std::string fragment_shader = "resources/shaders/03_AdvancedOpenGL/05_Cubemap/refraction.frag";
 
-        std::unique_ptr<Model> floor = std::make_unique<Model>(
+        auto floor = std::make_unique<Model>(
             "resources/models/plane.fbx",
             vertex_shader,
             fragment_shader,
@@ -308,7 +306,7 @@ namespace scene {
         refraction_objects.push_back(std::move(floor));
 
         // Box 1
-        std::unique_ptr<Model> box1 = std::make_unique<Model>(
+        auto box1 = std::make_unique<Model>(
             "resources/models/box.fbx",
             vertex_shader,
             fragment_shader,
@@ -324,7 +322,7 @@ namespace scene {
         refraction_objects.push_back(std::move(box1));
 
         // Box 2
-        std::unique_ptr<Model> box2 = std::make_unique<Model>(
+        auto box2 = std::make_unique<Model>(
             "resources/models/box.fbx",
             vertex_shader,
             fragment_shader,

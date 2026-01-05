@@ -2,24 +2,13 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "vendor/imgui/imgui.h"
-
-#include "LightDirectional.h"
-#include "LightPoint.h"
-
 #include "Renderer.h"
 #include "Camera.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
-#include "Texture.h"
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
 
 #include "15_SceneStencilTesting.h"
-
-
 
 namespace scene {
 
@@ -29,9 +18,9 @@ namespace scene {
         Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
         
         Renderer::Get().SetDepthTest(true);
-        Renderer::Get().SetDepthFunction(TestingFunc::LESS);                   // discard fragments that have higher values then the current (behind object)
+        Renderer::Get().SetDepthFunction(TestingFunc::LESS);    // discard fragments that have higher values then the current (behind object)
         Renderer::Get().SetStencilTest(true);
-        Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF);    // pass stencil test if stencil value != 1 (The mask 0xFF means all 8 bits are considered in the comparison)
+        Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF); // pass stencil test if stencil value != 1 (The mask 0xFF means all 8 bits are considered in the comparison)
         Renderer::Get().SetStencilOperation(StencilOp::KEEP, StencilOp::KEEP, StencilOp::REPLACE);
 
         Camera& camera = Renderer::Get().GetActiveCamera();
@@ -60,7 +49,7 @@ namespace scene {
         glm::vec3 cam_pos = cam.GetPosition();
 
         glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), 0.1f, 100.0f);
+        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
 
         // objects
         // plane
@@ -140,15 +129,15 @@ namespace scene {
         // draw floor as normal, but don't write the floor to the stencil buffer, we only care about the containers. 
         // We set its mask to 0x00 to not write to the stencil buffer.
         Renderer::Get().SetStencilMask(0x00);                        // disable writing to stencil buffer (all bits masked)
-        Renderer::Get().Draw(*objects[0]);                           // draw floor without affecting stencil
+        Renderer::Get().Draw(*objects[0]);                        // draw floor without affecting stencil
 
         // 1st. render pass, draw objects as normal, writing to the stencil buffer
         // --------------------------------------------------------------------
-        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 1, 0xFF);      // always pass stencil test, set reference value to 1
-        Renderer::Get().SetStencilMask(0xFF);                        // enable writing to stencil buffer (all bits unmasked)
+        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 1, 0xFF);   // always pass stencil test, set reference value to 1
+        Renderer::Get().SetStencilMask(0xFF);   // enable writing to stencil buffer (all bits unmasked)
         for (unsigned int i = 1; i < 3; i++)
         {
-            Renderer::Get().Draw(*objects[i]);                       // draw objects and mark their pixels with 1 in stencil buffer
+            Renderer::Get().Draw(*objects[i]);  // draw objects and mark their pixels with 1 in stencil buffer
         }
 
         // 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
@@ -156,18 +145,16 @@ namespace scene {
         // the objects' size differences, making it look like borders.
         // -----------------------------------------------------------------------------------------------------------------------------
         Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF);    // only pass stencil test where stencil value != 1 (around edges)
-        Renderer::Get().SetStencilMask(0x00);                        // disable writing to stencil buffer (read-only mode)
-        Renderer::Get().SetDepthTest(false);                         // disable depth test so outline draws on top of everything
+        Renderer::Get().SetStencilMask(0x00);   // disable writing to stencil buffer (read-only mode)
+        Renderer::Get().SetDepthTest(false);    // disable depth test so outline draws on top of everything
         for (auto& obj : outline_objects)
         {
-            Renderer::Get().Draw(*obj);                              // draw scaled objects, only visible where original wasn't drawn (outline effect)
+            Renderer::Get().Draw(*obj); // draw scaled objects, only visible where original wasn't drawn (outline effect)
         }
-        Renderer::Get().SetStencilMask(0xFF);                        // re-enable stencil writing for future rendering
-        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 0, 0xFF);      // reset stencil function to always pass with ref value 0
-        Renderer::Get().SetDepthTest(true);                          // re-enable depth testing for normal rendering
+        Renderer::Get().SetStencilMask(0xFF);   // re-enable stencil writing for future rendering
+        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 0, 0xFF);   // reset stencil function to always pass with ref value 0
+        Renderer::Get().SetDepthTest(true); // re-enable depth testing for normal rendering
     }
 
-    void SceneStencilTesting::OnImGuiRender()
-    {
-    }
+    void SceneStencilTesting::OnImGuiRender() { }
 }

@@ -33,7 +33,7 @@ void Model::LoadModel(const std::string& path)
     ProcessNode(scene->mRootNode, scene);
 }
 
-void Model::ProcessNode(aiNode* node, const aiScene* scene)
+void Model::ProcessNode(const aiNode* node, const aiScene* scene)
 {
     // process all the node's meshes (if any)
     for (unsigned int i = 0; i < node->mNumMeshes; i++)
@@ -48,10 +48,10 @@ void Model::ProcessNode(aiNode* node, const aiScene* scene)
     }
 }
 
-std::unique_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
+std::unique_ptr<Mesh> Model::ProcessMesh(const aiMesh* mesh, const aiScene* scene)
 {
     std::vector<Vertex> vertices;
-    std::vector<unsigned int> indices;
+    std::vector<GLuint> indices;
 
     // pre-allocate to avoid reallocations
     vertices.reserve(mesh->mNumVertices);
@@ -79,13 +79,13 @@ std::unique_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);
         }
 
-        vertices.push_back(vertex);
+        vertices.emplace_back(vertex);
     }
 
     // process indices
-    for (unsigned int i= 0; i< mesh->mNumFaces; i++)
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
     {
-        aiFace face = mesh->mFaces[i];
+        const aiFace& face = mesh->mFaces[i];
         for (unsigned int j = 0; j < face.mNumIndices; j++)
         {
             indices.push_back(face.mIndices[j]);
@@ -110,29 +110,30 @@ std::unique_ptr<Mesh> Model::ProcessMesh(aiMesh* mesh, const aiScene* scene)
      );
 }
 
-void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, aiTextureType type, std::string type_name)
+void Model::LoadMaterialTextures(Material* material, const aiMaterial* ai_material, const aiTextureType type, const std::string& type_name)
 {
-    unsigned int texture_count = ai_material->GetTextureCount(type);
+    const unsigned int texture_count = ai_material->GetTextureCount(type);
 
     for (unsigned int i = 0; i < texture_count; i++)
     {
         aiString current_path;
         if (ai_material->GetTexture(type, i, &current_path) != AI_SUCCESS)
             continue;
+
+        std::string texture_path = current_path.C_Str();  // Move this outside the ifdef
+
+#ifndef NDEBUG
         std::cout << current_path.C_Str() << std::endl;
-
-        std::string texture_path = current_path.C_Str();
-
         std::cout << texture_path << std::endl;
+#endif
+
         if (texture_path.empty())
             continue;
 
         std::string full_path = m_directory + '/' + texture_path;
 
         // check if texture already loaded
-        auto it = m_texture_cache.find(texture_path);
-
-        if (it == m_texture_cache.end())
+        if (auto it = m_texture_cache.find(texture_path); it == m_texture_cache.end())
         {
             // new texture - load it and cache the path
             Texture2D* new_texture = ResourceManager::Get().GetTexture2D(full_path);
@@ -141,7 +142,7 @@ void Model::LoadMaterialTextures(Material* material, aiMaterial* ai_material, ai
         }
         else
         {
-            // texture already exists - reuse it]
+            // texture already exists - reuse it
             material->AddTexture(type_name, it->second);
         }
     }
@@ -153,7 +154,7 @@ Model::Model(const std::string& path, const std::string& vertex_shader, const st
     LoadModel(path);
 }
 
-Model::Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader, Transform transform)
+Model::Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader, const Transform& transform)
     :m_transform(transform),
     m_vertex_shader_path(vertex_shader),
     m_fragment_shader_path(fragment_shader)
@@ -161,7 +162,7 @@ Model::Model(const std::string& path, const std::string& vertex_shader, const st
     LoadModel(path);
 }
 
-Model::Model(std::unique_ptr<Mesh> mesh, Transform transform)
+Model::Model(std::unique_ptr<Mesh> mesh, const Transform& transform)
     : m_transform(transform)
 {
     m_vertex_shader_path = mesh->GetMaterial().GetVertexPath();
@@ -175,17 +176,13 @@ glm::mat4 Model::GetModelMatrix()
     return m_model_matrix;
 }
 
-std::unordered_set<Material*> Model::GetMaterials()
+std::unordered_set<Material*> Model::GetMaterials() const
 {
     std::unordered_set<Material*> materials;
 
-    for (auto& m : m_meshes)
+    for (const auto& m : m_meshes)
     {
-        Material* material = &m->GetMaterial();
-        if (material)
-        {
-            materials.insert(material);
-        }
+        materials.insert(&m->GetMaterial());
     }
 
     return materials;
@@ -198,12 +195,16 @@ void Model::SetMaterials()
 
 void Model::UpdateModelMatrix()
 {
-    m_model_matrix = glm::mat4(1.0);
+    m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_transform.Location);
 
-    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    constexpr glm::vec3 X_AXIS(1.0f, 0.0f, 0.0f);
+    constexpr glm::vec3 Y_AXIS(0.0f, 1.0f, 0.0f);
+    constexpr glm::vec3 Z_AXIS(0.0f, 0.0f, 1.0f);
+
+    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.x), X_AXIS);
+    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.y), Y_AXIS);
+    m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.z), Z_AXIS);
 
     m_model_matrix = glm::scale(m_model_matrix, m_transform.Scale);
 }

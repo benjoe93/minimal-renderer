@@ -1,18 +1,11 @@
-#include <map>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "vendor/imgui/imgui.h"
 
-#include "LightDirectional.h"
-#include "LightPoint.h"
-
 #include "Renderer.h"
 #include "Camera.h"
-#include "IndexBuffer.h"
-#include "VertexArray.h"
-#include "VertexBuffer.h"
 #include "Texture2D.h"
 #include "Material.h"
 #include "Mesh.h"
@@ -31,7 +24,7 @@ namespace scene {
         std::string vertex_path = "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert";
         std::string fragment_path = "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag";
 
-        std::unique_ptr<Model> floor = std::make_unique<Model>(
+        auto floor = std::make_unique<Model>(
             "resources/models/plane.fbx",
             vertex_path,
             fragment_path,
@@ -47,7 +40,7 @@ namespace scene {
         objects.push_back(std::move(floor));
 
         // Box 1
-        std::unique_ptr<Model> box1 = std::make_unique<Model>(
+        auto box1 = std::make_unique<Model>(
             "resources/models/box.fbx",
             vertex_path,
             fragment_path,
@@ -87,7 +80,11 @@ namespace scene {
         Camera& cam = Renderer::Get().GetActiveCamera();
 
         glm::mat4 projection, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().state.scr_width) / static_cast<float>(Renderer::Get().state.scr_height), Renderer::Get().state.near_plane, Renderer::Get().state.far_plane);
+        projection = glm::perspective(
+            glm::radians(cam.GetFov()),
+            static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+            Renderer::Get().GetState().near_plane,
+            Renderer::Get().GetState().far_plane);
 
         // objects
         for (auto& obj : objects)
@@ -106,7 +103,5 @@ namespace scene {
             Renderer::Get().Draw(*obj);
     }
 
-    void SceneFaceCulling::OnImGuiRender()
-    {
-    }
+    void SceneFaceCulling::OnImGuiRender() { }
 }
