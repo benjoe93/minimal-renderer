@@ -14,8 +14,8 @@ file(GLOB MAIN_SOURCES
 
 set(SCENE_SOURCES
     "src/scenes/00_SceneClearColor.cpp"
-    "src/scenes/01_SceneHelloTriagle.cpp"
-    "src/scenes/02_SceneHelloTriagleIndexed.cpp"
+    "src/scenes/01_SceneHelloTriangle.cpp"
+    "src/scenes/02_SceneHelloTriangleIndexed.cpp"
     "src/scenes/03_SceneTextures.cpp"
     "src/scenes/04_SceneTransformation.cpp"
     "src/scenes/05_SceneCoordinateSystem.cpp"
@@ -51,8 +51,8 @@ file(GLOB MAIN_HEADERS
 set(SCENE_HEADERS
     "src/scenes/Scene.h"
     "src/scenes/00_SceneClearColor.h"
-    "src/scenes/01_SceneHelloTriagle.h"
-    "src/scenes/02_SceneHelloTriagleIndexed.h"
+    "src/scenes/01_SceneHelloTriangle.h"
+    "src/scenes/02_SceneHelloTriangleIndexed.h"
     "src/scenes/03_SceneTextures.h"
     "src/scenes/04_SceneTransformation.h"
     "src/scenes/05_SceneCoordinateSystem.h"
