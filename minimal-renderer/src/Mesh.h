@@ -24,13 +24,11 @@ private:
     std::unique_ptr<VertexArray>  m_va;
     std::unique_ptr<VertexBuffer> m_vb;
     std::unique_ptr<IndexBuffer>  m_ib;
-    std::unique_ptr<Material>     m_material;
 
-    std::vector<Vertex>     m_vertices;
-    std::vector<GLuint>     m_indices;
+    uint32_t m_material_slot_id = 0;
 
 public:
-    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::unique_ptr<Material> material);
+    Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices);
     ~Mesh() = default;
 
     Mesh(const Mesh&) = delete;
@@ -41,8 +39,7 @@ public:
     VertexArray& GetVertexArray() const { return *m_va; }
     VertexBuffer& GetVertexBuffer() const { return *m_vb; }
     IndexBuffer& GetIndexBuffer() const { return *m_ib; }
-    Material& GetMaterial() const { return *m_material; }
 
-    const std::vector<Vertex>& GetVertices() const { return m_vertices; }
-    const std::vector<unsigned int>& GetIndices() const { return m_indices; }
+    uint32_t GetMaterialSlotId() const { return m_material_slot_id; }
+    void SetMaterialSlotId(uint32_t slot_id) { m_material_slot_id = slot_id; }
 };

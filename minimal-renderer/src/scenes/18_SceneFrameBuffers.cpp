@@ -46,17 +46,26 @@ SceneFramebuffer::SceneFramebuffer()
     // unbind to prevent accidental renders
     framebuffer->Unbind();
 
+    // create mesh list
+    std::vector<std::unique_ptr<Mesh>> meshes;
+    meshes.push_back(std::make_unique<Mesh>(verts, indices));
+
+    // create model
     quad_normal = std::make_unique<Model>(
-        std::make_unique<Mesh>(
-            verts,
-            indices,
-            std::make_unique<Material>("resources/shaders/03_AdvancedOpenGL/04_Framebuffer/framebuffer.vert", "resources/shaders/03_AdvancedOpenGL/04_Framebuffer/framebuffer.frag")
-        ),
+        std::move(meshes),
         Transform()
     );
 
-    for (auto& m : quad_normal->GetMeshes())
-        m->GetMaterial().AddTexture("screenTexture", render_target);
+    Material* quad_material = ResourceManager::Get().GetMaterial(
+        "resources/shaders/03_AdvancedOpenGL/04_Framebuffer/framebuffer.vert",
+        "resources/shaders/03_AdvancedOpenGL/04_Framebuffer/framebuffer.frag"
+    );
+    quad_normal->SetMaterialSlot(0, quad_material);
+
+    for (auto& m : quad_normal->GetMeshes()) {
+        Material* mat = quad_normal->GetMaterialForMesh(m.get());
+        if (mat) mat->AddTexture("screenTexture", render_target);
+    }
 
     ConstructScene();
 }
@@ -86,8 +95,12 @@ void SceneFramebuffer::OnUpdate(double delta_time)
         ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
         MVP = projection * ModelView;
 
-        for (auto& mesh : obj->GetMeshes())
-            mesh->GetMaterial().SetUniform("mvp", MVP);
+        for (auto& mesh : obj->GetMeshes()) {
+            Material* material = obj->GetMaterialForMesh(mesh.get());
+            if (material) {
+                material->SetUniform("mvp", MVP);
+            }
+        }
     }
 }
 
@@ -100,7 +113,7 @@ void SceneFramebuffer::OnRender()
 
     for (auto& obj : objects)
         Renderer::Get().Draw(*obj);
-    
+
     // second pass
     framebuffer->Unbind();
     Renderer::Get().SetDepthTest(false);
@@ -112,59 +125,67 @@ void SceneFramebuffer::OnRender()
 
 void SceneFramebuffer::OnImGuiRender()
 {
-    
+
 }
 
 void scene::SceneFramebuffer::ConstructScene()
-    {
+{
     Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
     Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg", true);
 
-        std::unique_ptr<Model> floor = std::make_unique<Model>(
-            "resources/models/plane.fbx",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
-            Transform(
-                glm::vec3(0.0f, -0.5f, 0.0f),
-                glm::vec3(-90.0f, 0.0f, 0.0f),
-                glm::vec3(1.0f)
-            )
-        );
+    Material* object_material = ResourceManager::Get().GetMaterial(
+        "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
+        "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag"
+    );
 
-        for (auto& mesh : floor->GetMeshes())
-            mesh->GetMaterial().AddTexture("material.diffuse", metal_tex);
-        objects.push_back(std::move(floor));
+    std::unique_ptr<Model> floor = std::make_unique<Model>(
+        "resources/models/plane.fbx",
+        Transform(
+            glm::vec3(0.0f, -0.5f, 0.0f),
+            glm::vec3(-90.0f, 0.0f, 0.0f),
+            glm::vec3(1.0f)
+        )
+    );
+    floor->SetMaterialSlot(0, object_material);
 
-        // Box 1
-        auto box1 = std::make_unique<Model>(
-            "resources/models/box.fbx",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
-            Transform(
-                glm::vec3(-1.5f, 0.0f, -1.0f),
-                glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(1.0f)
-            )
-        );
-
-        for (auto& mesh : box1->GetMeshes())
-            mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
-        objects.push_back(std::move(box1));
-
-        // Box 2
-        auto box2 = std::make_unique<Model>(
-            "resources/models/box.fbx",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
-            Transform(
-                glm::vec3(1.5f, 0.0f, 0.0f),
-                glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(1.0f)
-            )
-        );
-
-        for (auto& mesh : box2->GetMeshes())
-            mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
-        objects.push_back(std::move(box2));
+    for (auto& mesh : floor->GetMeshes()) {
+        Material* mat = floor->GetMaterialForMesh(mesh.get());
+        if (mat) mat->AddTexture("material.diffuse", metal_tex);
     }
+    objects.push_back(std::move(floor));
+
+    // Box 1
+    auto box1 = std::make_unique<Model>(
+        "resources/models/box.fbx",
+        Transform(
+            glm::vec3(-1.5f, 0.0f, -1.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(1.0f)
+        )
+    );
+    box1->SetMaterialSlot(0, object_material);
+
+    for (auto& mesh : box1->GetMeshes()) {
+        Material* mat = box1->GetMaterialForMesh(mesh.get());
+        if (mat) mat->AddTexture("material.diffuse", marble_tex);
+    }
+    objects.push_back(std::move(box1));
+
+    // Box 2
+    auto box2 = std::make_unique<Model>(
+        "resources/models/box.fbx",
+        Transform(
+            glm::vec3(1.5f, 0.0f, 0.0f),
+            glm::vec3(0.0f, 0.0f, 0.0f),
+            glm::vec3(1.0f)
+        )
+    );
+    box2->SetMaterialSlot(0, object_material);
+
+    for (auto& mesh : box2->GetMeshes()) {
+        Material* mat = box2->GetMaterialForMesh(mesh.get());
+        if (mat) mat->AddTexture("material.diffuse", marble_tex);
+    }
+    objects.push_back(std::move(box2));
+}
 }

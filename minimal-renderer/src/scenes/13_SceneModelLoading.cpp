@@ -39,7 +39,7 @@ namespace scene {
         ////////////////////////////////////////////////////////////////////////////
         //                            geometry loading                            //
         ////////////////////////////////////////////////////////////////////////////
-        object = std::make_unique<Model>(BACKPACK_PATH, "resources/shaders/02_LoadingMesh/object.vert", "resources/shaders/02_LoadingMesh/object.frag");
+        object = std::make_unique<Model>(BACKPACK_PATH);
     }
 
     void SceneModelLoading::OnUpdate(double delta_time)
@@ -62,16 +62,16 @@ namespace scene {
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            auto& material = m->GetMaterial();
-            material.SetUniform("model", model);
-            material.SetUniform("mvp", MVP);
+            Material* material = object->GetMaterialForMesh(m.get());
+            material->SetUniform("model", model);
+            material->SetUniform("mvp", MVP);
             //material.SetUniformVec3("material.base_color", glm::vec3(1.0f, 0.0f, 0.0f));
-            material.SetUniform("material.shininess", 32.0f);
+            material->SetUniform("material.shininess", 32.0f);
 
-            material.SetUniform("dir_light.direction", directional_light->GetDirection());
-            material.SetUniform("dir_light.ambient", directional_light->GetAmbient());
-            material.SetUniform("dir_light.diffuse", directional_light->GetDiffuse());
-            material.SetUniform("dir_light.specular", directional_light->GetSpecular());
+            material->SetUniform("dir_light.direction", directional_light->GetDirection());
+            material->SetUniform("dir_light.ambient", directional_light->GetAmbient());
+            material->SetUniform("dir_light.diffuse", directional_light->GetDiffuse());
+            material->SetUniform("dir_light.specular", directional_light->GetSpecular());
         }
     }
 

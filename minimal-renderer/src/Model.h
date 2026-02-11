@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <unordered_map>
-#include <unordered_set>
 #include <memory>
 
 #include <assimp/scene.h>
@@ -24,12 +23,12 @@ class Model
 private:
     Transform m_transform;
     std::string m_directory;
-    std::string m_vertex_shader_path;
-    std::string m_fragment_shader_path;
     std::vector<std::unique_ptr<Mesh>> m_meshes;
-    std::unordered_map<std::string, Texture2D*> m_texture_cache; // tracks loaded paths
+
+    std::unordered_map<uint32_t, Material*> m_material_slots;
 
     glm::mat4 m_model_matrix = glm::mat4(1.0);
+    bool m_matrix_dirty = true;
 
     void LoadModel(const std::string& path);
     void ProcessNode(const aiNode* node, const aiScene* scene);
@@ -37,17 +36,16 @@ private:
     void LoadMaterialTextures(Material* material, const aiMaterial* ai_material, aiTextureType type, const std::string& type_name);
 
 public:
-    Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader);
-    Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader, const Transform& transform);
-    Model(std::unique_ptr<Mesh> mesh, const Transform& transform);
+    Model(const std::string& path, const Transform& transform = Transform());
+    Model(std::vector<std::unique_ptr<Mesh>> meshes, const Transform& transform = Transform());
 
-    void SetTransform(const Transform& new_transform) { m_transform = new_transform; }
-    void SetLocation(const glm::vec3& new_location) { m_transform.Location = new_location; }
-    void SetRotation(const glm::vec3& new_rotation) { m_transform.Rotation = new_rotation; }
-    void SetScale(const glm::vec3& new_scale) { m_transform.Scale = new_scale; }
+    void SetTransform(const Transform& new_transform);
+    void SetLocation(const glm::vec3& new_location);
+    void SetRotation(const glm::vec3& new_rotation);
+    void SetScale(const glm::vec3& new_scale);
 
-    void SetLocationOffset(const glm::vec3& new_location) { m_transform.Location += new_location; }
-    void SetRotationOffset(const glm::vec3& new_rotation) { m_transform.Rotation += new_rotation; }
+    void SetLocationOffset(const glm::vec3& new_location);
+    void SetRotationOffset(const glm::vec3& new_rotation);
 
     std::vector<std::unique_ptr<Mesh>>& GetMeshes() { return m_meshes; }
     const std::vector<std::unique_ptr<Mesh>>& GetMeshes() const { return m_meshes; }
@@ -58,9 +56,16 @@ public:
     const glm::vec3& GetRotation() const { return m_transform.Rotation; }
     const glm::vec3& GetScale() const { return m_transform.Scale; }
 
-    std::unordered_set<Material*> GetMaterials() const;
-    // TODO: finish implementation
-    void SetMaterials();
+    // Material slot management
+    void SetMaterialSlot(uint32_t slot_id, Material* material);
+    Material* GetMaterialSlot(uint32_t slot_id) const;
+    bool HasMaterialSlot(uint32_t slot_id) const;
+
+    // Get all materials used by this model
+    std::vector<Material*> GetAllMaterials() const;
+
+    //Get material for a specific mesh
+    Material* GetMaterialForMesh(const Mesh* mesh) const;
 
 private:
     void UpdateModelMatrix();

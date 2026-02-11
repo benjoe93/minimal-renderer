@@ -73,6 +73,20 @@ Shader* ResourceManager::GetShader(const std::string& vertex_path, const std::st
     return ptr;
 }
 
+Shader * ResourceManager::GetShader(const std::string &vertex_path, const std::string &fragment_path, const std::string &geometry_path)
+{
+    const std::string key = vertex_path + "|" + fragment_path + "|" + geometry_path;
+
+    auto it = m_shaders.find(key);
+    if (it != m_shaders.end())
+        return it->second.get();
+
+    auto new_shader = std::make_unique<Shader>(vertex_path, fragment_path, geometry_path);
+    Shader* ptr = new_shader.get();
+    m_shaders[key] = std::move(new_shader);
+    return ptr;
+}
+
 Material* ResourceManager::GetMaterial(const std::string& vertex_path, const std::string& fragment_path)
 {
     const std::string key = vertex_path + "|" + fragment_path;

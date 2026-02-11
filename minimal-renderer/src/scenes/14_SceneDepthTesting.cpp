@@ -7,6 +7,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "ResourceManager.h"
 
 #include "14_SceneDepthTesting.h"
 
@@ -22,15 +23,33 @@ namespace scene {
         ////////////////////////////////////////////////////////////////////////////
         //                            geometry setup                              //
         ////////////////////////////////////////////////////////////////////////////
-        objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
-        objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
-        objects.push_back(std::make_unique<Model>("resources/models/plane.fbx", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert", "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"));
-        for (auto& mesh : objects[0]->GetMeshes())
-            mesh->GetMaterial().AddTexture2D("resources/textures/marble.jpg", "material.diffuse", true);
-        for (auto& mesh : objects[1]->GetMeshes())
-            mesh->GetMaterial().AddTexture2D("resources/textures/marble.jpg", "material.diffuse", true);
-        for (auto& mesh : objects[2]->GetMeshes())
-            mesh->GetMaterial().AddTexture2D("resources/textures/metal.png", "material.diffuse", true);
+        objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
+        objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
+        objects.push_back(std::make_unique<Model>("resources/models/plane.fbx"));
+
+        Material* material = ResourceManager::Get().GetMaterial(
+            "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert",
+            "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"
+        );
+
+        Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/marble.jpg", true);
+        Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
+
+        material->AddTexture("material.diffuse", marble_tex);
+
+        // Set materials for boxes
+        for (int i = 0; i < 2; i++) {
+            objects[i]->SetMaterialSlot(0, material);
+        }
+
+        // Floor gets different texture
+        objects[2]->SetMaterialSlot(0, material);
+        for (auto& mesh : objects[2]->GetMeshes()) {
+            Material* floor_mat = objects[2]->GetMaterialForMesh(mesh.get());
+            if (floor_mat) {
+                floor_mat->AddTexture("material.diffuse", metal_tex);
+            }
+        }
     }
 
     void SceneDepthTesting::OnUpdate(double delta_time)
@@ -49,26 +68,28 @@ namespace scene {
         {
             model = glm::mat4(1.0);
             model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-            //model = glm::scale(model, glm::vec3(0.2f));
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            auto& material = m->GetMaterial();
-            material.SetUniform("model", model);
-            material.SetUniform("mvp", MVP);
+            Material* material = objects[0]->GetMaterialForMesh(m.get());
+            if (material) {
+                material->SetUniform("model", model);
+                material->SetUniform("mvp", MVP);
+            }
         }
 
         for (auto& m : objects[1]->GetMeshes())
         {
             model = glm::mat4(1.0);
             model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-            //model = glm::scale(model, glm::vec3(0.2f));
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            auto& material = m->GetMaterial();
-            material.SetUniform("model", model);
-            material.SetUniform("mvp", MVP);
+            Material* material = objects[1]->GetMaterialForMesh(m.get());
+            if (material) {
+                material->SetUniform("model", model);
+                material->SetUniform("mvp", MVP);
+            }
         }
 
         // plane
@@ -80,9 +101,11 @@ namespace scene {
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            auto& material = m->GetMaterial();
-            material.SetUniform("model", model);
-            material.SetUniform("mvp", MVP);
+            Material* material = objects[2]->GetMaterialForMesh(m.get());
+            if (material) {
+                material->SetUniform("model", model);
+                material->SetUniform("mvp", MVP);
+            }
         }
     }
 

@@ -37,40 +37,46 @@ namespace scene {
         std::string plane = "resources/models/plane.fbx";
         std::string box = "resources/models/box.fbx";
 
-        //std::string vert_path = "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert";
         std::string vert_path = "resources/shaders/03_AdvancedOpenGL/06_Advanced_GLSL/uniform_buffer_obj.vert";
         std::string frag_path = "resources/shaders/03_AdvancedOpenGL/06_Advanced_GLSL/uniform_buffer_obj.frag";
-        
+
         Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png");
         Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg");
 
-        // Models
-        Model* box0 = new Model(box, vert_path, frag_path, Transform(glm::vec3(-0.75f,  0.75f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f)));
-        Model* box1 = new Model(box, vert_path, frag_path, Transform(glm::vec3( 0.75f,  0.75f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f)));
-        Model* box2 = new Model(box, vert_path, frag_path, Transform(glm::vec3(-0.75f, -0.75f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f)));
-        Model* box3 = new Model(box, vert_path, frag_path, Transform(glm::vec3( 0.75f, -0.75f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f)));
-        m_objects.push_back(std::move(box0));
-        m_objects.push_back(std::move(box1));
-        m_objects.push_back(std::move(box2));
-        m_objects.push_back(std::move(box3));
+        Material* box_material = ResourceManager::Get().GetMaterial(vert_path, frag_path);
 
-        // Material uniforms
-        for (auto& mat : box0->GetMaterials()) {
+        // Models
+        auto box0 = new Model(box, Transform(glm::vec3(-0.75f,  0.75f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f)));
+        auto box1 = new Model(box, Transform(glm::vec3( 0.75f,  0.75f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f)));
+        auto box2 = new Model(box, Transform(glm::vec3(-0.75f, -0.75f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f)));
+        auto box3 = new Model(box, Transform(glm::vec3( 0.75f, -0.75f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f)));
+
+        m_objects.push_back(box0);
+        m_objects.push_back(box1);
+        m_objects.push_back(box2);
+        m_objects.push_back(box3);
+
+        for (auto& obj : m_objects) {
+            obj->SetMaterialSlot(0, box_material);
+        }
+
+        // Material uniforms - set different colors for each box
+        for (Material* mat : box0->GetAllMaterials()) {
             mat->SetUniform("color", glm::vec3(1.0f, 0.0f, 0.0f));
             mat->AddUniformBuffer("matrices", m_uniform_buffer);
         }
 
-        for (auto& mat : box1->GetMaterials()) {
+        for (Material* mat : box1->GetAllMaterials()) {
             mat->SetUniform("color", glm::vec3(0.0f, 1.0f, 0.0f));
             mat->AddUniformBuffer("matrices", m_uniform_buffer);
         }
 
-        for (auto& mat : box2->GetMaterials()) {
+        for (Material* mat : box2->GetAllMaterials()) {
             mat->SetUniform("color", glm::vec3(0.0f, 0.0f, 1.0f));
             mat->AddUniformBuffer("matrices", m_uniform_buffer);
         }
 
-        for (auto& mat : box3->GetMaterials()) {
+        for (Material* mat : box3->GetAllMaterials()) {
             mat->SetUniform("color", glm::vec3(1.0f, 1.0f, 0.0f));
             mat->AddUniformBuffer("matrices", m_uniform_buffer);
         }
@@ -108,11 +114,8 @@ namespace scene {
             ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
             MVP = projection * ModelView;
 
-            for (auto& mat : obj->GetMaterials()) {
+            for (Material* mat : obj->GetAllMaterials()) {
                 mat->SetUniform("model", obj->GetModelMatrix());
-                //mat->SetUniform("mvp", MVP);
-                //mat->SetUniform("projection", projection);
-                //mat->SetUniform("view", view);
             }
         }
     }

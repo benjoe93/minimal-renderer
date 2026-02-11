@@ -35,76 +35,68 @@ namespace scene {
         ////////////////////////////////////////////////////////////////////////////
         //                            geometry setup                              //
         ////////////////////////////////////////////////////////////////////////////
-        // floor
         Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
         Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg", true);
-        std::string vertex_path = "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert";
-        std::string fragment_path = "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag";
+
+        Material* object_material = ResourceManager::Get().GetMaterial(
+            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
+            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag"
+        );
 
         auto floor = std::make_unique<Model>(
             "resources/models/plane.fbx",
-            vertex_path,
-            fragment_path,
-            Transform(
-                glm::vec3(0.0f, -0.5f, 0.0f),
-                glm::vec3(-90.0f, 0.0f, 0.0f),
-                glm::vec3(1.0f)
-            )
+            Transform(glm::vec3(0.0f, -0.5f, 0.0f), glm::vec3(-90.0f, 0.0f, 0.0f), glm::vec3(1.0f))
         );
-
-            for (auto& mesh : floor->GetMeshes())
-                mesh->GetMaterial().AddTexture("material.diffuse", metal_tex);
-            objects.push_back(std::move(floor));
-        
-        // Box 1
         auto box1 = std::make_unique<Model>(
             "resources/models/box.fbx",
-            vertex_path,
-            fragment_path,
-            Transform(
-                glm::vec3(-1.5f, 0.0f, -1.0f),
-                glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(1.0f)
-            )
+            Transform(glm::vec3(-1.5f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f))
         );
-
-        for (auto& mesh : box1->GetMeshes())
-            mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
-        objects.push_back(std::move(box1));
-
-        // Box 2
         auto box2 = std::make_unique<Model>(
             "resources/models/box.fbx",
-            vertex_path,
-            fragment_path,
-            Transform(
-                glm::vec3(1.5f, 0.0f, 0.0f),
-                glm::vec3(0.0f, 0.0f, 0.0f),
-                glm::vec3(1.0f)
-            )
+            Transform(glm::vec3(1.5f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.0f))
         );
 
-            for (auto& mesh : box2->GetMeshes())
-                mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
-            objects.push_back(std::move(box2));
+        floor->SetMaterialSlot(0, object_material);
+        box1->SetMaterialSlot(0, object_material);
+        box2->SetMaterialSlot(0, object_material);
+
+        for (auto& mesh : floor->GetMeshes()) {
+            Material* mat = floor->GetMaterialForMesh(mesh.get());
+            if (mat) mat->AddTexture("material.diffuse", metal_tex);
+        }
+        for (auto& mesh : box1->GetMeshes()) {
+            Material* mat = box1->GetMaterialForMesh(mesh.get());
+            if (mat) mat->AddTexture("material.diffuse", marble_tex);
+        }
+        for (auto& mesh : box2->GetMeshes()) {
+            Material* mat = box2->GetMaterialForMesh(mesh.get());
+            if (mat) mat->AddTexture("material.diffuse", marble_tex);
+        }
+
+        objects.push_back(std::move(floor));
+        objects.push_back(std::move(box1));
+        objects.push_back(std::move(box2));
 
         // windows
         Texture2D* window_tex = ResourceManager::Get().GetTexture2D("resources/textures/window.png", true);
+        Material* window_material = ResourceManager::Get().GetMaterial(
+            "resources/shaders/03_AdvancedOpenGL/03_Blending/window.vert",
+            "resources/shaders/03_AdvancedOpenGL/03_Blending/window.frag"
+        );
+
         for (auto location : window_loc)
         {
             auto window = std::make_unique<Model>(
                 "resources/models/plane.fbx",
-                "resources/shaders/03_AdvancedOpenGL/03_Blending/window.vert",
-                "resources/shaders/03_AdvancedOpenGL/03_Blending/window.frag",
-                Transform(
-                    location,
-                    glm::vec3(0.0f, 0.0f, 180.0f),
-                    glm::vec3(0.1f)
-                )
+                Transform(location, glm::vec3(0.0f, 0.0f, 180.0f), glm::vec3(0.1f))
             );
 
-            for (auto& mesh : window->GetMeshes())
-                mesh->GetMaterial().AddTexture("material.diffuse", window_tex);
+            window->SetMaterialSlot(0, window_material);
+
+            for (auto& mesh : window->GetMeshes()) {
+                Material* mat = window->GetMaterialForMesh(mesh.get());
+                if (mat) mat->AddTexture("material.diffuse", window_tex);
+            }
             transparent_objects.push_back(std::move(window));
         }
 
@@ -112,21 +104,25 @@ namespace scene {
         Texture2D* grass_tex = ResourceManager::Get().GetTexture2D("resources/textures/grass.png", true);
         grass_tex->SetWrappingHorizontal(GL_CLAMP_TO_EDGE);
         grass_tex->SetWrappingVertical(GL_CLAMP_TO_EDGE);
+
+        Material* grass_material = ResourceManager::Get().GetMaterial(
+            "resources/shaders/03_AdvancedOpenGL/03_Blending/grass.vert",
+            "resources/shaders/03_AdvancedOpenGL/03_Blending/grass.frag"
+        );
+
         for (auto location : vegetation_loc)
         {
             auto grass = std::make_unique<Model>(
                 "resources/models/plane.fbx",
-                "resources/shaders/03_AdvancedOpenGL/03_Blending/grass.vert",
-                "resources/shaders/03_AdvancedOpenGL/03_Blending/grass.frag",
-                Transform(
-                    location,
-                    glm::vec3(0.0f, 0.0f, 180.0f),
-                    glm::vec3(0.05f)
-                )
+                Transform(location, glm::vec3(0.0f, 0.0f, 180.0f), glm::vec3(0.05f))
             );
 
-            for (auto& mesh : grass->GetMeshes())
-                mesh->GetMaterial().AddTexture("material.diffuse", grass_tex);
+            grass->SetMaterialSlot(0, grass_material);
+
+            for (auto& mesh : grass->GetMeshes()) {
+                Material* mat = grass->GetMaterialForMesh(mesh.get());
+                if (mat) mat->AddTexture("material.diffuse", grass_tex);
+            }
             objects.push_back(std::move(grass));
         }
     }
@@ -155,7 +151,10 @@ namespace scene {
 
             for (auto& mesh : obj->GetMeshes())
             {
-                mesh->GetMaterial().SetUniform("mvp", MVP);
+                Material* material = obj->GetMaterialForMesh(mesh.get());
+                if (material) {
+                    material->SetUniform("mvp", MVP);
+                }
             }
         }
 
@@ -166,7 +165,10 @@ namespace scene {
 
             for (auto& mesh : obj->GetMeshes())
             {
-                mesh->GetMaterial().SetUniform("mvp", MVP);
+                Material* material = obj->GetMaterialForMesh(mesh.get());
+                if (material) {
+                    material->SetUniform("mvp", MVP);
+                }
             }
         }
     }

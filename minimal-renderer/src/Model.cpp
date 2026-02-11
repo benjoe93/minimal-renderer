@@ -8,6 +8,11 @@
 
 #include "Model.h"
 
+#include <ranges>
+
+#define  DEFAULT_VERT_PATH "resources/shaders/02_LoadingMesh/object.vert"
+#define  DEFAULT_FRAG_PATH "resources/shaders/02_LoadingMesh/object.vert"
+
 
 void Model::LoadModel(const std::string& path)
 {
@@ -64,18 +69,15 @@ std::unique_ptr<Mesh> Model::ProcessMesh(const aiMesh* mesh, const aiScene* scen
         vertex.Position = glm::vec3( mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z );
 
         // Normal
-        if (mesh->HasNormals())
-        {
+        if (mesh->HasNormals()) {
             vertex.Normal = glm::vec3( mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z );
         }
 
         // UVs
-        if (mesh->mTextureCoords[0]) // check if there are any texture coordinates
-        {
+        if (mesh->mTextureCoords[0]) { // check if there are any texture coordinates
             vertex.TexCoords =  glm::vec2( mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y );
         }
-        else
-        {
+        else {
             vertex.TexCoords = glm::vec2(0.0f, 0.0f);
         }
 
@@ -83,39 +85,44 @@ std::unique_ptr<Mesh> Model::ProcessMesh(const aiMesh* mesh, const aiScene* scen
     }
 
     // process indices
-    for (unsigned int i = 0; i < mesh->mNumFaces; i++)
-    {
+    for (unsigned int i = 0; i < mesh->mNumFaces; i++) {
         const aiFace& face = mesh->mFaces[i];
-        for (unsigned int j = 0; j < face.mNumIndices; j++)
-        {
+        for (unsigned int j = 0; j < face.mNumIndices; j++) {
             indices.push_back(face.mIndices[j]);
         }
     }
-    
-    auto mat = std::make_unique<Material>(m_vertex_shader_path.c_str(), m_fragment_shader_path.c_str());
 
     // process material
     if (mesh->mMaterialIndex >= 0)
     {
-        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-        LoadMaterialTextures(mat.get(), material, aiTextureType_DIFFUSE, "material.diffuse");
-        LoadMaterialTextures(mat.get(), material, aiTextureType_SPECULAR, "material.specular");
-    }
-    
+        uint32_t slot_id = mesh->mMaterialIndex;
 
-    return std::make_unique<Mesh>(
-        std::move(vertices),
-        std::move(indices),
-        std::move(mat)
-     );
+        // Get or create material via ResourceManager
+        Material* material = ResourceManager::Get().GetMaterial(DEFAULT_VERT_PATH, DEFAULT_FRAG_PATH);
+
+        // load textures
+        aiMaterial* ai_material = scene->mMaterials[mesh->mMaterialIndex];
+        LoadMaterialTextures(material, ai_material, aiTextureType_DIFFUSE, "material.diffuse");
+        LoadMaterialTextures(material, ai_material, aiTextureType_SPECULAR, "material.specular");
+
+        // Assign to slot
+        SetMaterialSlot(slot_id, material);
+
+        // Set slot ID on mesh
+        auto new_mesh = std::make_unique<Mesh>(std::move(vertices), std::move(indices));
+        new_mesh->SetMaterialSlotId(slot_id);
+
+        return new_mesh;
+    }
+
+    return std::make_unique<Mesh>(std::move(vertices), std::move(indices));
 }
 
 void Model::LoadMaterialTextures(Material* material, const aiMaterial* ai_material, const aiTextureType type, const std::string& type_name)
 {
     const unsigned int texture_count = ai_material->GetTextureCount(type);
 
-    for (unsigned int i = 0; i < texture_count; i++)
-    {
+    for (unsigned int i = 0; i < texture_count; i++) {
         aiString current_path;
         if (ai_material->GetTexture(type, i, &current_path) != AI_SUCCESS)
             continue;
@@ -132,69 +139,98 @@ void Model::LoadMaterialTextures(Material* material, const aiMaterial* ai_materi
 
         std::string full_path = m_directory + '/' + texture_path;
 
-        // check if texture already loaded
-        if (auto it = m_texture_cache.find(texture_path); it == m_texture_cache.end())
-        {
-            // new texture - load it and cache the path
-            Texture2D* new_texture = ResourceManager::Get().GetTexture2D(full_path);
-            m_texture_cache[texture_path] = new_texture;
-            material->AddTexture(type_name, new_texture);
-        }
-        else
-        {
-            // texture already exists - reuse it
-            material->AddTexture(type_name, it->second);
-        }
+        Texture2D* new_texture = ResourceManager::Get().GetTexture2D(full_path);
+        material->AddTexture(type_name, new_texture);
     }
 }
 
-Model::Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader)
-    : m_vertex_shader_path(vertex_shader), m_fragment_shader_path(fragment_shader)
+Model::Model(const std::string& path, const Transform& transform)
+    :m_transform(transform)
 {
     LoadModel(path);
 }
 
-Model::Model(const std::string& path, const std::string& vertex_shader, const std::string& fragment_shader, const Transform& transform)
-    :m_transform(transform),
-    m_vertex_shader_path(vertex_shader),
-    m_fragment_shader_path(fragment_shader)
-{
-    LoadModel(path);
+Model::Model(std::vector<std::unique_ptr<Mesh>> meshes, const Transform& transform)
+    : m_transform(transform),
+      m_meshes(std::move(meshes))
+{}
+
+void Model::SetTransform(const Transform &new_transform) {
+    m_transform = new_transform;
+    m_matrix_dirty = true;
 }
 
-Model::Model(std::unique_ptr<Mesh> mesh, const Transform& transform)
-    : m_transform(transform)
-{
-    m_vertex_shader_path = mesh->GetMaterial().GetVertexPath();
-    m_fragment_shader_path = mesh->GetMaterial().GetFragmentPath();
-    m_meshes.push_back(std::move(mesh));
+void Model::SetLocation(const glm::vec3 &new_location) {
+    m_transform.Location = new_location;
+    m_matrix_dirty = true;
 }
 
-glm::mat4 Model::GetModelMatrix()
-{
+void Model::SetRotation(const glm::vec3 &new_rotation) {
+    m_transform.Rotation = new_rotation;
+    m_matrix_dirty = true;
+}
+
+void Model::SetScale(const glm::vec3 &new_scale) {
+    m_transform.Scale = new_scale;
+    m_matrix_dirty = true;
+}
+
+void Model::SetLocationOffset(const glm::vec3 &new_location) {
+    m_transform.Location += new_location;
+    m_matrix_dirty = true;
+}
+
+void Model::SetRotationOffset(const glm::vec3 &new_rotation) {
+    m_transform.Rotation += new_rotation;
+    m_matrix_dirty = true;
+}
+
+glm::mat4 Model::GetModelMatrix() {
     UpdateModelMatrix();
     return m_model_matrix;
 }
 
-std::unordered_set<Material*> Model::GetMaterials() const
+void Model::SetMaterialSlot(uint32_t slot_id, Material* material)
 {
-    std::unordered_set<Material*> materials;
+    m_material_slots[slot_id] = material;
+}
 
-    for (const auto& m : m_meshes)
-    {
-        materials.insert(&m->GetMaterial());
+Material* Model::GetMaterialSlot(uint32_t slot_id) const
+{
+    if (const auto it = m_material_slots.find(slot_id); it != m_material_slots.end()) {
+        return it->second;
+    }
+    return nullptr;  // Or return default material
+}
+
+bool Model::HasMaterialSlot(uint32_t slot_id) const
+{
+    return m_material_slots.contains(slot_id);
+}
+
+Material* Model::GetMaterialForMesh(const Mesh* mesh) const
+{
+    return GetMaterialSlot(mesh->GetMaterialSlotId());
+}
+
+std::vector<Material*> Model::GetAllMaterials() const
+{
+    std::vector<Material*> materials;
+    materials.reserve(m_material_slots.size());
+
+
+    for (const auto &material: m_material_slots | std::views::values) {
+        materials.push_back(material);
     }
 
     return materials;
 }
 
-void Model::SetMaterials()
-{
-    std::cout << "Set Materials Need to be fixed.";
-}
 
 void Model::UpdateModelMatrix()
 {
+    if (!m_matrix_dirty) return;
+
     m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_transform.Location);
 
@@ -207,4 +243,5 @@ void Model::UpdateModelMatrix()
     m_model_matrix = glm::rotate(m_model_matrix, glm::radians(m_transform.Rotation.z), Z_AXIS);
 
     m_model_matrix = glm::scale(m_model_matrix, m_transform.Scale);
+    m_matrix_dirty = false;
 }

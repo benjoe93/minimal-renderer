@@ -11,11 +11,13 @@ private:
     GLuint m_renderer_id;
     std::string m_vertex_path;
     std::string m_fragment_path;
+    std::string m_geometry_path;
     std::vector<std::pair<std::string, UniformBufferObj*>> u_uniform_buffers;
     mutable std::unordered_map<std::string, GLint> m_uniform_cache;
 
 public:
     Shader(const std::string& vertex_path, const std::string& fragment_path);
+    Shader(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path);
     ~Shader();
 
     Shader(const Shader&) = delete;

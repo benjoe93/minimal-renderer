@@ -79,13 +79,14 @@ void Renderer::Draw(Model& obj)
 {
     for (auto& mesh : obj.GetMeshes())
     {
-        IndexBuffer* ib = &mesh->GetIndexBuffer();
-        auto& material = mesh->GetMaterial();
+        Material* material = obj.GetMaterialForMesh(mesh.get());
 
-        material.Bind();
-        mesh->GetVertexArray().Bind();
-        GLCall(glDrawElements(GL_TRIANGLES, ib->GetCount(), GL_UNSIGNED_INT, nullptr));
-        material.Unbind();
+        if (material) {
+            material->Bind();
+            mesh->GetVertexArray().Bind();
+            GLCall(glDrawElements(GL_TRIANGLES, mesh->GetIndexBuffer().GetCount(), GL_UNSIGNED_INT, nullptr));
+            material->Unbind();
+        }
     }
 }
 #pragma endregion

@@ -1,21 +1,16 @@
 #include <glad/glad.h>
 
-#include "Material.h"
-
 #include "Mesh.h"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices, std::unique_ptr<Material> material)
-    : m_material(std::move(material)),
-      m_vertices(std::move(vertices)),
-      m_indices(std::move(indices))
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<GLuint> indices)
 {
     m_va = std::make_unique<VertexArray>();
     m_va->Bind();
 
-    m_vb = std::make_unique<VertexBuffer>(m_vertices.data(), m_vertices.size() * sizeof(Vertex));
+    m_vb = std::make_unique<VertexBuffer>(vertices.data(), vertices.size() * sizeof(Vertex));
     m_vb->Bind();
 
-    m_ib = std::make_unique<IndexBuffer>(m_indices.data(), m_indices.size());
+    m_ib = std::make_unique<IndexBuffer>(indices.data(), indices.size());
     m_ib->Bind();
 
     m_va->SetLayout(*m_vb, 0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), nullptr);

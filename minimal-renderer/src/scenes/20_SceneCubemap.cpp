@@ -109,7 +109,7 @@ namespace scene {
                 ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
                 MVP = projection * ModelView;
 
-                for (auto& mat : obj->GetMaterials())
+                for (Material* mat : obj->GetAllMaterials())
                     mat->SetUniform("mvp", MVP);
             }
             break;
@@ -119,7 +119,7 @@ namespace scene {
                 ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
                 MVP = projection * ModelView;
 
-                for (auto& mat : obj->GetMaterials())
+                for (Material* mat : obj->GetAllMaterials())
                 {
                     mat->SetUniform("mvp", MVP);
                     mat->SetUniform("model", obj->GetModelMatrix());
@@ -133,7 +133,7 @@ namespace scene {
                 ModelView = cam.GetViewMatrix() * obj->GetModelMatrix();
                 MVP = projection * ModelView;
 
-                for (auto& mat : obj->GetMaterials())
+                for (Material* mat : obj->GetAllMaterials())
                 {
                     mat->SetUniform("mvp", MVP);
                     mat->SetUniform("model", obj->GetModelMatrix());
@@ -183,157 +183,166 @@ namespace scene {
     }
 
     void SceneCubemap::ConstructScene()
-{
-    Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
-    Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg", true);
-
-    auto floor = std::make_unique<Model>(
-        "resources/models/plane.fbx",
-        "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
-        "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
-        Transform(
-            glm::vec3(0.0f, -0.5f, 0.0f),
-            glm::vec3(-90.0f, 0.0f, 0.0f),
-            glm::vec3(1.0f)
-        )
-    );
-
-    for (auto& mesh : floor->GetMeshes())
-        mesh->GetMaterial().AddTexture("material.diffuse", metal_tex);
-    objects.push_back(std::move(floor));
-
-    // Box 1
-    auto box1 = std::make_unique<Model>(
-        "resources/models/box.fbx",
-        "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
-        "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
-        Transform(
-            glm::vec3(-1.5f, 0.0f, -1.0f),
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(1.0f)
-        )
-    );
-
-    for (auto& mesh : box1->GetMeshes())
-        mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
-    objects.push_back(std::move(box1));
-
-    // Box 2
-    auto box2 = std::make_unique<Model>(
-        "resources/models/box.fbx",
-        "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
-        "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag",
-        Transform(
-            glm::vec3(1.5f, 0.0f, 0.0f),
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(1.0f)
-        )
-    );
-
-    for (auto& mesh : box2->GetMeshes())
-        mesh->GetMaterial().AddTexture("material.diffuse", marble_tex);
-    objects.push_back(std::move(box2));
-}
-
-    void SceneCubemap::ConstructReflectionScene(TextureCubemap* in_skybox)
     {
+        Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
+        Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/container.jpg", true);
+
+        Material* object_material = ResourceManager::Get().GetMaterial(
+            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert",
+            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag"
+        );
+
         auto floor = std::make_unique<Model>(
             "resources/models/plane.fbx",
-            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert",
-            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.frag",
             Transform(
                 glm::vec3(0.0f, -0.5f, 0.0f),
                 glm::vec3(-90.0f, 0.0f, 0.0f),
                 glm::vec3(1.0f)
             )
         );
+        floor->SetMaterialSlot(0, object_material);
 
-        for (auto& mat : floor->GetMaterials())
+        for (auto& mesh : floor->GetMeshes()) {
+            Material* mat = floor->GetMaterialForMesh(mesh.get());
+            if (mat) mat->AddTexture("material.diffuse", metal_tex);
+        }
+        objects.push_back(std::move(floor));
+
+        // Box 1
+        auto box1 = std::make_unique<Model>(
+            "resources/models/box.fbx",
+            Transform(
+                glm::vec3(-1.5f, 0.0f, -1.0f),
+                glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(1.0f)
+            )
+        );
+        box1->SetMaterialSlot(0, object_material);
+
+        for (auto& mesh : box1->GetMeshes()) {
+            Material* mat = box1->GetMaterialForMesh(mesh.get());
+            if (mat) mat->AddTexture("material.diffuse", marble_tex);
+        }
+        objects.push_back(std::move(box1));
+
+        // Box 2
+        auto box2 = std::make_unique<Model>(
+            "resources/models/box.fbx",
+            Transform(
+                glm::vec3(1.5f, 0.0f, 0.0f),
+                glm::vec3(0.0f, 0.0f, 0.0f),
+                glm::vec3(1.0f)
+            )
+        );
+        box2->SetMaterialSlot(0, object_material);
+
+        for (auto& mesh : box2->GetMeshes()) {
+            Material* mat = box2->GetMaterialForMesh(mesh.get());
+            if (mat) mat->AddTexture("material.diffuse", marble_tex);
+        }
+        objects.push_back(std::move(box2));
+    }
+
+    void SceneCubemap::ConstructReflectionScene(TextureCubemap* in_skybox)
+    {
+        Material* reflection_material = ResourceManager::Get().GetMaterial(
+            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert",
+            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.frag"
+        );
+
+        auto floor = std::make_unique<Model>(
+            "resources/models/plane.fbx",
+            Transform(
+                glm::vec3(0.0f, -0.5f, 0.0f),
+                glm::vec3(-90.0f, 0.0f, 0.0f),
+                glm::vec3(1.0f)
+            )
+        );
+        floor->SetMaterialSlot(0, reflection_material);
+
+        for (Material* mat : floor->GetAllMaterials())
             mat->AddTexture("cubemap", in_skybox);
         reflection_objects.push_back(std::move(floor));
 
         // Box 1
         auto box1 = std::make_unique<Model>(
             "resources/models/box.fbx",
-            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert",
-            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.frag",
             Transform(
                 glm::vec3(-1.5f, 0.0f, -1.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(1.0f)
             )
         );
+        box1->SetMaterialSlot(0, reflection_material);
 
-        for (auto& mat : box1->GetMaterials())
+        for (Material* mat : box1->GetAllMaterials())
             mat->AddTexture("cubemap", in_skybox);
         reflection_objects.push_back(std::move(box1));
 
         // Box 2
         auto box2 = std::make_unique<Model>(
             "resources/models/box.fbx",
-            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert",
-            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.frag",
             Transform(
                 glm::vec3(1.5f, 0.0f, 0.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(1.0f)
             )
         );
+        box2->SetMaterialSlot(0, reflection_material);
 
-        for (auto& mat : box2->GetMaterials())
+        for (Material* mat : box2->GetAllMaterials())
             mat->AddTexture("cubemap", in_skybox);
         reflection_objects.push_back(std::move(box2));
     }
 
     void SceneCubemap::ConstructRefractionScene(TextureCubemap* in_skybox)
     {
-        std::string vertex_shader = "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert";
-        std::string fragment_shader = "resources/shaders/03_AdvancedOpenGL/05_Cubemap/refraction.frag";
+        Material* refraction_material = ResourceManager::Get().GetMaterial(
+            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/reflection.vert",
+            "resources/shaders/03_AdvancedOpenGL/05_Cubemap/refraction.frag"
+        );
 
         auto floor = std::make_unique<Model>(
             "resources/models/plane.fbx",
-            vertex_shader,
-            fragment_shader,
             Transform(
                 glm::vec3(0.0f, -0.5f, 0.0f),
                 glm::vec3(-90.0f, 0.0f, 0.0f),
                 glm::vec3(1.0f)
             )
         );
+        floor->SetMaterialSlot(0, refraction_material);
 
-        for (auto& mat : floor->GetMaterials())
+        for (Material* mat : floor->GetAllMaterials())
             mat->AddTexture("cubemap", in_skybox);
         refraction_objects.push_back(std::move(floor));
 
         // Box 1
         auto box1 = std::make_unique<Model>(
             "resources/models/box.fbx",
-            vertex_shader,
-            fragment_shader,
             Transform(
                 glm::vec3(-1.5f, 0.0f, -1.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(1.0f)
             )
         );
+        box1->SetMaterialSlot(0, refraction_material);
 
-        for (auto& mat : box1->GetMaterials())
+        for (Material* mat : box1->GetAllMaterials())
             mat->AddTexture("cubemap", in_skybox);
         refraction_objects.push_back(std::move(box1));
 
         // Box 2
         auto box2 = std::make_unique<Model>(
             "resources/models/box.fbx",
-            vertex_shader,
-            fragment_shader,
             Transform(
                 glm::vec3(1.5f, 0.0f, 0.0f),
                 glm::vec3(0.0f, 0.0f, 0.0f),
                 glm::vec3(1.0f)
             )
         );
+        box2->SetMaterialSlot(0, refraction_material);
 
-        for (auto& mat : box2->GetMaterials())
+        for (Material* mat : box2->GetAllMaterials())
             mat->AddTexture("cubemap", in_skybox);
         refraction_objects.push_back(std::move(box2));
     }

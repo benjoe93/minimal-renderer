@@ -18,7 +18,7 @@ private:
     std::unordered_map<std::string, glm::mat4> u_mat4;
 
 public:
-    Material(const std::string& vertex_path, const std::string& fragment_path);
+    Material(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path = "");
     ~Material() = default;
 
     void AddTexture(const std::string& sampler_name, Texture* texture);

@@ -7,6 +7,7 @@
 #include "Material.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "ResourceManager.h"
 
 #include "15_SceneStencilTesting.h"
 
@@ -16,29 +17,48 @@ namespace scene {
         :Scene("Stencil Testing")
     {
         Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-        
+
         Renderer::Get().SetDepthTest(true);
-        Renderer::Get().SetDepthFunction(TestingFunc::LESS);    // discard fragments that have higher values then the current (behind object)
+        Renderer::Get().SetDepthFunction(TestingFunc::LESS);
         Renderer::Get().SetStencilTest(true);
-        Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF); // pass stencil test if stencil value != 1 (The mask 0xFF means all 8 bits are considered in the comparison)
+        Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF);
         Renderer::Get().SetStencilOperation(StencilOp::KEEP, StencilOp::KEEP, StencilOp::REPLACE);
 
         Camera& camera = Renderer::Get().GetActiveCamera();
 
-        // object setup
-        objects.push_back(std::make_unique<Model>("resources/models/plane.fbx", "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert", "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag"));
-        objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert", "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag"));
-        objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert", "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag"));
-        // boxes for the outline
-        outline_objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.vert", "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.frag"));
-        outline_objects.push_back(std::make_unique<Model>("resources/models/box.fbx",   "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.vert", "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.frag"));
+        Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
+        Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/marble.jpg", true);
 
-        for (auto& mesh : objects[0]->GetMeshes())
-            mesh->GetMaterial().AddTexture2D("resources/textures/metal.png", "material.diffuse", true);
-        for (auto& mesh : objects[1]->GetMeshes())
-            mesh->GetMaterial().AddTexture2D("resources/textures/marble.jpg", "material.diffuse", true);
-        for (auto& mesh : objects[2]->GetMeshes())
-            mesh->GetMaterial().AddTexture2D("resources/textures/marble.jpg", "material.diffuse", true);
+        // object setup
+        objects.push_back(std::make_unique<Model>("resources/models/plane.fbx"));
+        objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
+        objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
+
+        for (auto& mesh : objects[0]->GetMeshes()) {
+            Material* mat = objects[0]->GetMaterialForMesh(mesh.get());
+            if (mat) mat->AddTexture("material.diffuse", metal_tex);
+        }
+        for (auto& mesh : objects[1]->GetMeshes()) {
+            Material* mat = objects[1]->GetMaterialForMesh(mesh.get());
+            if (mat) mat->AddTexture("material.diffuse", marble_tex);
+        }
+        for (auto& mesh : objects[2]->GetMeshes()) {
+            Material* mat = objects[2]->GetMaterialForMesh(mesh.get());
+            if (mat) mat->AddTexture("material.diffuse", marble_tex);
+        }
+
+        // boxes for the outline
+        outline_objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
+        outline_objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
+
+        Material* outline_mat = ResourceManager::Get().GetMaterial(
+            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.vert",
+            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.frag"
+        );
+
+        for (auto& obj : outline_objects) {
+            obj->SetMaterialSlot(0, outline_mat);
+        }
     }
 
     void SceneStencilTesting::OnUpdate(double delta_time)
@@ -61,9 +81,11 @@ namespace scene {
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            auto& material = m->GetMaterial();
-            material.SetUniform("model", model);
-            material.SetUniform("mvp", MVP);
+            Material* material = objects[0]->GetMaterialForMesh(m.get());
+            if (material) {
+                material->SetUniform("model", model);
+                material->SetUniform("mvp", MVP);
+            }
         }
 
         // boxes for rendering
@@ -71,25 +93,28 @@ namespace scene {
         {
             model = glm::mat4(1.0);
             model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-            //model = glm::scale(model, glm::vec3(0.2f));
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            auto& material = m->GetMaterial();
-            material.SetUniform("model", model);
-            material.SetUniform("mvp", MVP);
+            Material* material = objects[1]->GetMaterialForMesh(m.get());
+            if (material) {
+                material->SetUniform("model", model);
+                material->SetUniform("mvp", MVP);
+            }
         }
+
         for (auto& m : objects[2]->GetMeshes())
         {
             model = glm::mat4(1.0);
             model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-            //model = glm::scale(model, glm::vec3(0.2f));
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            auto& material = m->GetMaterial();
-            material.SetUniform("model", model);
-            material.SetUniform("mvp", MVP);
+            Material* material = objects[2]->GetMaterialForMesh(m.get());
+            if (material) {
+                material->SetUniform("model", model);
+                material->SetUniform("mvp", MVP);
+            }
         }
 
         // boxes for outline
@@ -98,62 +123,57 @@ namespace scene {
             model = glm::mat4(1.0);
             model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
             model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
-            //model = glm::scale(model, glm::vec3(0.2f));
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            auto& material = m->GetMaterial();
-            material.SetUniform("model", model);
-            material.SetUniform("mvp", MVP);
+            Material* material = outline_objects[0]->GetMaterialForMesh(m.get());
+            if (material) {
+                material->SetUniform("model", model);
+                material->SetUniform("mvp", MVP);
+            }
         }
+
         for (auto& m : outline_objects[1]->GetMeshes())
         {
             model = glm::mat4(1.0);
             model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
             model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
-            //model = glm::scale(model, glm::vec3(0.2f));
             ModelView = cam.GetViewMatrix() * model;
             MVP = projection * ModelView;
 
-            auto& material = m->GetMaterial();
-            material.SetUniform("model", model);
-            material.SetUniform("mvp", MVP);
+            Material* material = outline_objects[1]->GetMaterialForMesh(m.get());
+            if (material) {
+                material->SetUniform("model", model);
+                material->SetUniform("mvp", MVP);
+            }
         }
     }
 
     void SceneStencilTesting::OnRender()
     {
         Renderer::Get().SetDepthTest(true);
-        Renderer::Get().SetStencilOperation(StencilOp::KEEP, StencilOp::KEEP, StencilOp::REPLACE); // replace stencil value when both stencil and depth tests pass
+        Renderer::Get().SetStencilOperation(StencilOp::KEEP, StencilOp::KEEP, StencilOp::REPLACE);
 
-        // draw floor as normal, but don't write the floor to the stencil buffer, we only care about the containers. 
-        // We set its mask to 0x00 to not write to the stencil buffer.
-        Renderer::Get().SetStencilMask(0x00);                        // disable writing to stencil buffer (all bits masked)
-        Renderer::Get().Draw(*objects[0]);                        // draw floor without affecting stencil
+        Renderer::Get().SetStencilMask(0x00);
+        Renderer::Get().Draw(*objects[0]);
 
-        // 1st. render pass, draw objects as normal, writing to the stencil buffer
-        // --------------------------------------------------------------------
-        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 1, 0xFF);   // always pass stencil test, set reference value to 1
-        Renderer::Get().SetStencilMask(0xFF);   // enable writing to stencil buffer (all bits unmasked)
+        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 1, 0xFF);
+        Renderer::Get().SetStencilMask(0xFF);
         for (unsigned int i = 1; i < 3; i++)
         {
-            Renderer::Get().Draw(*objects[i]);  // draw objects and mark their pixels with 1 in stencil buffer
+            Renderer::Get().Draw(*objects[i]);
         }
 
-        // 2nd. render pass: now draw slightly scaled versions of the objects, this time disabling stencil writing.
-        // Because the stencil buffer is now filled with several 1s. The parts of the buffer that are 1 are not drawn, thus only drawing 
-        // the objects' size differences, making it look like borders.
-        // -----------------------------------------------------------------------------------------------------------------------------
-        Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF);    // only pass stencil test where stencil value != 1 (around edges)
-        Renderer::Get().SetStencilMask(0x00);   // disable writing to stencil buffer (read-only mode)
-        Renderer::Get().SetDepthTest(false);    // disable depth test so outline draws on top of everything
+        Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF);
+        Renderer::Get().SetStencilMask(0x00);
+        Renderer::Get().SetDepthTest(false);
         for (auto& obj : outline_objects)
         {
-            Renderer::Get().Draw(*obj); // draw scaled objects, only visible where original wasn't drawn (outline effect)
+            Renderer::Get().Draw(*obj);
         }
-        Renderer::Get().SetStencilMask(0xFF);   // re-enable stencil writing for future rendering
-        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 0, 0xFF);   // reset stencil function to always pass with ref value 0
-        Renderer::Get().SetDepthTest(true); // re-enable depth testing for normal rendering
+        Renderer::Get().SetStencilMask(0xFF);
+        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 0, 0xFF);
+        Renderer::Get().SetDepthTest(true);
     }
 
     void SceneStencilTesting::OnImGuiRender() { }

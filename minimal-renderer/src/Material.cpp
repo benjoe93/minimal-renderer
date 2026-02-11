@@ -2,9 +2,14 @@
 #include "ResourceManager.h"
 #include "Texture2D.h"
 
-Material::Material(const std::string& vertex_path, const std::string& fragment_path)
+Material::Material(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path)
 {
-    m_shader = ResourceManager::Get().GetShader(vertex_path, fragment_path);
+    if (geometry_path.empty()) {
+        m_shader = ResourceManager::Get().GetShader(vertex_path, fragment_path);
+    }
+    else {
+        m_shader = ResourceManager::Get().GetShader(vertex_path, fragment_path, geometry_path);
+    }
 }
 
 void Material::AddTexture(const std::string& sampler_name, Texture* texture)

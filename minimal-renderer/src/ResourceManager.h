@@ -39,6 +39,7 @@ public:
     Texture2D* GetTexture2D(const std::string& file_path, bool is_flipped = true);
     TextureCubemap* GetCubemap(const std::unordered_map<CubeSide, std::string>& side_source);
     Shader* GetShader(const std::string& vertex_path, const std::string& fragment_path);
+    Shader* GetShader(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path);
     Material* GetMaterial(const std::string& vertex_path, const std::string& fragment_path);
     RenderTarget* GetRenderTarget(const std::string& name, GLuint width, GLuint height, GLuint nr_channels);
     RenderBuffer* GetRenderBuffer(const std::string& name, GLuint width, GLuint height);
