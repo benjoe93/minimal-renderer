@@ -1,6 +1,11 @@
 #include "Material.h"
+
+#include <format>
+
 #include "ResourceManager.h"
 #include "Texture2D.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/string_cast.hpp"
 
 Material::Material(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path)
 {
@@ -45,6 +50,7 @@ void Material::SetUniform(const std::string& name, const glm::mat4& value)
 
 void Material::Bind()
 {
+    GLint currentProgram = 0;
     m_shader->Bind();
 
     // Bind uniforms
@@ -54,10 +60,11 @@ void Material::Bind()
     }
     for (const auto& [name, value] : u_vec3)
     {
-        m_shader->SetUniform(name, value[0], value[1], value[2]);
+        m_shader->SetUniform(name, value.x, value.y, value.z);
     }
     for (const auto& [name, value] : u_mat4)
     {
+        // std::cout << "[MATRIX] - " << name << ": " << glm::to_string(value) << std::endl;
         m_shader->SetUniform(name, value);
     }
 

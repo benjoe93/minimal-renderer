@@ -95,3 +95,14 @@ void Camera::UpdateRotation()
     };
     m_cam_direction = glm::normalize(temp_dir);
 }
+
+void Camera::Reset() {
+    m_fov = DEFAULT_FOV;
+    m_cam_position = {0.0f, 0.0f, 3.0f};
+    m_cam_direction = {0.0f, 0.0f, -1.0f};
+    m_cam_up = {0.0f, 1.0f, 0.0f};
+    m_pitch = 0.0f;
+    m_yaw = -90.0f;
+    m_roll = 0.0f;
+    UpdateRotation();
+}

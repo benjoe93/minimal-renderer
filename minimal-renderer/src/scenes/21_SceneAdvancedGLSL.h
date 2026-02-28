@@ -1,23 +1,23 @@
 #pragma once
 #include <vector>
 #include "UniformBufferObject.h"
-#include "Scene.h"
+#include "../Scene.h"
 
 class Model;
 
-namespace scene {
-    class SceneAdvancedGLSL : public Scene
-    {
-    private:
-        std::vector<Model*> m_objects;
-        UniformBufferObj* m_uniform_buffer = nullptr;
+class SceneAdvancedGLSL : public Scene
+{
+private:
+    std::vector<Model*> m_objects;
+    UniformBufferObj* m_uniform_buffer = nullptr;
 
 
-    public:
-        SceneAdvancedGLSL();
-        ~SceneAdvancedGLSL();
+public:
+    SceneAdvancedGLSL();
+    ~SceneAdvancedGLSL();
 
-        void OnUpdate(double delta_time) override;
-        void OnRender() override;
-    };
-}
+    static std::string StaticName() { return "21_AdvancedGLSL"; }
+
+    void OnUpdate(double delta_time) override;
+    void OnRender() override;
+};

@@ -11,7 +11,7 @@
 #include <ranges>
 
 #define  DEFAULT_VERT_PATH "resources/shaders/02_LoadingMesh/object.vert"
-#define  DEFAULT_FRAG_PATH "resources/shaders/02_LoadingMesh/object.vert"
+#define  DEFAULT_FRAG_PATH "resources/shaders/02_LoadingMesh/object.frag"
 
 
 void Model::LoadModel(const std::string& path)
@@ -98,7 +98,7 @@ std::unique_ptr<Mesh> Model::ProcessMesh(const aiMesh* mesh, const aiScene* scen
         uint32_t slot_id = mesh->mMaterialIndex;
 
         // Get or create material via ResourceManager
-        Material* material = ResourceManager::Get().GetMaterial(DEFAULT_VERT_PATH, DEFAULT_FRAG_PATH);
+        Material* material = ResourceManager::Get().CreateMaterial("default", DEFAULT_VERT_PATH, DEFAULT_FRAG_PATH);
 
         // load textures
         aiMaterial* ai_material = scene->mMaterials[mesh->mMaterialIndex];

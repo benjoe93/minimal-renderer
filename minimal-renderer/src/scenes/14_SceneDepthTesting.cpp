@@ -5,120 +5,91 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "Material.h"
-#include "Mesh.h"
 #include "Model.h"
 #include "ResourceManager.h"
 
 #include "14_SceneDepthTesting.h"
 
-namespace scene {
+#include "SceneRegistry.h"
 
-    SceneDepthTesting::SceneDepthTesting()
-        :Scene("Depth Testing")
-    {
-        Renderer::Get().SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
+#define PLANE_PATH "resources/models/plane.fbx"
+#define BOX_PATH "resources/models/box.fbx"
 
-        Camera& camera = Renderer::Get().GetActiveCamera();
+#define OBJ_VERT_PATH "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert"
+#define OBJ_FRAG_PATH "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag"
 
-        ////////////////////////////////////////////////////////////////////////////
-        //                            geometry setup                              //
-        ////////////////////////////////////////////////////////////////////////////
-        objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
-        objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
-        objects.push_back(std::make_unique<Model>("resources/models/plane.fbx"));
+SceneDepthTesting::SceneDepthTesting()
+    : Scene(StaticName())
+{
+    Renderer::Get().SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
 
-        Material* material = ResourceManager::Get().GetMaterial(
-            "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.vert",
-            "resources/shaders/03_AdvancedOpenGL/01_DepthTesting/depth_test.frag"
-        );
+    Camera& camera = AppState::Get().GetActiveCamera();
 
-        Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/marble.jpg", true);
-        Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
+    // geometry setup
+    auto floor = std::make_unique<Model>(PLANE_PATH);
+    floor->SetLocation({0.0f, -0.5f, 0.0f});
+    floor->SetRotation({-90.0f, 0.0f, 0.0f});
 
-        material->AddTexture("material.diffuse", marble_tex);
+    auto box1 = std::make_unique<Model>(BOX_PATH);
+    box1->SetLocation({-1.5f, 0.0f, -1.0f});
 
-        // Set materials for boxes
-        for (int i = 0; i < 2; i++) {
-            objects[i]->SetMaterialSlot(0, material);
-        }
+    auto box2 = std::make_unique<Model>(BOX_PATH);
+    box2->SetLocation({1.5f, 0.0f, 0.0f});
 
-        // Floor gets different texture
-        objects[2]->SetMaterialSlot(0, material);
-        for (auto& mesh : objects[2]->GetMeshes()) {
-            Material* floor_mat = objects[2]->GetMaterialForMesh(mesh.get());
-            if (floor_mat) {
-                floor_mat->AddTexture("material.diffuse", metal_tex);
-            }
-        }
+    auto floor_material = ResourceManager::Get().GetMaterial("floor_material");
+    if (!floor_material) {
+        floor_material = ResourceManager::Get().CreateMaterial("floor_material", OBJ_VERT_PATH, OBJ_FRAG_PATH);
+        floor_material->AddTexture2D("resources/textures/metal.png", "material.diffuse");
     }
 
-    void SceneDepthTesting::OnUpdate(double delta_time)
-    {
-        Camera& cam = Renderer::Get().GetActiveCamera();
-        glm::vec3 cam_pos = cam.GetPosition();
-
-        glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
-
-        ////////////////////////////////////////////////////////////////////////////
-        //                           geometry update                              //
-        ////////////////////////////////////////////////////////////////////////////
-        // boxes
-        for (auto& m : objects[0]->GetMeshes())
-        {
-            model = glm::mat4(1.0);
-            model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-            ModelView = cam.GetViewMatrix() * model;
-            MVP = projection * ModelView;
-
-            Material* material = objects[0]->GetMaterialForMesh(m.get());
-            if (material) {
-                material->SetUniform("model", model);
-                material->SetUniform("mvp", MVP);
-            }
-        }
-
-        for (auto& m : objects[1]->GetMeshes())
-        {
-            model = glm::mat4(1.0);
-            model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-            ModelView = cam.GetViewMatrix() * model;
-            MVP = projection * ModelView;
-
-            Material* material = objects[1]->GetMaterialForMesh(m.get());
-            if (material) {
-                material->SetUniform("model", model);
-                material->SetUniform("mvp", MVP);
-            }
-        }
-
-        // plane
-        for (auto& m : objects[2]->GetMeshes())
-        {
-            model = glm::mat4(1.0);
-            model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));
-            model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            ModelView = cam.GetViewMatrix() * model;
-            MVP = projection * ModelView;
-
-            Material* material = objects[2]->GetMaterialForMesh(m.get());
-            if (material) {
-                material->SetUniform("model", model);
-                material->SetUniform("mvp", MVP);
-            }
-        }
+    auto box_material = ResourceManager::Get().GetMaterial("box_material");
+    if (!box_material) {
+        box_material = ResourceManager::Get().CreateMaterial("box_material", OBJ_VERT_PATH, OBJ_FRAG_PATH);
+        box_material->AddTexture2D("resources/textures/container.jpg", "material.diffuse");
     }
 
-    void SceneDepthTesting::OnRender()
-    {
-        Renderer::Get().SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
+    floor->SetMaterialSlot(0, floor_material);
+    box1->SetMaterialSlot(0, box_material);
+    box2->SetMaterialSlot(0, box_material);
 
-        ////////////////////////////////////////////////////////////////////////////
-        //                          geometry rendering                            //
-        ////////////////////////////////////////////////////////////////////////////
-        for (auto& obj : objects)
-            Renderer::Get().Draw(*obj);
-    }
+    objects.push_back(std::move(floor));
+    objects.push_back(std::move(box1));
+    objects.push_back(std::move(box2));
 
-    void SceneDepthTesting::OnImGuiRender() { }
 }
+
+void SceneDepthTesting::OnUpdate(double delta_time) {}
+
+void SceneDepthTesting::OnRender() {
+    Renderer::Get().SetBackgroundColor(glm::vec4(0.18f, 0.23f, 0.24f, 1.0f));
+
+    Camera& cam = AppState::Get().GetActiveCamera();
+    glm::vec3 cam_pos = cam.GetPosition();
+
+    glm::mat4 projection, model, ModelView, MVP;
+    projection = glm::perspective(
+        glm::radians(
+            cam.GetFov()),
+            static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()),
+        0.1f,
+        100.0f);
+
+    // geometry rendering -  we're doing this here to have the mvp updated right before the draw call even if multiple
+    // objects are using the same material
+    for (auto& obj : objects) {
+        for (auto& material : obj->GetAllMaterials()) {
+            model = obj->GetModelMatrix();
+            ModelView = cam.GetViewMatrix() * model;
+            MVP = projection * ModelView;
+
+            if (!material) continue;
+            material->SetUniform("model", model);
+            material->SetUniform("mvp", MVP);
+        }
+        Renderer::Get().Draw(*obj);
+    }
+}
+
+void SceneDepthTesting::OnImGuiRender() {}
+
+REGISTER_SCENE(SceneDepthTesting);

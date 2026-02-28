@@ -9,10 +9,12 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
-#include "Shader.h"
 
 #include "08_ScenePhongLight.h"
+
+#include "Material.h"
+#include "ResourceManager.h"
+#include "SceneRegistry.h"
 
 
 constexpr float vertices[] = {
@@ -83,13 +85,10 @@ constexpr unsigned int indices[] = {
 constexpr size_t element_size = 36;
 constexpr size_t buffer_size = element_size * 6 * sizeof(float);
 
-namespace scene {
 ScenePhongLight::ScenePhongLight()
-    :Scene("Phong Lighting")
+    : Scene(StaticName())
 {
-    ////////////////////////////////////////////////////////////////////////////
-    //                            geometry setup                              //
-    ////////////////////////////////////////////////////////////////////////////
+    // geometry setup
     object_va = std::make_unique<VertexArray>();
     object_va->Bind();
 
@@ -101,16 +100,16 @@ ScenePhongLight::ScenePhongLight()
     object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
-    object_shader = std::make_unique<Shader>("resources/shaders/01_Lighting/00_PhongLighting/object.vert", "resources/shaders/01_Lighting/00_PhongLighting/object.frag");
-
     object_va->Unbind();
     object_vb->Unbind();
     object_ib->Unbind();
-    object_shader->Unbind();
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                              light setup                               //
-    ////////////////////////////////////////////////////////////////////////////
+    object_material = ResourceManager::Get().GetMaterial("object_material");
+    if (!object_material) {
+        object_material = ResourceManager::Get().CreateMaterial("object_material", "resources/shaders/01_Lighting/00_PhongLighting/object.vert", "resources/shaders/01_Lighting/00_PhongLighting/object.frag");
+    }
+
+    // light setup
     light_va = std::make_unique<VertexArray>();
     light_va->Bind();
 
@@ -121,54 +120,50 @@ ScenePhongLight::ScenePhongLight()
 
     light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 
-    light_shader = std::make_unique<Shader>("resources/shaders/01_Lighting/00_PhongLighting/light.vert", "resources/shaders/01_Lighting/00_PhongLighting/light.frag");
-    light_shader->Bind();
+    light_material = ResourceManager::Get().GetMaterial("light_material");
+    if (!light_material) {
+        light_material = ResourceManager::Get().CreateMaterial("light_material", "resources/shaders/01_Lighting/00_PhongLighting/light.vert", "resources/shaders/01_Lighting/00_PhongLighting/light.frag");
+    }
 
     light_va->Unbind();
     light_vb->Unbind();
     light_ib->Unbind();
-    light_shader->Unbind();
 }
 
 void ScenePhongLight::OnRender()
 {
-    Camera& cam = Renderer::Get().GetActiveCamera();
+    Camera& cam = AppState::Get().GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                          geometry rendering                            //
-    ////////////////////////////////////////////////////////////////////////////
-    const glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
+    // geometry rendering
+    const glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()), 0.1f, 100.0f);
     auto model = glm::mat4(1.0f);
     glm::mat4 mvp_matrix = projection * cam.GetViewMatrix() * model;
 
-    object_shader->Bind();
-    object_shader->SetUniform("model", model);
-    object_shader->SetUniform("view", cam.GetViewMatrix());
-    object_shader->SetUniform("projection", projection);
+    object_material->SetUniform("model", model);
+    object_material->SetUniform("view", cam.GetViewMatrix());
+    object_material->SetUniform("projection", projection);
 
-    object_shader->SetUniform("u_objectColor", object_color[0], object_color[1], object_color[2]);
-    object_shader->SetUniform("u_viewPos", cam_pos[0], cam_pos[1], cam_pos[2]);
+    object_material->SetUniform("u_objectColor", {object_color[0], object_color[1], object_color[2]});
+    object_material->SetUniform("u_viewPos", {cam_pos[0], cam_pos[1], cam_pos[2]});
 
-    object_shader->SetUniform("u_lightColor", light_color[0], light_color[1], light_color[2]);
-    object_shader->SetUniform("u_lightPos", light_position[0], light_position[1], light_position[2]);
+    object_material->SetUniform("u_lightColor", {light_color[0], light_color[1], light_color[2]});
+    object_material->SetUniform("u_lightPos", {light_position[0], light_position[1], light_position[2]});
 
-    Renderer::Get().Draw(*object_va, *object_ib, *object_shader);
+    Renderer::Get().Draw(*object_va, *object_ib, object_material);
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                            light rendering                             //
-    ////////////////////////////////////////////////////////////////////////////
-    light_shader->Bind();
+    // light rendering
+    light_material->Bind();
     auto light_transform = glm::mat4(1.0f);
-    light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
+    light_transform = glm::translate(light_transform, {light_position[0], light_position[1], light_position[2]});
     light_transform = glm::scale(light_transform, glm::vec3(0.1f));
-    light_shader->SetUniform("model", light_transform);
-    light_shader->SetUniform("view", cam.GetViewMatrix());
-    light_shader->SetUniform("projection", projection);
+    light_material->SetUniform("model", light_transform);
+    light_material->SetUniform("view", cam.GetViewMatrix());
+    light_material->SetUniform("projection", projection);
 
-    light_shader->SetUniform("u_lightColor", light_color[0], light_color[1], light_color[2]);
+    light_material->SetUniform("u_lightColor", {light_color[0], light_color[1], light_color[2]});
 
-    Renderer::Get().Draw(*light_va, *light_ib, *light_shader);
+    Renderer::Get().Draw(*light_va, *light_ib, light_material);
 }
 
 void ScenePhongLight::OnImGuiRender()
@@ -182,4 +177,5 @@ void ScenePhongLight::OnImGuiRender()
     ImGui::ColorEdit3("Object Color", object_color);
     ImGui::End();
 }
-}
+
+REGISTER_SCENE(ScenePhongLight);

@@ -1,14 +1,13 @@
 #pragma once
-#include "Scene.h"
+#include "../Scene.h"
 
 class Renderer;
 class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
-namespace scene {
-    class SceneHelloTriangle : public Scene
-    {
+class SceneHelloTriangle : public Scene
+{
     private:
         unsigned int vertex_shader = 0;
         unsigned int fragment_shader = 0;
@@ -20,8 +19,9 @@ namespace scene {
     public:
         SceneHelloTriangle();
 
+        static std::string StaticName() { return "01_Hello_Triangle"; }
+
         void OnUpdate(double delta_time) override;
         void OnRender() override;
         void OnImGuiRender() override;
-    };
-}
+};

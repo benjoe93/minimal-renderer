@@ -1,5 +1,9 @@
 #include <cassert>
 #include "ResourceManager.h"
+
+#include <ranges>
+
+#include "Framebuffer.h"
 #include "Texture2D.h"
 #include "TextureCubemap.h"
 #include "Shader.h"
@@ -9,27 +13,23 @@
 
 static ResourceManager* s_instance = nullptr;
 
-void ResourceManager::Init()
-{
+void ResourceManager::Init() {
     assert(!s_instance && "ResourceManager already initialized!");
     s_instance = new ResourceManager();
 }
 
-void ResourceManager::Shutdown()
-{
+void ResourceManager::Shutdown() {
     assert(s_instance && "ResourceManager not initialized!");
     delete s_instance;
     s_instance = nullptr;
 }
 
-ResourceManager& ResourceManager::Get()
-{
+ResourceManager& ResourceManager::Get() {
     assert(s_instance && "ResourceManager not initialized! Call Init() first.");
     return *s_instance;
 }
 
-Texture2D* ResourceManager::GetTexture2D(const std::string& file_path, bool is_flipped)
-{
+Texture2D* ResourceManager::GetTexture2D(const std::string& file_path, bool is_flipped) {
     auto it = m_textures_2d.find(file_path);
     if (it != m_textures_2d.end())
         return it->second.get();
@@ -40,12 +40,10 @@ Texture2D* ResourceManager::GetTexture2D(const std::string& file_path, bool is_f
     return ptr;
 }
 
-TextureCubemap* ResourceManager::GetCubemap(const std::unordered_map<CubeSide, std::string>& side_source)
-{
+TextureCubemap* ResourceManager::GetCubemap(const std::unordered_map<CubeSide, std::string>& side_source) {
     // Create consistent key
     std::string key;
-    for (const auto& [side, path] : side_source)
-    {
+    for (const auto &path: side_source | std::views::values) {
         key += path + "|";
     }
 
@@ -59,8 +57,7 @@ TextureCubemap* ResourceManager::GetCubemap(const std::unordered_map<CubeSide, s
     return ptr;
 }
 
-Shader* ResourceManager::GetShader(const std::string& vertex_path, const std::string& fragment_path)
-{
+Shader* ResourceManager::GetShader(const std::string& vertex_path, const std::string& fragment_path) {
     const std::string key = vertex_path + "|" + fragment_path;
 
     auto it = m_shaders.find(key);
@@ -73,8 +70,7 @@ Shader* ResourceManager::GetShader(const std::string& vertex_path, const std::st
     return ptr;
 }
 
-Shader * ResourceManager::GetShader(const std::string &vertex_path, const std::string &fragment_path, const std::string &geometry_path)
-{
+Shader * ResourceManager::GetShader(const std::string &vertex_path, const std::string &fragment_path, const std::string &geometry_path) {
     const std::string key = vertex_path + "|" + fragment_path + "|" + geometry_path;
 
     auto it = m_shaders.find(key);
@@ -87,23 +83,32 @@ Shader * ResourceManager::GetShader(const std::string &vertex_path, const std::s
     return ptr;
 }
 
-Material* ResourceManager::GetMaterial(const std::string& vertex_path, const std::string& fragment_path)
-{
-    const std::string key = vertex_path + "|" + fragment_path;
-
-    auto it = m_materials.find(key);
-    if (it != m_materials.end())
-        return it->second.get();
-
+Material * ResourceManager::CreateMaterial(const std::string &name, const std::string &vertex_path, const std::string &fragment_path, const std::string &geometry_path) {
     // Note: Material constructor gets shader from ResourceManager
-    auto new_material = std::make_unique<Material>(vertex_path, fragment_path);
-    Material* ptr = new_material.get();
-    m_materials[key] = std::move(new_material);
-    return ptr;
+    std::unique_ptr<Material> new_material;
+    if (geometry_path.empty()) {
+        m_materials[name] = std::make_unique<Material>(vertex_path, fragment_path);
+    }
+    else {
+        m_materials[name] = std::make_unique<Material>(vertex_path, fragment_path, geometry_path);
+    }
+
+    return m_materials[name].get();
 }
 
-RenderTarget* ResourceManager::GetRenderTarget(const std::string& name, GLuint width, GLuint height, GLuint nr_channels)
-{
+Material * ResourceManager::GetMaterial(const std::string &name) {
+    if (m_materials.contains(name)) {
+        return m_materials[name].get();
+    }
+
+    return nullptr;
+}
+
+bool ResourceManager::IsValidMaterial(const std::string &name) const {
+    return m_materials.contains(name);
+}
+
+RenderTarget* ResourceManager::GetRenderTarget(const std::string& name, GLuint width, GLuint height, GLuint nr_channels) {
     auto it = m_render_targets.find(name);
     if (it != m_render_targets.end())
         return it->second.get();
@@ -114,8 +119,7 @@ RenderTarget* ResourceManager::GetRenderTarget(const std::string& name, GLuint w
     return ptr;
 }
 
-RenderBuffer* ResourceManager::GetRenderBuffer(const std::string& name, GLuint width, GLuint height)
-{
+RenderBuffer* ResourceManager::GetRenderBuffer(const std::string& name, GLuint width, GLuint height) {
     auto it = m_render_buffers.find(name);
     if (it != m_render_buffers.end())
         return it->second.get();
@@ -126,13 +130,23 @@ RenderBuffer* ResourceManager::GetRenderBuffer(const std::string& name, GLuint w
     return ptr;
 }
 
-void ResourceManager::RemoveTexture2D(const std::string& file_path)
-{
+Framebuffer * ResourceManager::GetFramebuffer(const std::string &name) {
+    auto it = m_framebuffers.find(name);
+    if (it != m_framebuffers.end()) {
+        return it->second.get();
+    }
+
+    auto new_buffer = std::make_unique<Framebuffer>();
+    Framebuffer* ptr = new_buffer.get();
+    m_framebuffers[name] = std::move(new_buffer);
+    return ptr;
+}
+
+void ResourceManager::RemoveTexture2D(const std::string& file_path) {
     m_textures_2d.erase(file_path);
 }
 
-void ResourceManager::RemoveShader(const std::string& vertex_path, const std::string& fragment_path)
-{
+void ResourceManager::RemoveShader(const std::string& vertex_path, const std::string& fragment_path) {
     const std::string key = vertex_path + "|" + fragment_path;
     m_shaders.erase(key);
 }

@@ -17,3 +17,16 @@ RenderTarget::RenderTarget(GLuint width, GLuint height, GLuint nr_channels)
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
     GLCall(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 }
+
+void RenderTarget::Resize(GLuint width, GLuint height) {
+    if (width == m_width && height == m_height)
+        return;
+
+    m_width = width;
+    m_height = height;
+
+    GLCall(glBindTexture(GL_TEXTURE_2D, m_renderer_id));
+
+    GLCall(glTexImage2D(GL_TEXTURE_2D, 0, GetFormat(), width, height, 0, GetFormat(), GL_UNSIGNED_BYTE, nullptr));
+
+}

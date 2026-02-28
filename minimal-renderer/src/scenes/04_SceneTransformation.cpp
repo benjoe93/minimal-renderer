@@ -8,12 +8,13 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture.h"
 #include "Material.h"
-#include "Mesh.h"
 #include "Model.h"
 
 #include "04_SceneTransformation.h"
+
+#include "ResourceManager.h"
+#include "SceneRegistry.h"
 
 static float vertices[] = {
     // positions          // uvs        // colors           
@@ -27,73 +28,62 @@ static unsigned int indices[] = {
     3, 2, 1   // second Triangle
 };
 
-namespace scene {
-    SceneTransform::SceneTransform()
-        :Scene("Model transformation")
-    {
-        ////////////////////////////////////////////////////////////////////////////
-        //                              load texture                              //
-        ////////////////////////////////////////////////////////////////////////////
-        tex1 = std::make_shared<Texture2D>("resources/textures/container.jpg", "texture1");
-        tex2 = std::make_shared<Texture2D>("resources/textures/awesomeface.png", "texture2");
-        tex1->Bind();
-        tex2->Bind(1);
-
-        ////////////////////////////////////////////////////////////////////////////
-        //                              shader setup                              //
-        ////////////////////////////////////////////////////////////////////////////
-        shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/transform.vert", "resources/shaders/00_GettingStarted/texture_loading.frag");
-        shader->Bind();
-        shader->SetUniform("texture1", 0);
-        shader->SetUniform("texture2", 1);
-
-        ////////////////////////////////////////////////////////////////////////////
-        //                            geometry setup                              //
-        ////////////////////////////////////////////////////////////////////////////
-        // vertex array object
-        vao = std::make_unique<VertexArray>();
-        vao->Bind();
-
-        // vertex buffer object
-        vbo = std::make_unique <VertexBuffer>(vertices, 4 * 8 * sizeof(float));
-        vbo->Bind();
-
-        // element buffer object
-        ebo = std::make_unique<IndexBuffer>(indices, 6);
-        ebo->Bind();
-
-        vao->SetLayout(*vbo, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);                                 // vertex position
-        vao->SetLayout(*vbo, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));   // uv coords
-        vao->SetLayout(*vbo, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(5 * sizeof(float)));   // vertex color
-        
-        vbo->Unbind();
-        vao->Unbind();
+SceneTransform::SceneTransform()
+    : Scene(StaticName())
+{
+    material = ResourceManager::Get().GetMaterial("transform_material");
+    if (!material) {
+        material = ResourceManager::Get().CreateMaterial("transform_material", "resources/shaders/00_GettingStarted/transform.vert", "resources/shaders/00_GettingStarted/texture_loading.frag");
+        material->AddTexture2D("resources/textures/container.jpg", "texture1", true);
+        material->AddTexture2D("resources/textures/awesomeface.png", "texture2", true);
     }
 
-    void SceneTransform::OnUpdate(double delta_time)
-    {}
+    // geometry setup
+    // vertex array object
+    vao = std::make_unique<VertexArray>();
+    vao->Bind();
 
-    void SceneTransform::OnRender()
-    {
-        // clean new frame
-        Renderer::Get().SetBackgroundColor(glm::vec4(0.2f, 0.3f, 0.3f, 1.0f));
-        Renderer::Get().Clear(GL_COLOR_BUFFER_BIT);
-        
-        // transform
-        auto trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(location[0], location[1], 0.0f));
-        trans = glm::rotate(trans, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
-        
-        // draw
-        shader->SetUniform("transform", trans);
-        Renderer::Get().Draw(*vao, *ebo, *shader);
-    }
+    // vertex buffer object
+    vbo = std::make_unique <VertexBuffer>(vertices, 4 * 8 * sizeof(float));
+    vbo->Bind();
 
-    void SceneTransform::OnImGuiRender()
-    {
-        ImGui::Begin(m_name.c_str());
-        ImGui::DragFloat2("Location", location, 0.01f, -1.0f, 1.0f, "%.2f");
-        ImGui::DragFloat("Rotation", &angle, 0.1f, -720.0f, 720.0f, "%.1f");
-        ImGui::End();
-    }
+    // element buffer object
+    ebo = std::make_unique<IndexBuffer>(indices, 6);
+    ebo->Bind();
+
+    vao->SetLayout(*vbo, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);                                 // vertex position
+    vao->SetLayout(*vbo, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));   // uv coords
+    vao->SetLayout(*vbo, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(5 * sizeof(float)));   // vertex color
+
+    vbo->Unbind();
+    vao->Unbind();
 }
+
+void SceneTransform::OnUpdate(double delta_time)
+{}
+
+void SceneTransform::OnRender()
+{
+    // clean new frame
+    Renderer::Get().SetBackgroundColor(glm::vec4(0.2f, 0.3f, 0.3f, 1.0f));
+    Renderer::Get().Clear(GL_COLOR_BUFFER_BIT);
+
+    // transform
+    auto trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(location[0], location[1], 0.0f));
+    trans = glm::rotate(trans, glm::radians(angle), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    // draw
+    material->SetUniform("transform", trans);
+    Renderer::Get().Draw(*vao, *ebo, material);
+}
+
+void SceneTransform::OnImGuiRender()
+{
+    ImGui::Begin(m_name.c_str());
+    ImGui::DragFloat2("Location", location, 0.01f, -1.0f, 1.0f, "%.2f");
+    ImGui::DragFloat("Rotation", &angle, 0.1f, -720.0f, 720.0f, "%.1f");
+    ImGui::End();
+}
+
+REGISTER_SCENE(SceneTransform);

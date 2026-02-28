@@ -16,6 +16,9 @@
 
 #include "12_SceneMultipleLights.h"
 
+#include "ResourceManager.h"
+#include "SceneRegistry.h"
+
 constexpr float vertices[] = {
     // Positions            // Normal               // uv
     // Front face (z = -0.5)
@@ -109,193 +112,173 @@ constexpr glm::vec3 point_light_col[] = {
     glm::vec3(1.0f, 1.0f, 0.0f)
 };
 
-namespace scene {
-    SceneMultipleLights::SceneMultipleLights()
-        :Scene("Multiple Lights")
+SceneMultipleLights::SceneMultipleLights()
+    : Scene(StaticName())
+{
+    Camera& camera = AppState::Get().GetActiveCamera();
+
+    // light setup  //
+    directional_light = std::make_unique<DirectionalLight>(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
+
+    for (int ptl_id = 0; ptl_id < 4; ptl_id++)
     {
-        Camera& camera = Renderer::Get().GetActiveCamera();
+        glm::vec3 color = point_light_col[ptl_id];
+        glm::vec3 position = point_light_pos[ptl_id];
 
-        ////////////////////////////////////////////////////////////////////////////
-        //                              light setup                               //
-        ////////////////////////////////////////////////////////////////////////////
-        directional_light = std::make_unique<DirectionalLight>(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
-
-        for (int ptl_id = 0; ptl_id < 4; ptl_id++)
-        {
-            glm::vec3 color = point_light_col[ptl_id];
-            glm::vec3 position = point_light_pos[ptl_id];
-
-            point_lights.push_back(std::make_unique<PointLight>(position, color * 0.2f , color, color));
-            ptl_data.push_back(LightData({ position[0], position[1], position[2] }, { color[0], color[1], color[2] }));
-        }
-
-        spot_light = std::make_unique<SpotLight>(camera.GetPosition(), camera.GetDirection(), 25.0f, 30.0f, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
-
-        ////////////////////////////////////////////////////////////////////////////
-        //                            geometry setup                              //
-        ////////////////////////////////////////////////////////////////////////////
-        object_va = std::make_unique<VertexArray>();
-        object_va->Bind();
-
-        object_vb = std::make_unique<VertexBuffer>(vertices, buffer_size);
-        object_vb->Bind();
-        object_ib = std::make_unique<IndexBuffer>(indices, element_size);
-        object_ib->Bind();
-
-        object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
-        object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
-        object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(6 * sizeof(float)));
-
-        for (int mat_id = 0; mat_id < 10; mat_id++)
-        {
-            object_materials.push_back(std::make_unique<Material>("resources/shaders/01_Lighting/04_MultipleLights/object.vert", "resources/shaders/01_Lighting/04_MultipleLights/object.frag"));
-
-            object_materials[mat_id]->AddTexture2D("resources/textures/container2.png", "material.diffuse", true);
-            object_materials[mat_id]->AddTexture2D("resources/textures/container2_specular.png", "material.specular", true);
-        }
-
-        object_va->Unbind();
-        object_vb->Unbind();
-        object_ib->Unbind();
+        point_lights.push_back(std::make_unique<PointLight>(position, color * 0.2f , color, color));
+        ptl_data.push_back(LightData({ position[0], position[1], position[2] }, { color[0], color[1], color[2] }));
     }
 
-    void SceneMultipleLights::OnUpdate(double delta_time)
+    spot_light = std::make_unique<SpotLight>(camera.GetPosition(), camera.GetDirection(), 25.0f, 30.0f, glm::vec3(0.2f), glm::vec3(1.0f), glm::vec3(1.0f));
+
+    // geometry setup
+    object_va = std::make_unique<VertexArray>();
+    object_va->Bind();
+
+    object_vb = std::make_unique<VertexBuffer>(vertices, buffer_size);
+    object_vb->Bind();
+    object_ib = std::make_unique<IndexBuffer>(indices, element_size);
+    object_ib->Bind();
+
+    object_va->SetLayout(*object_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
+    object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
+    object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(6 * sizeof(float)));
+
+    for (int mat_id = 0; mat_id < 10; mat_id++)
     {
-        Camera& cam = Renderer::Get().GetActiveCamera();
-        glm::vec3 cam_pos = cam.GetPosition();
+        std::string mat_name = "light_mat_" + std::to_string(mat_id);
+        auto current_mat = ResourceManager::Get().GetMaterial(mat_name);
+        if (!current_mat) {
+            current_mat = ResourceManager::Get().CreateMaterial(mat_name, "resources/shaders/01_Lighting/04_MultipleLights/object.vert", "resources/shaders/01_Lighting/04_MultipleLights/object.frag");
+            current_mat->AddTexture2D("resources/textures/container2.png", "material.diffuse", true);
+            current_mat->AddTexture2D("resources/textures/container2_specular.png", "material.specular", true);
+        }
+        object_materials.push_back(current_mat);
+    }
 
-        glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
+    object_va->Unbind();
+    object_vb->Unbind();
+    object_ib->Unbind();
+}
 
-        ////////////////////////////////////////////////////////////////////////////
-        //                           directional light                            //
-        ////////////////////////////////////////////////////////////////////////////
-        directional_light->SetDirection(glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]));
-        directional_light->Update(projection, cam.GetViewMatrix());
+void SceneMultipleLights::OnUpdate(double delta_time)
+{
+    Camera& cam = AppState::Get().GetActiveCamera();
+    glm::vec3 cam_pos = cam.GetPosition();
 
-        ////////////////////////////////////////////////////////////////////////////
-        //                              point light                               //
-        ////////////////////////////////////////////////////////////////////////////
+    glm::mat4 projection, model, ModelView, MVP;
+    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()), 0.1f, 100.0f);
+
+    
+    //directional light //
+    directional_light->SetDirection(glm::vec3(dir_light_direction[0], dir_light_direction[1], dir_light_direction[2]));
+    directional_light->Update(projection, cam.GetViewMatrix());
+
+    // point light  //
+    for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
+    {
+        point_lights[ptl_id]->SetPosition(glm::vec3(ptl_data[ptl_id].position[0], ptl_data[ptl_id].position[1], ptl_data[ptl_id].position[2]));
+        point_lights[ptl_id]->SetAmbient (glm::vec3(ptl_data[ptl_id].color[0] * 0.2f, ptl_data[ptl_id].color[1] * 0.2f, ptl_data[ptl_id].color[2] * 0.2f));
+        point_lights[ptl_id]->SetDiffuse (glm::vec3(ptl_data[ptl_id].color[0], ptl_data[ptl_id].color[1], ptl_data[ptl_id].color[2]));
+        point_lights[ptl_id]->SetSpecular(glm::vec3(ptl_data[ptl_id].color[0], ptl_data[ptl_id].color[1], ptl_data[ptl_id].color[2]));
+
+        point_lights[ptl_id]->Update(projection, cam.GetViewMatrix());
+    }
+
+    //  spotlight   //
+    spot_light->SetPosition(cam_pos);
+    spot_light->SetDirection(cam.GetDirection());
+    spot_light->Update(projection, cam.GetViewMatrix());
+
+    //  geometry    //
+    for (int obj_id = 0; obj_id < 10; obj_id++)
+    {
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, cube_positions[obj_id]);
+        float angle = 20.0f * obj_id;
+        model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+
+        ModelView = cam.GetViewMatrix() * model;
+        MVP = projection * ModelView;
+
+        object_materials[obj_id]->SetUniform("model", model);
+        object_materials[obj_id]->SetUniform("mvp", MVP);
+        object_materials[obj_id]->SetUniform("material.shininess", 32.f);
+        object_materials[obj_id]->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
+
+        // light data
+        object_materials[obj_id]->SetUniform("dir_light.direction", directional_light->GetDirection());
+        object_materials[obj_id]->SetUniform("dir_light.ambient", directional_light->GetAmbient());
+        object_materials[obj_id]->SetUniform("dir_light.diffuse", directional_light->GetDiffuse());
+        object_materials[obj_id]->SetUniform("dir_light.specular", directional_light->GetSpecular());
+
         for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
         {
-            point_lights[ptl_id]->SetPosition(glm::vec3(ptl_data[ptl_id].position[0], ptl_data[ptl_id].position[1], ptl_data[ptl_id].position[2]));
-            point_lights[ptl_id]->SetAmbient (glm::vec3(ptl_data[ptl_id].color[0] * 0.2f, ptl_data[ptl_id].color[1] * 0.2f, ptl_data[ptl_id].color[2] * 0.2f));
-            point_lights[ptl_id]->SetDiffuse (glm::vec3(ptl_data[ptl_id].color[0], ptl_data[ptl_id].color[1], ptl_data[ptl_id].color[2]));
-            point_lights[ptl_id]->SetSpecular(glm::vec3(ptl_data[ptl_id].color[0], ptl_data[ptl_id].color[1], ptl_data[ptl_id].color[2]));
+            std::string current_light = "point_lights[" + std::to_string(ptl_id) + "].";
 
-            point_lights[ptl_id]->Update(projection, cam.GetViewMatrix());
+            object_materials[obj_id]->SetUniform(current_light + "position",    point_lights[ptl_id]->GetPosition());
+            object_materials[obj_id]->SetUniform(current_light + "constant",    point_lights[ptl_id]->GetConstant());
+            object_materials[obj_id]->SetUniform(current_light + "linear",      point_lights[ptl_id]->GetLinear());
+            object_materials[obj_id]->SetUniform(current_light + "quadratic",   point_lights[ptl_id]->GetQuadratic());
+            object_materials[obj_id]->SetUniform(current_light + "ambient",     point_lights[ptl_id]->GetAmbient());
+            object_materials[obj_id]->SetUniform(current_light + "diffuse",     point_lights[ptl_id]->GetDiffuse());
+            object_materials[obj_id]->SetUniform(current_light + "specular",    point_lights[ptl_id]->GetSpecular());
         }
 
-        ////////////////////////////////////////////////////////////////////////////
-        //                               spotlight                                //
-        ////////////////////////////////////////////////////////////////////////////
-        spot_light->SetPosition(cam_pos);
-        spot_light->SetDirection(cam.GetDirection());
-        spot_light->Update(projection, cam.GetViewMatrix());
-
-        ////////////////////////////////////////////////////////////////////////////
-        //                               geometry                                 //
-        ////////////////////////////////////////////////////////////////////////////
-        for (int obj_id = 0; obj_id < 10; obj_id++)
-        {
-            model = glm::mat4(1.0f);
-            model = glm::translate(model, cube_positions[obj_id]);
-            float angle = 20.0f * obj_id;
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-
-            ModelView = cam.GetViewMatrix() * model;
-            MVP = projection * ModelView;
-
-            object_materials[obj_id]->SetUniform("model", model);
-            object_materials[obj_id]->SetUniform("mvp", MVP);
-            object_materials[obj_id]->SetUniform("material.shininess", 32.f);
-            object_materials[obj_id]->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
-            object_materials[obj_id]->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
-
-            // light data
-            object_materials[obj_id]->SetUniform("dir_light.direction", directional_light->GetDirection());
-            object_materials[obj_id]->SetUniform("dir_light.ambient", directional_light->GetAmbient());
-            object_materials[obj_id]->SetUniform("dir_light.diffuse", directional_light->GetDiffuse());
-            object_materials[obj_id]->SetUniform("dir_light.specular", directional_light->GetSpecular());
-
-            for (int ptl_id = 0; ptl_id < point_lights.size(); ptl_id++)
-            {
-                std::string current_light = "point_lights[" + std::to_string(ptl_id) + "].";
-
-                object_materials[obj_id]->SetUniform(current_light + "position",    point_lights[ptl_id]->GetPosition());
-                object_materials[obj_id]->SetUniform(current_light + "constant",    point_lights[ptl_id]->GetConstant());
-                object_materials[obj_id]->SetUniform(current_light + "linear",      point_lights[ptl_id]->GetLinear());
-                object_materials[obj_id]->SetUniform(current_light + "quadratic",   point_lights[ptl_id]->GetQuadratic());
-                object_materials[obj_id]->SetUniform(current_light + "ambient",     point_lights[ptl_id]->GetAmbient());
-                object_materials[obj_id]->SetUniform(current_light + "diffuse",     point_lights[ptl_id]->GetDiffuse());
-                object_materials[obj_id]->SetUniform(current_light + "specular",    point_lights[ptl_id]->GetSpecular());
-            }
-
-            object_materials[obj_id]->SetUniform("spot_light.position",         spot_light->GetPosition());
-            object_materials[obj_id]->SetUniform("spot_light.direction",        spot_light->GetDirection());
-            object_materials[obj_id]->SetUniform("spot_light.ambient",          spot_light->GetAmbient());
-            object_materials[obj_id]->SetUniform("spot_light.diffuse",          spot_light->GetDiffuse());
-            object_materials[obj_id]->SetUniform("spot_light.specular",         spot_light->GetSpecular());
-            object_materials[obj_id]->SetUniform("spot_light.constant",         spot_light->GetConstant());
-            object_materials[obj_id]->SetUniform("spot_light.linear",           spot_light->GetLinear());
-            object_materials[obj_id]->SetUniform("spot_light.quadratic",        spot_light->GetQuadratic());
-            object_materials[obj_id]->SetUniform("spot_light.cut_off",          glm::cos(glm::radians(spot_light->GetInnerAngle()/2)));
-            object_materials[obj_id]->SetUniform("spot_light.outer_cut_off",    glm::cos(glm::radians(spot_light->GetOuterAngle()/2)));
-        }
-    }
-
-    void SceneMultipleLights::OnRender()
-    {
-        Renderer::Get().SetBackgroundColor(glm::vec4(background_color[0], background_color[1], background_color[2], 1.0));
-
-        ////////////////////////////////////////////////////////////////////////////
-        //                            light rendering                             //
-        ////////////////////////////////////////////////////////////////////////////
-        directional_light->GetMaterial().Bind();
-        Renderer::Get().Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), *directional_light->GetMaterial().GetShader());
-        directional_light->GetMaterial().Unbind();
-
-        for (const auto & point_light : point_lights)
-        {
-            point_light->GetMaterial().Bind();
-            Renderer::Get().Draw(point_light->GetVertArray(), point_light->GetIndexBuffer(), *point_light->GetMaterial().GetShader());
-            point_light->GetMaterial().Unbind();
-        }
-
-        spot_light->GetMaterial().Bind();
-        Renderer::Get().Draw(spot_light->GetVertArray(), spot_light->GetIndexBuffer(), *spot_light->GetMaterial().GetShader());
-        spot_light->GetMaterial().Unbind();
-
-        ////////////////////////////////////////////////////////////////////////////
-        //                          geometry rendering                            //
-        ////////////////////////////////////////////////////////////////////////////
-        for (int obj_id = 0; obj_id < 10; obj_id++)
-        {
-            object_materials[obj_id]->Bind();
-            Renderer::Get().Draw(*object_va, *object_ib, *object_materials[obj_id]->GetShader());
-            object_materials[obj_id]->Unbind();
-        }
-    }
-
-    void SceneMultipleLights::OnImGuiRender()
-    {
-        ImGui::Begin(m_name.c_str());
-        ImGui::ColorEdit3("Background", background_color);
-        ImGui::Separator();
-        ImGui::Text("Sun");
-        ImGui::SliderFloat3("Dir", dir_light_direction, -1.0f, 1.0f, "%.2f");
-        ImGui::Separator();
-
-        for (int i = 0; i < ptl_data.size(); i++)
-        {
-            std::string name = "Point Light " + std::to_string(i);
-            std::string pos_id = "##Position" + std::to_string(i);
-            std::string col_id = "##Color" + std::to_string(i);
-            ImGui::Text(name.c_str());
-            ImGui::SliderFloat3(pos_id.c_str(), ptl_data[i].position, -12.0f, 12.0f, "%.2f");
-            ImGui::ColorEdit3(col_id.c_str(), ptl_data[i].color);
-            ImGui::Separator();
-        }
-        ImGui::End();
+        object_materials[obj_id]->SetUniform("spot_light.position",         spot_light->GetPosition());
+        object_materials[obj_id]->SetUniform("spot_light.direction",        spot_light->GetDirection());
+        object_materials[obj_id]->SetUniform("spot_light.ambient",          spot_light->GetAmbient());
+        object_materials[obj_id]->SetUniform("spot_light.diffuse",          spot_light->GetDiffuse());
+        object_materials[obj_id]->SetUniform("spot_light.specular",         spot_light->GetSpecular());
+        object_materials[obj_id]->SetUniform("spot_light.constant",         spot_light->GetConstant());
+        object_materials[obj_id]->SetUniform("spot_light.linear",           spot_light->GetLinear());
+        object_materials[obj_id]->SetUniform("spot_light.quadratic",        spot_light->GetQuadratic());
+        object_materials[obj_id]->SetUniform("spot_light.cut_off",          glm::cos(glm::radians(spot_light->GetInnerAngle()/2)));
+        object_materials[obj_id]->SetUniform("spot_light.outer_cut_off",    glm::cos(glm::radians(spot_light->GetOuterAngle()/2)));
     }
 }
+
+void SceneMultipleLights::OnRender()
+{
+    Renderer::Get().SetBackgroundColor(glm::vec4(background_color[0], background_color[1], background_color[2], 1.0));
+
+    // light rendering//
+    Renderer::Get().Draw(directional_light->GetVertArray(), directional_light->GetIndexBuffer(), directional_light->GetMaterial());
+
+    for (const auto & point_light : point_lights)
+    {
+        Renderer::Get().Draw(point_light->GetVertArray(), point_light->GetIndexBuffer(), point_light->GetMaterial());
+    }
+
+    Renderer::Get().Draw(spot_light->GetVertArray(), spot_light->GetIndexBuffer(), spot_light->GetMaterial());
+
+    // geometry rendering
+    for (int obj_id = 0; obj_id < 10; obj_id++)
+    {
+        Renderer::Get().Draw(*object_va, *object_ib, object_materials[obj_id]);
+    }
+}
+
+void SceneMultipleLights::OnImGuiRender()
+{
+    ImGui::Begin(m_name.c_str());
+    ImGui::ColorEdit3("Background", background_color);
+    ImGui::Separator();
+    ImGui::Text("Sun");
+    ImGui::SliderFloat3("Dir", dir_light_direction, -1.0f, 1.0f, "%.2f");
+    ImGui::Separator();
+
+    for (int i = 0; i < ptl_data.size(); i++)
+    {
+        std::string name = "Point Light " + std::to_string(i);
+        std::string pos_id = "##Position" + std::to_string(i);
+        std::string col_id = "##Color" + std::to_string(i);
+        ImGui::Text(name.c_str());
+        ImGui::SliderFloat3(pos_id.c_str(), ptl_data[i].position, -12.0f, 12.0f, "%.2f");
+        ImGui::ColorEdit3(col_id.c_str(), ptl_data[i].color);
+        ImGui::Separator();
+    }
+    ImGui::End();
+}
+
+REGISTER_SCENE(SceneMultipleLights);

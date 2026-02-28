@@ -33,6 +33,7 @@ Shader::Shader(const std::string& vertex_path, const std::string& fragment_path)
     catch (const std::ifstream::failure& e)
     {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << m_vertex_path << '\n';
+        std::cout << "ERROR::SHADER::FILE_NOT_READ: " << e.what() << std::endl;
     }
     const char* v_shader_code = vertex_code.c_str();
     const char* f_shader_code = fragment_code.c_str();
@@ -63,7 +64,7 @@ Shader::Shader(const std::string& vertex_path, const std::string& fragment_path)
     if (!success)
     {
         GLCall(glGetShaderInfoLog(fragment, 512, nullptr, info_log));
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << info_log << std::endl;
+        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED - " << fragment_path << "\n" << info_log << std::endl;
     };
 
     // shader program
@@ -118,6 +119,7 @@ Shader::Shader(const std::string &vertex_path, const std::string &fragment_path,
     catch (const std::ifstream::failure& e)
     {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << m_vertex_path << '\n';
+        std::cout << "ERROR::SHADER::FILE_NOT_READ: " << e.what() << std::endl;
     }
     const char* v_shader_code = vertex_code.c_str();
     const char* f_shader_code = fragment_code.c_str();

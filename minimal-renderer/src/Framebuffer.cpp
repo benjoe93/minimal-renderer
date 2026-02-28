@@ -45,6 +45,23 @@ RenderTarget* Framebuffer::GetRenderTarget(const AttachmentTarget target) const
     return nullptr;
 }
 
+bool Framebuffer::IsComplete() const {
+    GLint previous = 0;
+    glGetIntegerv(GL_FRAMEBUFFER_BINDING, &previous);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, m_renderer_id);
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE)
+    {
+        std::cout << "FBO error: " << status << std::endl;
+    }
+
+    glBindFramebuffer(GL_FRAMEBUFFER, previous);
+
+    return status == GL_FRAMEBUFFER_COMPLETE;
+}
+
 void Framebuffer::Validate() const
 {
     switch (const auto error = glCheckFramebufferStatus(GL_FRAMEBUFFER))

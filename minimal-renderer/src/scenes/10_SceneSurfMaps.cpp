@@ -13,6 +13,9 @@
 
 #include "10_SceneSurfMaps.h"
 
+#include "ResourceManager.h"
+#include "SceneRegistry.h"
+
 constexpr float vertices[] = {
     // Positions            // Normal               // uv
     // Front face (z = -0.5)
@@ -81,13 +84,10 @@ constexpr unsigned int indices[] = {
 constexpr size_t element_size = 36;
 constexpr size_t buffer_size = element_size * 8 * sizeof(float);
 
-namespace scene {
 SceneSurfMaps::SceneSurfMaps()
-    :Scene("Surface Maps")
+    : Scene(StaticName())
 {
-    ////////////////////////////////////////////////////////////////////////////
-    //                            geometry setup                              //
-    ////////////////////////////////////////////////////////////////////////////
+    // geometry setup
     object_va = std::make_unique<VertexArray>();
     object_va->Bind();
 
@@ -100,18 +100,18 @@ SceneSurfMaps::SceneSurfMaps()
     object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
     object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(6 * sizeof(float)));
 
-    object_material = std::make_unique<Material>("resources/shaders/01_Lighting/02_SurfaceMaps/object.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/object.frag");
-
-    object_material->AddTexture2D("resources/textures/container2.png", "material.diffuse", true);
-    object_material->AddTexture2D("resources/textures/container2_specular.png", "material.specular", true);
+    object_material = ResourceManager::Get().GetMaterial("surface_material");
+    if (!object_material) {
+        object_material = ResourceManager::Get().CreateMaterial("surface_material","resources/shaders/01_Lighting/02_SurfaceMaps/object.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/object.frag");
+        object_material->AddTexture2D("resources/textures/container2.png", "material.diffuse", true);
+        object_material->AddTexture2D("resources/textures/container2_specular.png", "material.specular", true);
+    }
 
     object_va->Unbind();
     object_vb->Unbind();
     object_ib->Unbind();
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                              light setup                               //
-    ////////////////////////////////////////////////////////////////////////////
+    // light setup
     light_va = std::make_unique<VertexArray>();
     light_va->Bind();
 
@@ -122,7 +122,10 @@ SceneSurfMaps::SceneSurfMaps()
 
     light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
 
-    light_material = std::make_unique<Material>("resources/shaders/01_Lighting/02_SurfaceMaps/light.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/light.frag");
+    light_material = ResourceManager::Get().GetMaterial("light_mat");
+    if (!light_material) {
+        light_material = ResourceManager::Get().CreateMaterial("light_mat", "resources/shaders/01_Lighting/02_SurfaceMaps/light.vert", "resources/shaders/01_Lighting/02_SurfaceMaps/light.frag");
+    }
 
     light_va->Unbind();
     light_vb->Unbind();
@@ -131,13 +134,11 @@ SceneSurfMaps::SceneSurfMaps()
 
 void SceneSurfMaps::OnUpdate(double delta_time)
 {
-    Camera& cam = Renderer::Get().GetActiveCamera();
+    Camera& cam = AppState::Get().GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
-    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()), 0.1f, 100.0f);
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                           geometry update                              //
-    ////////////////////////////////////////////////////////////////////////////
+    // geometry update
     auto model = glm::mat4(1.0f);
 
     object_material->SetUniform("model", model);
@@ -146,16 +147,13 @@ void SceneSurfMaps::OnUpdate(double delta_time)
 
     object_material->SetUniform("material.shininess", 32.f);
 
-    object_material->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
     object_material->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
     object_material->SetUniform("light.position", glm::vec3(light_position[0], light_position[1], light_position[2]));
     object_material->SetUniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
     object_material->SetUniform("light.diffuse", glm::vec3(light_color[0], light_color[1], light_color[2]));
     object_material->SetUniform("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                             light update                               //
-    ////////////////////////////////////////////////////////////////////////////
+    // light update
     auto light_transform = glm::mat4(1.0f);
     light_transform = glm::translate(light_transform, glm::vec3(light_position[0], light_position[1], light_position[2]));
     light_transform = glm::scale(light_transform, glm::vec3(0.1f, 0.1f, 0.1f));
@@ -169,19 +167,11 @@ void SceneSurfMaps::OnUpdate(double delta_time)
 
 void SceneSurfMaps::OnRender()
 {
-    ////////////////////////////////////////////////////////////////////////////
-    //                          geometry rendering                            //
-    ////////////////////////////////////////////////////////////////////////////
-    object_material->Bind();
-    Renderer::Get().Draw(*object_va, *object_ib, *object_material->GetShader());
-    object_material->Unbind();
+    // geometry rendering
+    Renderer::Get().Draw(*object_va, *object_ib, object_material);
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                            light rendering                             //
-    ////////////////////////////////////////////////////////////////////////////
-    light_material->Bind();
-    Renderer::Get().Draw(*light_va, *light_ib, *light_material->GetShader());
-    light_material->Unbind();
+    // light rendering
+    Renderer::Get().Draw(*light_va, *light_ib, light_material);
 }
 
 void SceneSurfMaps::OnImGuiRender()
@@ -192,7 +182,7 @@ void SceneSurfMaps::OnImGuiRender()
     ImGui::Separator();
 
     ImGui::ColorEdit3("Light Color", light_color);
-    ImGui::ColorEdit3("Object Color", object_color);
     ImGui::End();
 }
-}
+
+REGISTER_SCENE(SceneSurfMaps);

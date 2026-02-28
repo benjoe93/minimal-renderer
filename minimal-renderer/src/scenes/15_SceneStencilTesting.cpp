@@ -5,176 +5,155 @@
 #include "Renderer.h"
 #include "Camera.h"
 #include "Material.h"
-#include "Mesh.h"
 #include "Model.h"
 #include "ResourceManager.h"
 
 #include "15_SceneStencilTesting.h"
 
-namespace scene {
+#include <ranges>
 
-    SceneStencilTesting::SceneStencilTesting()
-        :Scene("Stencil Testing")
-    {
-        Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+#include "SceneRegistry.h"
 
-        Renderer::Get().SetDepthTest(true);
-        Renderer::Get().SetDepthFunction(TestingFunc::LESS);
-        Renderer::Get().SetStencilTest(true);
-        Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF);
-        Renderer::Get().SetStencilOperation(StencilOp::KEEP, StencilOp::KEEP, StencilOp::REPLACE);
+#define OBJ_VERT_PATH "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.vert"
+#define OBJ_FRAG_PATH "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/object.frag"
 
-        Camera& camera = Renderer::Get().GetActiveCamera();
+#define STENCIL_VERT_PATH "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.vert"
+#define STENCIL_FRAG_PATH "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.frag"
 
-        Texture2D* metal_tex = ResourceManager::Get().GetTexture2D("resources/textures/metal.png", true);
-        Texture2D* marble_tex = ResourceManager::Get().GetTexture2D("resources/textures/marble.jpg", true);
 
-        // object setup
-        objects.push_back(std::make_unique<Model>("resources/models/plane.fbx"));
-        objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
-        objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
+SceneStencilTesting::SceneStencilTesting()
+    : Scene(StaticName())
+{
+    Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
 
-        for (auto& mesh : objects[0]->GetMeshes()) {
-            Material* mat = objects[0]->GetMaterialForMesh(mesh.get());
-            if (mat) mat->AddTexture("material.diffuse", metal_tex);
-        }
-        for (auto& mesh : objects[1]->GetMeshes()) {
-            Material* mat = objects[1]->GetMaterialForMesh(mesh.get());
-            if (mat) mat->AddTexture("material.diffuse", marble_tex);
-        }
-        for (auto& mesh : objects[2]->GetMeshes()) {
-            Material* mat = objects[2]->GetMaterialForMesh(mesh.get());
-            if (mat) mat->AddTexture("material.diffuse", marble_tex);
-        }
+    Renderer::Get().SetDepthTest(true);
+    Renderer::Get().SetDepthFunction(TestingFunc::LESS);
+    Renderer::Get().SetStencilTest(true);
+    Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF);
+    Renderer::Get().SetStencilOperation(StencilOp::KEEP, StencilOp::KEEP, StencilOp::REPLACE);
 
-        // boxes for the outline
-        outline_objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
-        outline_objects.push_back(std::make_unique<Model>("resources/models/box.fbx"));
+    Camera& camera = AppState::Get().GetActiveCamera();
 
-        Material* outline_mat = ResourceManager::Get().GetMaterial(
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.vert",
-            "resources/shaders/03_AdvancedOpenGL/02_StencilTesting/stencil_test.frag"
-        );
+    auto floor = std::make_unique<Model>("resources/models/plane.fbx");
+    floor->SetLocation({0.0f, -0.5f, 0.0f});
+    floor->SetRotation({-90.0f, 0.0f, 0.0f});
+    auto box1 = std::make_unique<Model>("resources/models/box.fbx");
+    box1->SetLocation({-1.5f, 0.0f, -1.0f});
+    auto box2 = std::make_unique<Model>("resources/models/box.fbx");
+    box2->SetLocation({1.5f, 0.0f, 0.0f});
 
-        for (auto& obj : outline_objects) {
-            obj->SetMaterialSlot(0, outline_mat);
-        }
+    auto floor_material = ResourceManager::Get().GetMaterial("floor_material");
+    if (!floor_material) {
+        floor_material = ResourceManager::Get().CreateMaterial("floor_material", OBJ_VERT_PATH, OBJ_FRAG_PATH);
+        floor_material->AddTexture2D("resources/textures/metal.png", "material.diffuse");
     }
 
-    void SceneStencilTesting::OnUpdate(double delta_time)
-    {
-        Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
-
-        Camera& cam = Renderer::Get().GetActiveCamera();
-        glm::vec3 cam_pos = cam.GetPosition();
-
-        glm::mat4 projection, model, ModelView, MVP;
-        projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
-
-        // objects
-        // plane
-        for (auto& m : objects[0]->GetMeshes())
-        {
-            model = glm::mat4(1.0);
-            model = glm::translate(model, glm::vec3(0.0f, -0.5f, 0.0f));
-            model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-            ModelView = cam.GetViewMatrix() * model;
-            MVP = projection * ModelView;
-
-            Material* material = objects[0]->GetMaterialForMesh(m.get());
-            if (material) {
-                material->SetUniform("model", model);
-                material->SetUniform("mvp", MVP);
-            }
-        }
-
-        // boxes for rendering
-        for (auto& m : objects[1]->GetMeshes())
-        {
-            model = glm::mat4(1.0);
-            model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-            ModelView = cam.GetViewMatrix() * model;
-            MVP = projection * ModelView;
-
-            Material* material = objects[1]->GetMaterialForMesh(m.get());
-            if (material) {
-                material->SetUniform("model", model);
-                material->SetUniform("mvp", MVP);
-            }
-        }
-
-        for (auto& m : objects[2]->GetMeshes())
-        {
-            model = glm::mat4(1.0);
-            model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-            ModelView = cam.GetViewMatrix() * model;
-            MVP = projection * ModelView;
-
-            Material* material = objects[2]->GetMaterialForMesh(m.get());
-            if (material) {
-                material->SetUniform("model", model);
-                material->SetUniform("mvp", MVP);
-            }
-        }
-
-        // boxes for outline
-        for (auto& m : outline_objects[0]->GetMeshes())
-        {
-            model = glm::mat4(1.0);
-            model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
-            model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
-            ModelView = cam.GetViewMatrix() * model;
-            MVP = projection * ModelView;
-
-            Material* material = outline_objects[0]->GetMaterialForMesh(m.get());
-            if (material) {
-                material->SetUniform("model", model);
-                material->SetUniform("mvp", MVP);
-            }
-        }
-
-        for (auto& m : outline_objects[1]->GetMeshes())
-        {
-            model = glm::mat4(1.0);
-            model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
-            model = glm::scale(model, glm::vec3(1.1f, 1.1f, 1.1f));
-            ModelView = cam.GetViewMatrix() * model;
-            MVP = projection * ModelView;
-
-            Material* material = outline_objects[1]->GetMaterialForMesh(m.get());
-            if (material) {
-                material->SetUniform("model", model);
-                material->SetUniform("mvp", MVP);
-            }
-        }
+    auto box_material = ResourceManager::Get().GetMaterial("box_material");
+    if (!box_material) {
+        box_material = ResourceManager::Get().CreateMaterial("box_material", OBJ_VERT_PATH, OBJ_FRAG_PATH);
+        box_material->AddTexture2D("resources/textures/container.jpg", "material.diffuse");
     }
 
-    void SceneStencilTesting::OnRender()
-    {
-        Renderer::Get().SetDepthTest(true);
-        Renderer::Get().SetStencilOperation(StencilOp::KEEP, StencilOp::KEEP, StencilOp::REPLACE);
+    floor->SetMaterialSlot(0, floor_material);
+    box1->SetMaterialSlot(0, box_material);
+    box2->SetMaterialSlot(0, box_material);
 
-        Renderer::Get().SetStencilMask(0x00);
-        Renderer::Get().Draw(*objects[0]);
+    objects.push_back(std::move(floor));
+    objects.push_back(std::move(box1));
+    objects.push_back(std::move(box2));
 
-        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 1, 0xFF);
-        Renderer::Get().SetStencilMask(0xFF);
-        for (unsigned int i = 1; i < 3; i++)
-        {
-            Renderer::Get().Draw(*objects[i]);
-        }
+    // boxes for the outline
+    auto outline_box1 = std::make_unique<Model>("resources/models/box.fbx");
+    outline_box1->SetLocation({-1.5f, 0.0f, -1.0f});
+    outline_box1->SetScale(glm::vec3(1.1f));
+    auto outline_box2 = std::make_unique<Model>("resources/models/box.fbx");
+    outline_box2->SetLocation({1.5f, 0.0f, 0.0f});
+    outline_box2->SetScale(glm::vec3(1.1f));
 
-        Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF);
-        Renderer::Get().SetStencilMask(0x00);
-        Renderer::Get().SetDepthTest(false);
-        for (auto& obj : outline_objects)
-        {
-            Renderer::Get().Draw(*obj);
-        }
-        Renderer::Get().SetStencilMask(0xFF);
-        Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 0, 0xFF);
-        Renderer::Get().SetDepthTest(true);
+    outline_objects.push_back(std::move(outline_box1));
+    outline_objects.push_back(std::move(outline_box2));
+
+    auto outline_mat = ResourceManager::Get().GetMaterial("outline_mat");
+    if (!outline_mat) {
+        outline_mat = ResourceManager::Get().CreateMaterial("outline_mat", STENCIL_VERT_PATH, STENCIL_FRAG_PATH);
     }
 
-    void SceneStencilTesting::OnImGuiRender() { }
+    for (auto& obj : outline_objects) {
+        obj->SetMaterialSlot(0, outline_mat);
+    }
 }
+
+void SceneStencilTesting::OnUpdate(double delta_time)
+{
+    Renderer::Get().SetBackgroundColor(glm::vec4(0.1f, 0.1f, 0.1f, 1.0f));
+}
+
+void SceneStencilTesting::OnRender()
+{
+    Camera& cam = AppState::Get().GetActiveCamera();
+
+    glm::mat4 projection, model, ModelView, MVP;
+    projection = glm::perspective(
+        glm::radians(
+            cam.GetFov()),
+            static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()),
+        0.1f,
+        100.0f);
+
+    // Draw floor
+    Renderer::Get().SetDepthTest(true);
+    Renderer::Get().SetStencilOperation(StencilOp::KEEP, StencilOp::KEEP, StencilOp::REPLACE);
+    Renderer::Get().SetStencilMask(0x00);
+
+    model = objects[0]->GetModelMatrix();
+    ModelView = cam.GetViewMatrix() * model;
+    MVP = projection * ModelView;
+
+    for (auto& mat : objects[0]->GetAllMaterials()) {
+        mat->SetUniform("model", model);
+        mat->SetUniform("mvp", MVP);
+    }
+    Renderer::Get().Draw(*objects[0]);
+
+    // Draw boxes
+    Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 1, 0xFF);
+    Renderer::Get().SetStencilMask(0xFF);
+    for (auto& obj : objects | std::views::drop(1)) {
+        model = obj->GetModelMatrix();
+        ModelView = cam.GetViewMatrix() * model;
+        MVP = projection * ModelView;
+
+        for (auto& mat : obj->GetAllMaterials()) {
+            mat->SetUniform("model", model);
+            mat->SetUniform("mvp", MVP);
+        }
+
+        Renderer::Get().Draw(*obj);
+    }
+
+    // Draw outlines
+    Renderer::Get().SetStencilFunction(TestingFunc::NOTEQUAL, 1, 0xFF);
+    Renderer::Get().SetStencilMask(0x00);
+    Renderer::Get().SetDepthTest(false);
+
+    for (auto& obj : outline_objects) {
+        model = obj->GetModelMatrix();
+        ModelView = cam.GetViewMatrix() * model;
+        MVP = projection * ModelView;
+
+        for (auto& mat : obj->GetAllMaterials()) {
+            mat->SetUniform("model", model);
+            mat->SetUniform("mvp", MVP);
+        }
+
+        Renderer::Get().Draw(*obj);
+    }
+
+    Renderer::Get().SetStencilMask(0xFF);
+    Renderer::Get().SetStencilFunction(TestingFunc::ALWAYS, 0, 0xFF);
+    Renderer::Get().SetDepthTest(true);
+}
+
+void SceneStencilTesting::OnImGuiRender() { }
+
+REGISTER_SCENE(SceneStencilTesting);

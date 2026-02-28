@@ -1,10 +1,9 @@
 #pragma once
 
-#include "Scene.h"
+#include "../Scene.h"
 
 class Renderer;
 
-namespace scene {
 class SceneClearColor : public Scene
 {
 private:
@@ -12,8 +11,9 @@ private:
 
 public:
     SceneClearColor();
+
+    static std::string StaticName() { return "00_ClearColor"; }
     
     void OnRender() override;
     void OnImGuiRender() override;
 };
-}

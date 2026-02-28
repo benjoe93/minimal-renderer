@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "Scene.h"
+#include "../Scene.h"
 
 class Renderer;
 class IndexBuffer;
@@ -9,7 +9,6 @@ class Shader;
 class VertexArray;
 class VertexBuffer;
 
-namespace scene {
 class SceneCubeMultiple : public Scene
 {
 private:
@@ -17,14 +16,12 @@ private:
     std::unique_ptr<VertexBuffer> vb;
     std::unique_ptr<IndexBuffer> ib;
 
-    std::unique_ptr<Texture2D> texture_1;
-    std::unique_ptr<Texture2D> texture_2;
-
-    std::unique_ptr<Shader> default_shader;
+    Material* material;
 
 public:
     SceneCubeMultiple();
 
+    static std::string StaticName() { return "07_MultipleCubes"; }
+
     void OnRender() override;
 };
-}

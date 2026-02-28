@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include "Scene.h"
+#include "../Scene.h"
 
 class Renderer;
 class VertexArray;
@@ -8,22 +8,22 @@ class VertexBuffer;
 class IndexBuffer;
 class Shader;
 
-namespace scene {
-    class SceneTextures : public Scene
-    {
-    private:
-        std::unique_ptr<Shader> shader;
-        unsigned int VBO;
-        unsigned int VAO;
-        unsigned int EBO;
+class SceneTextures : public Scene
+{
+private:
+    std::unique_ptr<Shader> shader;
+    unsigned int VBO;
+    unsigned int VAO;
+    unsigned int EBO;
 
-        unsigned int tex1, tex2;
+    unsigned int tex1, tex2;
 
-    public:
-        SceneTextures();
+public:
+    SceneTextures();
 
-        void OnUpdate(double delta_time) override;
-        void OnRender() override;
-        void OnImGuiRender() override;
-    };
-}
+    static std::string StaticName() { return "03_Textures"; }
+
+    void OnUpdate(double delta_time) override;
+    void OnRender() override;
+    void OnImGuiRender() override;
+};

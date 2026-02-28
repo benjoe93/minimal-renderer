@@ -6,4 +6,6 @@ class RenderTarget : public Texture
 {
 public:
     RenderTarget(GLuint width, GLuint height, GLuint nr_channels);
+    void Resize(GLuint width, GLuint height);
+
 };

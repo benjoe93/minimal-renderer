@@ -20,6 +20,8 @@ public:
     void Bind() const;
     void Unbind() const;
 
+    void Resize(GLuint width, GLuint height);
+
     GLuint GetId() const { return m_renderer_id; }
     GLuint GetWidth() const { return m_width; }
     GLuint GetHeight() const { return m_height; }

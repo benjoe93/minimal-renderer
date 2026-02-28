@@ -10,12 +10,15 @@
 #include "VertexArray.h"
 #include "VertexBuffer.h"
 #include "Texture2D.h"
-#include "Shader.h"
+#include "Material.h"
 
 #include "06_SceneCube.h"
 
+#include "ResourceManager.h"
+#include "SceneRegistry.h"
 
-    static float vertices[] = {
+
+static float vertices[] = {
         // positions          // uvs        // colors
          0.5f,  0.5f,  0.5f,   1.0f, 1.0f,   1.0f, 0.0f, 0.0f,   // 0: front top right
          0.5f, -0.5f,  0.5f,   1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   // 1: front bottom right
@@ -27,61 +30,46 @@
         -0.5f, -0.5f, -0.5f,   0.0f, 0.0f,   1.0f, 0.0f, 1.0f,   // 6: back bottom left
         -0.5f,  0.5f, -0.5f,   0.0f, 1.0f,   1.0f, 1.0f, 1.0f    // 7: back top left
     };
-    static unsigned int indices[] = {
-        // Front face (z = +0.5)
-        0, 2, 1,
-        0, 3, 2,
+static unsigned int indices[] = {
+    // Front face (z = +0.5)
+    0, 2, 1,
+    0, 3, 2,
 
-        // Back face (z = -0.5)
-        4, 5, 6,
-        4, 6, 7,
+    // Back face (z = -0.5)
+    4, 5, 6,
+    4, 6, 7,
 
-        // Left face (x = -0.5)  
-        3, 7, 6,
-        3, 6, 2,
+    // Left face (x = -0.5)
+    3, 7, 6,
+    3, 6, 2,
 
-        // Right face (x = +0.5)
-        0, 1, 5,
-        0, 5, 4,
+    // Right face (x = +0.5)
+    0, 1, 5,
+    0, 5, 4,
 
-        // Bottom face (y = -0.5)
-        1, 2, 5,
-        2, 6, 5,
+    // Bottom face (y = -0.5)
+    1, 2, 5,
+    2, 6, 5,
 
-        // Top face (y = +0.5)
-        0, 4, 7,
-        0, 7, 3
-    };
+    // Top face (y = +0.5)
+    0, 4, 7,
+    0, 7, 3
+};
 
-namespace scene {
-scene::SceneCube::SceneCube()
-    :Scene("First Cube")
+SceneCube::SceneCube()
+    : Scene(StaticName())
 {
     // Set scene background color
     Renderer::Get().SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                              load texture                              //
-    ////////////////////////////////////////////////////////////////////////////
-    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", true);
-    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", true);
+    material = ResourceManager::Get().GetMaterial("cube_material");
+    if (!material) {
+        material = ResourceManager::Get().CreateMaterial("cube_material", "resources/shaders/00_GettingStarted/default.vert", "resources/shaders/00_GettingStarted/default.frag");
+        material->AddTexture2D("resources/textures/container.jpg", "texture_1", true);
+        material->AddTexture2D("resources/textures/awesomeface.png", "texture_2", true);
+    }
 
-    texture_1->Bind();
-    texture_2->Bind(1);
-
-    ////////////////////////////////////////////////////////////////////////////
-    //                              shader setup                              //
-    ////////////////////////////////////////////////////////////////////////////
-    default_shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/default.vert", "resources/shaders/00_GettingStarted/default.frag");
-
-    // Pass textures to shader
-    default_shader->Bind();
-    default_shader->SetUniform("texture_1", 0);
-    default_shader->SetUniform("texture_2", 1);
-
-    ////////////////////////////////////////////////////////////////////////////
-    //                            geometry setup                              //
-    ////////////////////////////////////////////////////////////////////////////
+    // geometry setup
     va = std::make_unique<VertexArray>();
     va->Bind();
 
@@ -98,12 +86,12 @@ scene::SceneCube::SceneCube()
     va->Unbind();
 }
 
-void scene::SceneCube::OnRender()
+void SceneCube::OnRender()
 {
     // Projection matrix
     const glm::mat4 projection = glm::perspective(
-        glm::radians(Renderer::Get().GetActiveCamera().GetFov()),
-        static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+        glm::radians(AppState::Get().GetActiveCamera().GetFov()),
+        static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()),
         0.1f,
         100.0f
     );
@@ -116,15 +104,15 @@ void scene::SceneCube::OnRender()
     model = glm::rotate(model, glm::radians(rotation[1]), glm::vec3(0.0f, 1.0f, 0.0f));
     model = glm::rotate(model, glm::radians(rotation[2]), glm::vec3(0.0f, 0.0f, 1.0f));
 
-    default_shader->SetUniform("model", model);
-    default_shader->SetUniform("view", Renderer::Get().GetActiveCamera().GetViewMatrix());
-    default_shader->SetUniform("projection", projection);
+    material->SetUniform("model", model);
+    material->SetUniform("view", AppState::Get().GetActiveCamera().GetViewMatrix());
+    material->SetUniform("projection", projection);
 
     // draw first triangle
-    Renderer::Get().Draw(*va, *ib , *default_shader);
+    Renderer::Get().Draw(*va, *ib , material);
 }
 
-void scene::SceneCube::OnImGuiRender()
+void SceneCube::OnImGuiRender()
 {
     ImGui::Begin(m_name.c_str());
 
@@ -138,4 +126,5 @@ void scene::SceneCube::OnImGuiRender()
     
     ImGui::End();
 }
-}
+
+REGISTER_SCENE(SceneCube);

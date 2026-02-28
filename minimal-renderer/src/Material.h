@@ -22,7 +22,7 @@ public:
     ~Material() = default;
 
     void AddTexture(const std::string& sampler_name, Texture* texture);
-    void AddTexture2D(const std::string& path, const std::string& sampler_name, bool is_flipped);
+    void AddTexture2D(const std::string& path, const std::string& sampler_name, bool is_flipped = true);
 
     void SetUniform(const std::string& name, float value);
     void SetUniform(const std::string& name, const glm::vec3& value);

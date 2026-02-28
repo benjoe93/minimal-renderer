@@ -7,10 +7,12 @@
 #include "IndexBuffer.h"
 #include "VertexArray.h"
 #include "VertexBuffer.h"
-#include "Texture2D.h"
-#include "Shader.h"
 
 #include "07_SceneCubeMultiple.h"
+
+#include "Material.h"
+#include "ResourceManager.h"
+#include "SceneRegistry.h"
 
 
 constexpr float vertices[] = {
@@ -84,34 +86,21 @@ constexpr glm::vec3 cube_positions[] = {
     glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-namespace scene {
-scene::SceneCubeMultiple::SceneCubeMultiple()
-    :Scene("Multiple Cubes")
+SceneCubeMultiple::SceneCubeMultiple()
+    : Scene(StaticName())
 {
     // Set scene background color
     Renderer::Get().SetBackgroundColor({ 0.2f, 0.3f, 0.3f, 1.0f });
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                              load texture                              //
-    ////////////////////////////////////////////////////////////////////////////
-    texture_1 = std::make_unique<Texture2D>("resources/textures/container.jpg", true);
-    texture_2 = std::make_unique<Texture2D>("resources/textures/awesomeface.png", true);
+    // material setup
+    material = ResourceManager::Get().GetMaterial("cube_material");
+    if (!material) {
+        material = ResourceManager::Get().CreateMaterial("cube_material", "resources/shaders/00_GettingStarted/default.vert", "resources/shaders/00_GettingStarted/default.frag");
+        material->AddTexture2D("resources/textures/container.jpg", "texture_1");
+        material->AddTexture2D("resources/textures/awesomeface.png", "texture_2");
+    }
 
-    texture_1->Bind();
-    texture_2->Bind(1);
-
-    ////////////////////////////////////////////////////////////////////////////
-    //                              shader setup                              //
-    ////////////////////////////////////////////////////////////////////////////
-    default_shader = std::make_unique<Shader>("resources/shaders/00_GettingStarted/default.vert", "resources/shaders/00_GettingStarted/default.frag");
-
-    default_shader->Bind();
-    default_shader->SetUniform("texture_1", 0);
-    default_shader->SetUniform("texture_2", 1);
-
-    ////////////////////////////////////////////////////////////////////////////
-    //                            geometry setup                              //
-    ////////////////////////////////////////////////////////////////////////////
+    // geometry setup
     va = std::make_unique<VertexArray>();
     va->Bind();
 
@@ -120,7 +109,7 @@ scene::SceneCubeMultiple::SceneCubeMultiple()
     vb->Bind();
     ib = std::make_unique<IndexBuffer>(indices, 36);
 
-    va->SetLayout(*vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);                    // vertex position
+    va->SetLayout(*vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);                                // vertex position
     va->SetLayout(*vb, 1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));  // uv coords
     va->SetLayout(*vb, 2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(5 * sizeof(float)));  // vertex color
 
@@ -128,12 +117,12 @@ scene::SceneCubeMultiple::SceneCubeMultiple()
     va->Unbind();
 }
 
-void scene::SceneCubeMultiple::OnRender()
+void SceneCubeMultiple::OnRender()
 {
     // Projection matrix
     const glm::mat4 projection = glm::perspective(
-        glm::radians(Renderer::Get().GetActiveCamera().GetFov()),
-        static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()),
+        glm::radians(AppState::Get().GetActiveCamera().GetFov()),
+        static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()),
         0.1f,
         100.0f);
 
@@ -146,12 +135,13 @@ void scene::SceneCubeMultiple::OnRender()
         const float rotation = i * 20.0f;
         model = glm::rotate(model, glm::radians(rotation), glm::vec3(1.0f, 0.3f, 0.5f));
 
-        default_shader->SetUniform("model", model);
-        default_shader->SetUniform("view", Renderer::Get().GetActiveCamera().GetViewMatrix());
-        default_shader->SetUniform("projection", projection);
+        material->SetUniform("model", model);
+        material->SetUniform("view", AppState::Get().GetActiveCamera().GetViewMatrix());
+        material->SetUniform("projection", projection);
 
         // draw first triangle
-        Renderer::Get().Draw(*va, *ib , *default_shader);
+        Renderer::Get().Draw(*va, *ib , material);
     }
 }
-}
+
+REGISTER_SCENE(SceneCubeMultiple);

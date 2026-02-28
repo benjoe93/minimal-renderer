@@ -27,11 +27,11 @@ class TextureCubemap : public Texture
 {
 private:
     std::unordered_map<CubeSide, std::string> m_textures_paths;
-
+    bool m_vertical_flip;
     void LoadTextureForSide(CubeSide side, CubePosition position);
 
 public:
-    TextureCubemap(const std::unordered_map<CubeSide, std::string>& side_source);
+    TextureCubemap(const std::unordered_map<CubeSide, std::string>& side_source, bool vertical_flip = false);
 
     // Prevent copying
     TextureCubemap(const TextureCubemap&) = delete;

@@ -1,8 +1,6 @@
 #pragma once
 #include "Renderer.h"
 
-
-
 class Camera
 {
 private:
@@ -51,4 +49,6 @@ public:
     void MoveDown(const double delta_time);
     void MoveUp(const double delta_time);
     void UpdateRotation();
+
+    void Reset();
 };

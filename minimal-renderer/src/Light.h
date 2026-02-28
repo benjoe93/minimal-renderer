@@ -34,7 +34,7 @@ public:
 
     VertexArray& GetVertArray() const { return *m_va; }
     IndexBuffer& GetIndexBuffer() const { return *m_ib; }
-    Material& GetMaterial() const { return *m_material; }
+    Material* GetMaterial() const { return m_material.get(); }
 
     void SetPosition(const glm::vec3& new_position) { m_position = new_position; };
     void SetAmbient(const glm::vec3& new_ambient) { m_ambient = new_ambient; };

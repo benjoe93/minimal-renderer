@@ -14,6 +14,9 @@
 
 #include "11_SceneLightCasters.h"
 
+#include "ResourceManager.h"
+#include "SceneRegistry.h"
+
 constexpr float vertices[] = {
     // Positions            // Normal               // uv
     // Front face (z = -0.5)
@@ -95,13 +98,10 @@ constexpr glm::vec3 cube_positions[] = {
     glm::vec3(-1.3f,  1.0f, -1.5f)
 };
 
-namespace scene {
 SceneLightCasters::SceneLightCasters()
-    :Scene("Light Casters")
+    : Scene(StaticName())
 {
-    ////////////////////////////////////////////////////////////////////////////
-    //                            geometry setup                              //
-    ////////////////////////////////////////////////////////////////////////////
+    //                            geometry setup
     object_va = std::make_unique<VertexArray>();
     object_va->Bind();
 
@@ -114,21 +114,26 @@ SceneLightCasters::SceneLightCasters()
     object_va->SetLayout(*object_vb, 1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(3 * sizeof(float)));
     object_va->SetLayout(*object_vb, 2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void *>(6 * sizeof(float)));
 
+    object_materials.clear();
     for (int i = 0; i < 10; i++)
     {
-        object_materials.push_back(std::make_unique<Material>("resources/shaders/01_Lighting/03_LightCasters/object.vert", "resources/shaders/01_Lighting/03_LightCasters/object.frag"));
+        std::string mat_name = "obj_mat_" + std::to_string(i);
 
-        object_materials[i]->AddTexture2D("resources/textures/container2.png", "material.diffuse", true);
-        object_materials[i]->AddTexture2D("resources/textures/container2_specular.png", "material.specular", true);
+        auto current_mat = ResourceManager::Get().GetMaterial(mat_name);
+        if (!current_mat) {
+            current_mat = ResourceManager::Get().CreateMaterial(mat_name, "resources/shaders/01_Lighting/03_LightCasters/object.vert", "resources/shaders/01_Lighting/03_LightCasters/object.frag");
+            current_mat->AddTexture2D("resources/textures/container2.png", "material.diffuse", true);
+            current_mat->AddTexture2D("resources/textures/container2_specular.png", "material.specular", true);
+        }
+
+        object_materials.push_back(current_mat);
     }
 
     object_va->Unbind();
     object_vb->Unbind();
     object_ib->Unbind();
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                              light setup                               //
-    ////////////////////////////////////////////////////////////////////////////
+    // light setup 
     light_va = std::make_unique<VertexArray>();
     light_va->Bind();
 
@@ -139,7 +144,11 @@ SceneLightCasters::SceneLightCasters()
 
     light_va->SetLayout(*light_vb, 0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), nullptr);
 
-    light_material = std::make_unique<Material>("resources/shaders/01_Lighting/03_LightCasters/light.vert", "resources/shaders/01_Lighting/03_LightCasters/light.frag");
+    light_material = ResourceManager::Get().GetMaterial("light_mat");
+    if (!light_material) {
+        light_material = ResourceManager::Get().CreateMaterial("light_mat", "resources/shaders/01_Lighting/03_LightCasters/light.vert", "resources/shaders/01_Lighting/03_LightCasters/light.frag");
+    }
+
 
     light_va->Unbind();
     light_vb->Unbind();
@@ -149,16 +158,14 @@ SceneLightCasters::SceneLightCasters()
 void SceneLightCasters::OnUpdate(double delta_time)
 {
 
-    Camera& cam = Renderer::Get().GetActiveCamera();
+    Camera& cam = AppState::Get().GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
 
     glm::mat4 projection, model, ModelView, MVP;
-    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(Renderer::Get().GetScreenWidth()) / static_cast<float>(Renderer::Get().GetScreenHeight()), 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()), 0.1f, 100.0f);
 
     // geometry update
-    ////////////////////////////////////////////////////////////////////////////
-    //                           directional light                            //
-    ////////////////////////////////////////////////////////////////////////////
+    // directional light
     /*
     for (int i = 0; i < 10; i++)
     {
@@ -175,7 +182,6 @@ void SceneLightCasters::OnUpdate(double delta_time)
 
         object_materials[i]->SetUniform("material.shininess", 32.f);
 
-        object_materials[i]->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
         object_materials[i]->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
         object_materials[i]->SetUniform("light.direction", glm::vec3(-light_position[0], -light_position[1], -light_position[2])); // Directon is need to be flipped to get the direction from the fragment to the light
         object_materials[i]->SetUniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
@@ -188,9 +194,7 @@ void SceneLightCasters::OnUpdate(double delta_time)
     }
     */
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                              point light                               //
-    ////////////////////////////////////////////////////////////////////////////
+    // point light
     /*
     for (int i = 0; i < 10; i++)
     {
@@ -207,7 +211,6 @@ void SceneLightCasters::OnUpdate(double delta_time)
 
         object_materials[i]->SetUniform("material.shininess", 32.f);
 
-        object_materials[i]->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
         object_materials[i]->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
         object_materials[i]->SetUniform("light.position", glm::vec3(light_position[0], light_position[1], light_position[2]));
         object_materials[i]->SetUniform("light.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
@@ -220,9 +223,7 @@ void SceneLightCasters::OnUpdate(double delta_time)
     }
     */
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                               spotlight                                //
-    ////////////////////////////////////////////////////////////////////////////
+    // spotlight
     for (int i = 0; i < 10; i++)
     {
         model = glm::mat4(1.0f);
@@ -238,7 +239,6 @@ void SceneLightCasters::OnUpdate(double delta_time)
 
         object_materials[i]->SetUniform("material.shininess", 32.f);
 
-        object_materials[i]->SetUniform("material.specular", glm::vec3(0.5f, 0.5f, 0.5f));
         object_materials[i]->SetUniform("u_viewPos", glm::vec3(cam_pos[0], cam_pos[1], cam_pos[2]));
 
         object_materials[i]->SetUniform("light.position", cam_pos);
@@ -255,9 +255,7 @@ void SceneLightCasters::OnUpdate(double delta_time)
 
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                              light update                              //
-    ////////////////////////////////////////////////////////////////////////////
+    // light update
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::vec3(light_position[0], light_position[1], light_position[2]));
     model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
@@ -273,22 +271,14 @@ void SceneLightCasters::OnUpdate(double delta_time)
 void SceneLightCasters::OnRender()
 {
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                          geometry rendering                            //
-    ////////////////////////////////////////////////////////////////////////////
+    // geometry rendering
     for (int i = 0; i < 10; i++)
     {
-        object_materials[i]->Bind();
-        Renderer::Get().Draw(*object_va, *object_ib, *object_materials[i]->GetShader());
-        object_materials[i]->Unbind();
+        Renderer::Get().Draw(*object_va, *object_ib, object_materials[i]);
     }
 
-    ////////////////////////////////////////////////////////////////////////////
-    //                            light rendering                             //
-    ////////////////////////////////////////////////////////////////////////////
-    light_material->Bind();
-    Renderer::Get().Draw(*light_va, *light_ib, *light_material->GetShader());
-    light_material->Unbind();
+    // light rendering
+    Renderer::Get().Draw(*light_va, *light_ib, light_material);
 }
 
 void SceneLightCasters::OnImGuiRender()
@@ -302,4 +292,5 @@ void SceneLightCasters::OnImGuiRender()
     ImGui::ColorEdit3("Object Color", object_color);
     ImGui::End();
 }
-}
+
+REGISTER_SCENE(SceneLightCasters);

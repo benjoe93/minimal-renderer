@@ -24,3 +24,14 @@ void RenderBuffer::Unbind() const
 {
     GLCall(glBindRenderbuffer(GL_RENDERBUFFER, 0));
 }
+
+void RenderBuffer::Resize(GLuint width, GLuint height) {
+    if (width == m_width && height == m_height)
+        return;
+
+    m_width = width;
+    m_height = height;
+
+    glBindRenderbuffer(GL_RENDERBUFFER, m_renderer_id);
+    GLCall(glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, width, height));
+}

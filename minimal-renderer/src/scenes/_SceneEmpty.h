@@ -8,7 +8,6 @@ class VertexArray;
 class VertexBuffer;
 class IndexBuffer;
 
-namespace scene {
     class _SceneEmpty : public Scene
     {
     private:
@@ -18,9 +17,10 @@ namespace scene {
         _SceneEmpty();
         ~_SceneEmpty();
 
+        static std::string StaticName() { return "00_SceneEmpty"; }
+
         void OnUpdate(double delta_time) override;
         void OnRender() override;
         void OnImGuiRender() override;
         void ConstructScene();
     };
-}

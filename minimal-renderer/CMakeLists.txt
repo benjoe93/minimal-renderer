@@ -49,7 +49,7 @@ file(GLOB MAIN_HEADERS
 )
 
 set(SCENE_HEADERS
-    "src/scenes/Scene.h"
+    "src/Scene.h"
     "src/scenes/00_SceneClearColor.h"
     "src/scenes/01_SceneHelloTriangle.h"
     "src/scenes/02_SceneHelloTriangleIndexed.h"

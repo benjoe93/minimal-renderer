@@ -4,13 +4,13 @@
 #include <string>
 #include <glad/glad.h>
 
-// Forward declarations
 class Texture2D;
 class TextureCubemap;
 class Shader;
 class Material;
 class RenderTarget;
 class RenderBuffer;
+class Framebuffer;
 enum class CubeSide;
 
 class ResourceManager
@@ -29,6 +29,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<Material>> m_materials;
     std::unordered_map<std::string, std::unique_ptr<RenderTarget>> m_render_targets;
     std::unordered_map<std::string, std::unique_ptr<RenderBuffer>> m_render_buffers;
+    std::unordered_map<std::string, std::unique_ptr<Framebuffer>> m_framebuffers;
 
 public:
     static void Init();
@@ -40,9 +41,14 @@ public:
     TextureCubemap* GetCubemap(const std::unordered_map<CubeSide, std::string>& side_source);
     Shader* GetShader(const std::string& vertex_path, const std::string& fragment_path);
     Shader* GetShader(const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path);
-    Material* GetMaterial(const std::string& vertex_path, const std::string& fragment_path);
+
+    Material* CreateMaterial(const std::string& name, const std::string& vertex_path, const std::string& fragment_path, const std::string& geometry_path = "");
+    Material* GetMaterial(const std::string& name);
+    bool IsValidMaterial(const std::string& name) const;
+
     RenderTarget* GetRenderTarget(const std::string& name, GLuint width, GLuint height, GLuint nr_channels);
     RenderBuffer* GetRenderBuffer(const std::string& name, GLuint width, GLuint height);
+    Framebuffer* GetFramebuffer(const std::string& name);
 
     // Manual resource removal
     void RemoveTexture2D(const std::string& file_path);

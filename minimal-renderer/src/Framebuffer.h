@@ -68,7 +68,9 @@ public:
     void AttachRenderTarget(AttachmentTarget target, RenderTarget* render_target);
     void AttachRenderBuffer(AttachmentTarget target, const RenderBuffer* render_buffer);
 
-   GLuint GetId() const { return m_renderer_id; }
+    GLuint GetId() const { return m_renderer_id; }
 
     RenderTarget* GetRenderTarget(AttachmentTarget target) const;
+
+    bool IsComplete() const;
 };

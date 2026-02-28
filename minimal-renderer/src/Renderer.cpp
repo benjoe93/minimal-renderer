@@ -6,8 +6,7 @@
 
 #include "Renderer.h"
 
-Renderer::Renderer()
-{
+Renderer::Renderer() {
     SetBlending(m_blending);
     SetBlendFunction(BlendFunc::SRC_ALPHA, BlendFunc::ONE_MINUS_SRC_ALPHA);
     SetBlendEquation(BlendEquation::ADD); // this is the default 
@@ -30,19 +29,16 @@ Renderer::Renderer()
 #endif
 }
 
-Renderer& Renderer::Get()
-{
+Renderer& Renderer::Get() {
     static auto m_instance = Renderer();
     return m_instance;
 }
 
-void Renderer::Clear(GLbitfield bits) const
-{
+void Renderer::Clear(GLbitfield bits) const {
     GLCall(glClear(bits));
 }
 
-void Renderer::Tick(double current_time)
-{
+void Renderer::Tick(double current_time) {
     // If m_last_frame hasn't been set yet, initialize it
     if (m_last_frame == 0.0) {
         m_last_frame = current_time;
@@ -61,24 +57,20 @@ void Renderer::Tick(double current_time)
 }
 
 #pragma region DrawFunctions
-void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, const Shader& shader) const
-{
-    shader.Bind();
+void Renderer::Draw(const VertexArray& va, const IndexBuffer& ib, Material* material) const {
+    material->Bind();
     va.Bind();
     GLCall(glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(ib.GetCount()), GL_UNSIGNED_INT, nullptr));
 }
 
-void Renderer::Draw(const VertexArray& va, int count, Material& material) const
-{
-    material.Bind();
+void Renderer::Draw(const VertexArray& va, int count, Material* material) const {
+    material->Bind();
     va.Bind();
     GLCall(glDrawArrays(GL_TRIANGLES, 0, count));
 }
 
-void Renderer::Draw(Model& obj)
-{
-    for (auto& mesh : obj.GetMeshes())
-    {
+void Renderer::Draw(Model& obj) {
+    for (auto& mesh : obj.GetMeshes()) {
         Material* material = obj.GetMaterialForMesh(mesh.get());
 
         if (material) {
@@ -92,142 +84,101 @@ void Renderer::Draw(Model& obj)
 #pragma endregion
 
 #pragma region RenderSettings
-void Renderer::SetBlending(bool enabled)
-{
+void Renderer::SetBlending(bool enabled) {
     m_blending = enabled;
 
-    if (enabled)
-    {
+    if (enabled) {
         GLCall(glEnable(GL_BLEND));
     }
-    else
-    {
+    else {
         GLCall(glDisable(GL_BLEND));
     }
 }
 
-void Renderer::SetDepthTest(bool enabled)
-{
+void Renderer::SetDepthTest(bool enabled) {
     m_depth_buffer = enabled;
 
-    if (enabled)
-    {
+    if (enabled) {
         GLCall(glEnable(GL_DEPTH_TEST));
     }
-    else
-    {
+    else {
         GLCall(glDisable(GL_DEPTH_TEST));
     }
 }
 
-void Renderer::SetFaceCulling(bool enabled)
-{
+void Renderer::SetFaceCulling(bool enabled) {
     m_face_culling = enabled;
 
-    if (enabled)
-    {
+    if (enabled) {
         GLCall(glEnable(GL_CULL_FACE));
     }
-    else
-    {
+    else {
         GLCall(glDisable(GL_CULL_FACE));
     }
 }
 
-void Renderer::SetStencilTest(bool enabled)
-{
+void Renderer::SetStencilTest(bool enabled) {
     m_stencil_buffer = enabled;
 
-    if (enabled)
-    {
+    if (enabled) {
         GLCall(glEnable(GL_STENCIL_TEST));
     }
-    else
-    {
+    else {
         GLCall(glDisable(GL_STENCIL_TEST));
     }
 }
 
-void Renderer::SetWireframeRender(bool enabled)
-{
+void Renderer::SetWireframeRender(bool enabled) {
     m_wireframe = enabled;
 
-    if (enabled)
-    {
+    if (enabled) {
         GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_LINE));
     }
-    else
-    {
+    else {
         GLCall(glPolygonMode(GL_FRONT_AND_BACK, GL_FILL));
     }
 }
 
-void Renderer::SetDepthFunction(TestingFunc function)
-{
+void Renderer::SetDepthFunction(TestingFunc function) {
     GLCall(glDepthFunc(static_cast<GLenum>(function)));
 }
 
-void Renderer::SetStencilFunction(TestingFunc function, int reference_value, unsigned int bit_mask)
-{
+void Renderer::SetStencilFunction(TestingFunc function, int reference_value, unsigned int bit_mask) {
     GLCall(glStencilFunc(static_cast<GLenum>(function), reference_value, bit_mask));
 }
 
-void Renderer::SetStencilMask(unsigned int bit_mask)
-{
+void Renderer::SetStencilMask(unsigned int bit_mask) {
     GLCall(glStencilMask(bit_mask));
 }
 
-void Renderer::SetStencilOperation(StencilOp stencil_fail, StencilOp depth_fail, StencilOp pass)
-{
+void Renderer::SetStencilOperation(StencilOp stencil_fail, StencilOp depth_fail, StencilOp pass) {
     GLCall(glStencilOp(static_cast<GLenum>(stencil_fail), static_cast<GLenum>(depth_fail), static_cast<GLenum>(pass)));
 }
 
-void Renderer::SetBlendFunction(BlendFunc src_factor, BlendFunc dst_factor)
-{
+void Renderer::SetBlendFunction(BlendFunc src_factor, BlendFunc dst_factor) {
     GLCall(glBlendFunc(static_cast<GLenum>(src_factor), static_cast<GLenum>(dst_factor)));
 }
 
-void Renderer::SetBlendEquation(BlendEquation eq)
-{
+void Renderer::SetBlendEquation(BlendEquation eq) {
     GLCall(glBlendEquation(static_cast<GLenum>(eq)));
 }
 
-void Renderer::SetFaceCullingMode(FaceCullMode mode)
-{
+void Renderer::SetFaceCullingMode(FaceCullMode mode) {
     GLCall(glCullFace(static_cast<GLenum>(mode)));
 }
 
-void Renderer::SetFrontFace(FrontFace mode)
-{
+void Renderer::SetFrontFace(FrontFace mode) {
     GLCall(glFrontFace(static_cast<GLenum>(mode)));
 }
 
-void Renderer::SetBackgroundColor(const glm::vec4 &new_color)
-{
+void Renderer::SetBackgroundColor(const glm::vec4 &new_color) {
     m_background_color = new_color;
     GLCall(glClearColor(new_color.r, new_color.g, new_color.b, new_color.a));
 }
 #pragma endregion
 
-GLint Renderer::GetMaxVertexAttribs() const
-{
+GLint Renderer::GetMaxVertexAttribs() const {
     GLint nrAttr;
     GLCall(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttr));
     return nrAttr;
-}
-
-void Renderer::SetScreenSize(GLuint width, GLuint height)
-{
-    m_state.scr_width = width;
-    m_state.scr_height = height;
-}
-
-Camera& Renderer::GetActiveCamera() const
-{
-    auto it = m_state.cameras.find(m_state.active_camera);
-    if (it == m_state.cameras.end())
-    {
-        throw std::runtime_error("Active camera not found!");
-    }
-    return *it->second;
 }
