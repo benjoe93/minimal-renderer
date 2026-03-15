@@ -73,7 +73,7 @@ void SceneCoordinateSystem::OnRender()
 
     // Projection matrix
     const auto& renderer = Renderer::Get();
-    const float aspect = static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight());
+    const float aspect = static_cast<float>(AppState::Get().GetViewport()->GetWidth()) / static_cast<float>(AppState::Get().GetViewport()->GetHeight());
     const glm::mat4 projection = glm::perspective(glm::radians(45.0f), aspect, AppState::Get().GetNearPlane(), AppState::Get().GetFarPlane());
 
     // View matrix

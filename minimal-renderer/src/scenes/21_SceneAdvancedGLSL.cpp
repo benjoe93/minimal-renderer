@@ -27,7 +27,7 @@ SceneAdvancedGLSL::SceneAdvancedGLSL()
     Camera& cam = AppState::Get().GetActiveCamera();
     glm::mat4 projection = glm::perspective(
         glm::radians(cam.GetFov()),
-        static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()),
+        static_cast<float>(AppState::Get().GetViewport()->GetWidth()) / static_cast<float>(AppState::Get().GetViewport()->GetHeight()),
         AppState::Get().GetNearPlane(),
         AppState::Get().GetFarPlane());
     m_uniform_buffer->Bind();
@@ -103,7 +103,7 @@ void SceneAdvancedGLSL::OnUpdate(double delta_time)
     glm::mat4 projection, ModelView, MVP, view;
     projection = glm::perspective(
         glm::radians(cam.GetFov()),
-        static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()),
+        static_cast<float>(AppState::Get().GetViewport()->GetWidth()) / static_cast<float>(AppState::Get().GetViewport()->GetHeight()),
         AppState::Get().GetNearPlane(),
         AppState::Get().GetFarPlane());
     view = cam.GetViewMatrix();

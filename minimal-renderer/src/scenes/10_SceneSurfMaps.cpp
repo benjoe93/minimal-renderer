@@ -136,7 +136,7 @@ void SceneSurfMaps::OnUpdate(double delta_time)
 {
     Camera& cam = AppState::Get().GetActiveCamera();
     glm::vec3 cam_pos = cam.GetPosition();
-    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()), 0.1f, 100.0f);
+    glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetViewport()->GetWidth()) / static_cast<float>(AppState::Get().GetViewport()->GetHeight()), 0.1f, 100.0f);
 
     // geometry update
     auto model = glm::mat4(1.0f);

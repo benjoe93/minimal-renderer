@@ -4,6 +4,8 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
+#include "Viewport.h"
+
 class Camera;
 
 enum class CursorState {
@@ -25,6 +27,7 @@ private:
 
     GLuint m_active_camera = 0;
     std::unordered_map<GLuint, Camera*> m_cameras;
+    Viewport* m_viewport;
 
 private:
     AppState() = default;
@@ -52,5 +55,6 @@ public:
 
     void SetScreenSize(GLuint width, GLuint height);
 
-
+    void SetViewport(Viewport* viewport) { m_viewport = viewport; }
+    Viewport* GetViewport() { return m_viewport; }
 };

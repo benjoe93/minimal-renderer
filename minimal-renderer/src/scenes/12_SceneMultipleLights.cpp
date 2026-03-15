@@ -167,7 +167,7 @@ void SceneMultipleLights::OnUpdate(double delta_time)
     glm::vec3 cam_pos = cam.GetPosition();
 
     glm::mat4 projection, model, ModelView, MVP;
-    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()), 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetViewport()->GetWidth()) / static_cast<float>(AppState::Get().GetViewport()->GetHeight()), 0.1f, 100.0f);
 
     
     //directional light //

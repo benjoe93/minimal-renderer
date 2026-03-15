@@ -126,7 +126,7 @@ void SceneCubemap::OnRender()
     glm::mat4 projection, ModelView, MVP;
     projection = glm::perspective(
         glm::radians(cam.GetFov()),
-        static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()),
+        static_cast<float>(AppState::Get().GetViewport()->GetWidth()) / static_cast<float>(AppState::Get().GetViewport()->GetHeight()),
         AppState::Get().GetNearPlane(),
         AppState::Get().GetFarPlane());
 

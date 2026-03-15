@@ -122,7 +122,7 @@ void SceneCubeMultiple::OnRender()
     // Projection matrix
     const glm::mat4 projection = glm::perspective(
         glm::radians(AppState::Get().GetActiveCamera().GetFov()),
-        static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()),
+        static_cast<float>(AppState::Get().GetViewport()->GetWidth()) / static_cast<float>(AppState::Get().GetViewport()->GetHeight()),
         0.1f,
         100.0f);
 

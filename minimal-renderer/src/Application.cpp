@@ -12,6 +12,8 @@
 
 #define WINDOW_TITLE "LearnOpenGL"
 
+constexpr int WINDOW_WIDTH = 1280;
+constexpr int WINDOW_HEIGHT = 720;
 constexpr float MOUSE_SENSITIVITY = 0.1f;
 constexpr float SCROLL_SPEED_FACTOR = 5.0f;
 
@@ -40,7 +42,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
     // GLFW: create a window and its OpenGL context
-    GLFWwindow* window = glfwCreateWindow(1280, 720, WINDOW_TITLE, nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, nullptr, nullptr);
     if (!window)
     {
         std::cout << "Failed to create GLFW window" << std::endl;
@@ -66,6 +68,7 @@ int main()
     EditorUI editor_ui;
     editor_ui.Init(window);
     Viewport viewport;
+    AppState::Get().SetViewport(&viewport);
 
     #ifndef NDEBUG
     // Test scene registration

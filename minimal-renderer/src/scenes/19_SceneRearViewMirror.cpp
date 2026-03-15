@@ -39,11 +39,11 @@ SceneRearViewMirror::SceneRearViewMirror()
     framebuffer = std::make_unique<Framebuffer>();
 
     // create a color attachment texture
-    render_target = new RenderTarget(AppState::Get().GetScreenWidth(), AppState::Get().GetScreenHeight(), 3);
+    render_target = new RenderTarget(AppState::Get().GetViewport()->GetWidth(), AppState::Get().GetViewport()->GetHeight(), 3);
     framebuffer->AttachRenderTarget(AttachmentTarget::COLOR0, render_target);
 
     // create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
-    render_buffer = new RenderBuffer(AppState::Get().GetScreenWidth(), AppState::Get().GetScreenHeight());
+    render_buffer = new RenderBuffer(AppState::Get().GetViewport()->GetWidth(), AppState::Get().GetViewport()->GetHeight());
     framebuffer->AttachRenderBuffer(AttachmentTarget::DEPTH_STENCIL, render_buffer);
     
     // unbind to prevent accidental renders
@@ -93,7 +93,7 @@ void SceneRearViewMirror::OnRender()
     glm::mat4 projection, ModelView, MVP;
     projection = glm::perspective(
         glm::radians(cam.GetFov()),
-        static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()),
+        static_cast<float>(AppState::Get().GetViewport()->GetWidth()) / static_cast<float>(AppState::Get().GetViewport()->GetHeight()),
         AppState::Get().GetNearPlane(),
         AppState::Get().GetFarPlane()
     );

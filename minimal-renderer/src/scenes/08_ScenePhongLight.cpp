@@ -104,9 +104,9 @@ ScenePhongLight::ScenePhongLight()
     object_vb->Unbind();
     object_ib->Unbind();
 
-    object_material = ResourceManager::Get().GetMaterial("object_material");
+    object_material = ResourceManager::Get().GetMaterial("phong_material");
     if (!object_material) {
-        object_material = ResourceManager::Get().CreateMaterial("object_material", "resources/shaders/01_Lighting/00_PhongLighting/object.vert", "resources/shaders/01_Lighting/00_PhongLighting/object.frag");
+        object_material = ResourceManager::Get().CreateMaterial("phong_material", "resources/shaders/01_Lighting/00_PhongLighting/object.vert", "resources/shaders/01_Lighting/00_PhongLighting/object.frag");
     }
 
     // light setup
@@ -136,7 +136,7 @@ void ScenePhongLight::OnRender()
     glm::vec3 cam_pos = cam.GetPosition();
 
     // geometry rendering
-    const glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetScreenWidth()) / static_cast<float>(AppState::Get().GetScreenHeight()), 0.1f, 100.0f);
+    const glm::mat4 projection = glm::perspective(glm::radians(cam.GetFov()), static_cast<float>(AppState::Get().GetViewport()->GetWidth()) / static_cast<float>(AppState::Get().GetViewport()->GetHeight()), 0.1f, 100.0f);
     auto model = glm::mat4(1.0f);
     glm::mat4 mvp_matrix = projection * cam.GetViewMatrix() * model;
 
